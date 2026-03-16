@@ -2,7 +2,7 @@
 # Connect this repo in Render Dashboard → New → Static Site (or use "New from Blueprint")
 services:
   - type: web
-    name: ai-dashboards
+    name: ai-kingston-dashboard
     runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
