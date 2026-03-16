@@ -1,0 +1,13 @@
+# Render Blueprint: static site (Vite + React)
+# Connect this repo in Render Dashboard → New → Static Site (or use "New from Blueprint")
+services:
+  - type: web
+    name: ai-dashboards
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      # SPA fallback: serve index.html for all paths so client-side routing works
+      - type: rewrite
+        source: /*
+        destination: /index.html
