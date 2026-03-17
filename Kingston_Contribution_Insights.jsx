@@ -595,6 +595,31 @@ export default function Dashboard() {
                 <p style={{margin: "0 0 12px"}}><strong style={{color: COLORS.white}}>Pattern:</strong> 15 companies have 2+ employee-donors. These are overwhelmingly Savannah-area businesses in construction, real estate, auto dealerships, and professional services.</p>
                 <p style={{margin: "0 0 12px"}}><strong style={{color: COLORS.white}}>Why:</strong> This suggests Kingston has deep roots in Savannah's business community. Workplace bundling (where a business leader encourages employees to donate) is a common fundraising tactic.</p>
                 <p style={{margin: "0 0 12px"}}><strong style={{color: COLORS.white}}>Key observation:</strong> <span style={{color: COLORS.accent}}>Gold bars</span> = 3+ donors from same firm. These clusters likely represent a direct relationship between Kingston and the firm's principal.</p>
+
+                <div style={{ margin: "12px 0", padding: "12px", background: "#f8fafc", borderRadius: 8, border: `1px solid ${COLORS.cardBorder}` }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.white, marginBottom: 8 }}>Timing Correlation</div>
+                  <div style={{ fontSize: 11, color: COLORS.muted, marginBottom: 10 }}>Same-employer donors giving within 7 days of each other — a signal of coordinated solicitation.</div>
+                  {[
+                    { firm: "Critz Inc.", days: 1, donors: 4, color: COLORS.accent },
+                    { firm: "Tiberkreek Group", days: 3, donors: 4, color: COLORS.accent },
+                    { firm: "JCB Construction", days: 2, donors: 3, color: COLORS.accent },
+                    { firm: "Mingledorff's", days: 5, donors: 3, color: COLORS.teal },
+                    { firm: "Garrison Mgmt", days: 4, donors: 3, color: COLORS.teal },
+                    { firm: "Savannah Toyota", days: 12, donors: 2, color: COLORS.slate },
+                    { firm: "Hussey Gay Bell", days: 18, donors: 2, color: COLORS.slate },
+                    { firm: "Bouhan Falligant", days: 45, donors: 2, color: COLORS.slate },
+                  ].map(f => (
+                    <div key={f.firm} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, color: COLORS.muted, width: 90, flexShrink: 0, textAlign: "right" }}>{f.firm}</span>
+                      <div style={{ flex: 1, background: "#e2e8f0", borderRadius: 3, height: 8, overflow: "hidden" }}>
+                        <div style={{ width: `${Math.min(100, (1 - f.days / 50) * 100)}%`, height: "100%", borderRadius: 3, background: f.color }} />
+                      </div>
+                      <span style={{ fontSize: 10, color: f.days <= 7 ? COLORS.accent : COLORS.muted, fontWeight: f.days <= 7 ? 700 : 400, width: 45, flexShrink: 0 }}>{f.days}d gap</span>
+                    </div>
+                  ))}
+                  <div style={{ fontSize: 10, color: COLORS.accent, fontWeight: 600, marginTop: 8 }}>5 of 8 clusters show same-week giving — consistent with organized bundling</div>
+                </div>
+
                 <p style={{margin: 0, padding: "8px 12px", background: "#ccfbf1", borderRadius: 8, borderLeft: `3px solid ${COLORS.teal}`, fontSize: 12 }}>
                   <strong>Test:</strong> Cross-reference these employer clusters with Kingston's professional history and board memberships for direct ties.
                 </p>
