@@ -136,6 +136,8 @@ const Card = ({ children, span = 1, title, subtitle }) => (
     display: "flex",
     flexDirection: "column",
     gap: 12,
+    minWidth: 0,
+    overflow: "hidden",
   }}>
     {title && (
       <div style={{ marginBottom: 4 }}>
@@ -172,6 +174,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const insightSections = [
+  { id: "summary", label: "KPI Summary" },
   { id: "amounts", label: "Amount Clustering" },
   { id: "household", label: "Household Bundling" },
   { id: "timeline", label: "Filing Timeline" },
@@ -183,7 +186,7 @@ const insightSections = [
 ];
 
 export default function Dashboard() {
-  const [active, setActive] = useState("amounts");
+  const [active, setActive] = useState("summary");
 
   return (
     <div style={{ minHeight: "100vh", background: COLORS.bg, color: COLORS.text, fontFamily: "'DM Sans', 'Segoe UI', sans-serif" }}>
@@ -206,7 +209,7 @@ export default function Dashboard() {
       <div className="dk-header" style={{ padding: "28px 32px 0", maxWidth: 1200, margin: "0 auto" }}>
         <div className="dk-title-row" style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 4 }}>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: COLORS.white, letterSpacing: "-0.03em" }}>
-            Friends of Jim Kingston
+            Jim Kingston Contributions
           </h1>
           <span style={{ fontSize: 12, color: COLORS.accent, fontWeight: 600, background: "#fef3c7", padding: "3px 10px", borderRadius: 20, marginBottom: 3 }}>
             FEC Contribution Analysis
@@ -216,43 +219,198 @@ export default function Dashboard() {
           820 itemized receipts · 534 unique contributors · $1.73M net · 2025–2026 Primary Runoff cycle
         </p>
 
-        {/* KPI Row */}
-        <div className="dk-kpi" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, margin: "20px 0 16px" }}>
-          {[
-            { l: "Gross Receipts", v: "$1.88M", c: COLORS.green },
-            { l: "Refunds", v: "-$158K", c: COLORS.rose },
-            { l: "Net Raised", v: "$1.73M", c: COLORS.accent },
-            { l: "Unique Donors", v: "534", c: COLORS.blue },
-            { l: "Avg. Contribution", v: "$2,449", c: COLORS.teal },
-          ].map(s => <Card key={s.l}><StatBadge label={s.l} value={s.v} color={s.c} /></Card>)}
-        </div>
-
         {/* Nav */}
-        <div className="dk-nav" style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 20 }}>
-          {insightSections.map(s => (
-            <button
-              key={s.id}
-              onClick={() => setActive(s.id)}
-              style={{
-                background: active === s.id ? COLORS.accent : "transparent",
-                color: active === s.id ? "#fff" : COLORS.muted,
-                border: `1px solid ${active === s.id ? COLORS.accent : COLORS.cardBorder}`,
-                borderRadius: 20,
-                padding: "6px 14px",
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
+        <div style={{ margin: "20px 0" }}>
+          <button
+            onClick={() => setActive("summary")}
+            className="dk-summary-btn"
+            style={{
+              display: "block",
+              width: "100%",
+              background: active === "summary" ? COLORS.accent : "transparent",
+              color: active === "summary" ? "#fff" : COLORS.muted,
+              border: `1px solid ${active === "summary" ? COLORS.accent : COLORS.cardBorder}`,
+              borderRadius: 20,
+              padding: "8px 14px",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.15s",
+              marginBottom: 8,
+              letterSpacing: "0.02em",
+            }}
+          >
+            KPI Summary
+          </button>
+          <div className="dk-nav" style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            {insightSections.filter(s => s.id !== "summary").map(s => (
+              <button
+                key={s.id}
+                onClick={() => setActive(s.id)}
+                style={{
+                  background: active === s.id ? COLORS.accent : "transparent",
+                  color: active === s.id ? "#fff" : COLORS.muted,
+                  border: `1px solid ${active === s.id ? COLORS.accent : COLORS.cardBorder}`,
+                  borderRadius: 20,
+                  padding: "6px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="dk-content" style={{ padding: "0 32px 40px", maxWidth: 1200, margin: "0 auto" }}>
+
+        {/* SUMMARY */}
+        {active === "summary" && (
+          <div className="dk-section" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            {/* Row 1, Col 1: Waterfall */}
+            <Card title="Fundraising Waterfall" subtitle="How gross receipts become net raised after refunds.">
+              <div style={{ textAlign: "center", padding: "8px 0 0" }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: COLORS.accent, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>$1.73M</div>
+                <div style={{ fontSize: 11, color: COLORS.muted }}>net raised</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={[
+                  { name: "Gross", value: 1880000 },
+                  { name: "Refunds", value: 158000 },
+                  { name: "Net", value: 1730000 },
+                ]} margin={{ top: 16, right: 10, bottom: 0, left: 10 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: COLORS.muted }} axisLine={false} tickLine={false} />
+                  <YAxis hide domain={[0, 2000000]} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="value" name="Amount" radius={[4, 4, 0, 0]} label={({ x, y, width, index }) => {
+                    const labels = ["$1.88M", "-$158K", "$1.73M"];
+                    return <text x={x + width / 2} y={y - 6} textAnchor="middle" fontSize={10} fontWeight={600} fill={COLORS.muted}>{labels[index]}</text>;
+                  }}>
+                    {[COLORS.green, COLORS.rose, COLORS.accent].map((c, i) => (
+                      <Cell key={i} fill={c} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* Row 1, Col 2: Savannah Dominance */}
+            <Card title="Savannah Dominance" subtitle="One city drives the campaign — Savannah alone accounts for nearly half of all contribution records.">
+              <div style={{ textAlign: "center", padding: "8px 0 0" }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: COLORS.green, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>44%</div>
+                <div style={{ fontSize: 11, color: COLORS.muted }}>of receipts from Savannah</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: "Savannah", value: 342 },
+                      { name: "Other GA", value: 290 },
+                      { name: "DC/VA", value: 61 },
+                      { name: "Other states", value: 127 },
+                    ]}
+                    cx="50%" cy="50%"
+                    innerRadius={40} outerRadius={60}
+                    dataKey="value"
+                    startAngle={90} endAngle={-270}
+                    paddingAngle={2}
+                    label={({ name, value }) => `${name}`}
+                  >
+                    <Cell fill={COLORS.accent} />
+                    <Cell fill={COLORS.green} />
+                    <Cell fill={COLORS.violet} />
+                    <Cell fill={COLORS.slate} />
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* Row 2, Col 1: Donor Engagement */}
+            <Card title="Donor Engagement" subtitle="534 unique donors filed 820 receipts — 35% are repeat contributors.">
+              <div style={{ textAlign: "center", padding: "8px 0 0" }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: COLORS.blue, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>534</div>
+                <div style={{ fontSize: 11, color: COLORS.muted }}>unique donors</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: "One-time donors", value: 348 },
+                      { name: "Repeat donors", value: 186 },
+                    ]}
+                    cx="50%" cy="50%"
+                    innerRadius={40} outerRadius={60}
+                    dataKey="value"
+                    startAngle={90} endAngle={-270}
+                    paddingAngle={3}
+                    label={({ value }) => value}
+                  >
+                    <Cell fill={COLORS.blue} />
+                    <Cell fill={COLORS.violet} />
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* Row 2, Col 2: Donor Concentration */}
+            <Card title="Donor Concentration" subtitle="How much of total fundraising comes from the biggest contributors.">
+              <div style={{ textAlign: "center", padding: "8px 0 0" }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: COLORS.violet, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>62%</div>
+                <div style={{ fontSize: 11, color: COLORS.muted }}>from top 50 donors</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <AreaChart data={[
+                  { pct: "Top 10", cumulative: 28 },
+                  { pct: "Top 20", cumulative: 41 },
+                  { pct: "Top 50", cumulative: 62 },
+                  { pct: "Top 100", cumulative: 78 },
+                  { pct: "All 534", cumulative: 100 },
+                ]} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
+                  <XAxis dataKey="pct" tick={{ fontSize: 9, fill: COLORS.muted }} axisLine={false} tickLine={false} />
+                  <YAxis hide domain={[0, 100]} />
+                  <Tooltip formatter={v => `${v}%`} />
+                  <Area type="monotone" dataKey="cumulative" name="% of Total $" stroke={COLORS.violet} fill={COLORS.violet} fillOpacity={0.15} strokeWidth={2}
+                    label={{ position: "top", fontSize: 10, fontWeight: 600, fill: COLORS.muted, formatter: v => `${v}%` }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* Row 2, Col 3: Household Leverage */}
+            <Card title="Household Leverage" subtitle="Spousal pairs effectively double giving — 15 homemaker-spouse pairs contribute at or near the combined max.">
+              <div style={{ textAlign: "center", padding: "8px 0 0" }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: COLORS.teal, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>$7K</div>
+                <div style={{ fontSize: 11, color: COLORS.muted }}>typical household pair</div>
+              </div>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={[
+                  { type: "Individual max", value: 3500 },
+                  { type: "Spousal pair", value: 7000 },
+                  { type: "Top household", value: 10500 },
+                ]} margin={{ top: 16, right: 10, bottom: 0, left: 10 }}>
+                  <XAxis dataKey="type" tick={{ fontSize: 9, fill: COLORS.muted }} axisLine={false} tickLine={false} />
+                  <YAxis hide domain={[0, 12000]} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="value" name="Amount" radius={[4, 4, 0, 0]} label={({ x, y, width, index }) => {
+                    const labels = ["$3.5K", "$7K", "$10.5K"];
+                    return <text x={x + width / 2} y={y - 6} textAnchor="middle" fontSize={10} fontWeight={600} fill={COLORS.muted}>{labels[index]}</text>;
+                  }}>
+                    <Cell fill={COLORS.slate} />
+                    <Cell fill={COLORS.teal} />
+                    <Cell fill={COLORS.accent} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </div>
+        )}
 
         {/* INSIGHT 1: AMOUNT CLUSTERING */}
         {active === "amounts" && (
@@ -292,10 +450,10 @@ export default function Dashboard() {
             <Card title="Spousal ʻMirror Contributionsʼ"
               subtitle="15 homemaker donors match a spouse at the same address — 81% of all homemaker last names overlap with other donors. This doubles effective household giving.">
               <ResponsiveContainer width="100%" height={340}>
-                <BarChart data={spousalData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 100 }}>
+                <BarChart data={spousalData} layout="vertical" margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: COLORS.muted }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-                  <YAxis dataKey="homemaker" type="category" tick={{ fontSize: 11, fill: COLORS.muted }} width={100} />
+                  <XAxis type="number" domain={[0, 45000]} tick={{ fontSize: 11, fill: COLORS.muted }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                  <YAxis dataKey="homemaker" type="category" tick={{ fontSize: 10, fill: COLORS.muted }} width={80} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="hmTotal" name="Homemaker" stackId="a" fill={COLORS.rose} radius={[0, 0, 0, 0]} />
                   <Bar dataKey="spTotal" name="Spouse" stackId="a" fill={COLORS.blue} radius={[0, 4, 4, 0]} />
@@ -419,10 +577,10 @@ export default function Dashboard() {
             <Card title="Employer-Linked Donor Clusters"
               subtitle="Multiple employees from the same company donating suggests workplace-organized fundraising or executive social networks. Critz Inc. leads with 4 donors and $51K.">
               <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={employerNetwork} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 120 }}>
+                <BarChart data={employerNetwork} layout="vertical" margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: COLORS.muted }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-                  <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: COLORS.muted }} width={120} />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: COLORS.muted }} width={90} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="total" name="Total $" fill={COLORS.teal} radius={[0, 4, 4, 0]}>
                     {employerNetwork.map((e, i) => (
