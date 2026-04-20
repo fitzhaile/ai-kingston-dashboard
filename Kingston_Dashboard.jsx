@@ -2214,6 +2214,8 @@ const TABS = [
 export default function Dashboard() {
   const [tab, setTab] = useState('overview');
   const contentRef = useRef(null);
+  const navRef = useRef(null);
+  const [navOverflow, setNavOverflow] = useState({ left: false, right: false });
 
   // Scroll back to top whenever the tab changes
   useEffect(() => {
@@ -2221,6 +2223,26 @@ export default function Dashboard() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [tab]);
+
+  // Detect nav overflow so we can show scroll affordances on mobile
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const update = () => {
+      const hasOverflow = el.scrollWidth > el.clientWidth + 1;
+      setNavOverflow({
+        left: el.scrollLeft > 2,
+        right: hasOverflow && el.scrollLeft + el.clientWidth < el.scrollWidth - 2,
+      });
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
 
   return (
     <div style={{ fontFamily: 'DM Sans, sans-serif', background: P.bg, color: P.ink, minHeight: '100vh' }}>
@@ -2248,18 +2270,40 @@ export default function Dashboard() {
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>May 19, 2026 · <span style={{ color: P.warning }}>{DAYS_TO_PRIMARY} days</span></div>
           </div>
         </div>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto' }}>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{
-              background: 'none', border: 'none',
-              borderBottom: tab === t.id ? `3px solid ${P.kingston}` : '3px solid transparent',
-              padding: '12px 16px', fontFamily: 'DM Sans', fontSize: 13,
-              fontWeight: tab === t.id ? 700 : 500,
-              color: tab === t.id ? P.kingston : P.muted,
-              cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap',
-              transition: 'color 0.15s',
-            }}>{t.label}</button>
-          ))}
+        <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
+          <div ref={navRef} style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            {TABS.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{
+                background: 'none', border: 'none',
+                borderBottom: tab === t.id ? `3px solid ${P.kingston}` : '3px solid transparent',
+                padding: '12px 16px', fontFamily: 'DM Sans', fontSize: 13,
+                fontWeight: tab === t.id ? 700 : 500,
+                color: tab === t.id ? P.kingston : P.muted,
+                cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap',
+                transition: 'color 0.15s',
+              }}>{t.label}</button>
+            ))}
+          </div>
+          <div aria-hidden="true" style={{
+            position: 'absolute', top: 0, right: 0, bottom: 0, width: 44,
+            pointerEvents: 'none',
+            background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 65%)`,
+            opacity: navOverflow.right ? 1 : 0,
+            transition: 'opacity 0.2s',
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+            paddingRight: 10, paddingBottom: 3,
+            color: P.kingston, fontSize: 20, fontWeight: 700, lineHeight: 1,
+          }}>›</div>
+          <div aria-hidden="true" style={{
+            position: 'absolute', top: 0, left: 0, bottom: 0, width: 44,
+            pointerEvents: 'none',
+            background: `linear-gradient(to left, rgba(255,255,255,0), ${P.paper} 65%)`,
+            opacity: navOverflow.left ? 1 : 0,
+            transition: 'opacity 0.2s',
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+            paddingLeft: 10, paddingBottom: 3,
+            color: P.kingston, fontSize: 20, fontWeight: 700, lineHeight: 1,
+          }}>‹</div>
         </div>
       </div>
 
