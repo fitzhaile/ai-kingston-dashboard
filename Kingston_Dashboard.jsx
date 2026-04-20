@@ -1704,65 +1704,6 @@ const TabInsights = () => {
 };
 
 /* ============================================================
-   TAB 7: PLAYBOOK
-   ============================================================ */
-const TabPlaybook = () => {
-  const items = [
-    { pri: '01', tag: 'URGENT',        tone: 'danger',  head: 'Ride the Trump-endorsement wave — this week.',
-      body: 'The endorsement bump has a short half-life. Send a full-file email within 48 hours with a specific "President Trump is counting on us" ask. Expect this single send to outperform any other of the cycle. Follow up Thursday (your highest-converting day) with a list of conservative media hits.' },
-    { pri: '02', tag: 'REVENUE',       tone: 'navy',    head: 'Work the $751K of unused primary capacity.',
-      body: 'Of 485 primary donors, 304 have not hit the $3,500 cap. The 170 mid-tier donors ($1K–$2.4K) alone can legally add nearly $400K if converted. Call-time for the top half of this list is the single highest-ROI finance activity possible in the next two weeks.' },
-    { pri: '03', tag: 'REVENUE',       tone: 'navy',    head: 'Convert 181 primary max-outs to general-election commitments.',
-      body: 'These donors cannot give another primary dollar, but 107 have not maxed the general. Opening the general ask this week potentially adds ~$374K and builds a deterrent war chest that makes November look unwinnable for any Democrat.' },
-    { pri: '04', tag: 'STRATEGY',      tone: 'warning', head: 'Engineer a 50%+1 finish. Do not hope for it.',
-      body: 'Every dollar spent on mail, field, and TV that moves the margin above 50% on May 19 saves the $333K sitting in your runoff account and prevents a six-week dogfight with whoever places second. With Montgomery on 2-month runway and Farrell tapped out on self-funding, a dominant win is reachable — but only if you spend now.' },
-    { pri: '05', tag: 'COALITION',     tone: 'navy',    head: 'Fix the retiree gap. Montgomery owns it right now.',
-      body: 'Kingston: 7% retiree donors. Montgomery: 41%. In a GOP primary where retirees vote 2-3x the rate of younger voters, this is the one dimension where Montgomery\'s coalition is actually stronger than yours. Secure 2-3 veteran endorsements (Fort Stewart alums, VFW post leaders) and run targeted mail in 31313 (Hinesville/Fort Stewart), 31547 (Kingsland), 31411 (Skidaway retirees).' },
-    { pri: '06', tag: 'RELATIONSHIPS', tone: 'default', head: 'Thank the 10 bundler firms personally, this week.',
-      body: 'Critz Inc., Colonial Group, McManamy Jackson Hollis, Sterling Seacrest, Pintail, J.C. Lewis, Howard Barker Lane, Sea Raven Media, First Capital City, Tiber Creek. Host a private candidate breakfast with the 10 key organizers. Hand-written notes same day. These are November surrogates.' },
-    { pri: '07', tag: 'RELATIONSHIPS', tone: 'default', head: 'Call Abbott and Miller personally.',
-      body: 'Logan Abbott (Savannah 31406) and Martin Miller (Skidaway 31416) both gave Farrell more than they gave you ($3,500 and $3,300 respectively). With Trump\'s endorsement in hand, a candidate call this week — "we need you on board before May 19" — converts almost certainly.' },
-    { pri: '08', tag: 'GEOGRAPHY',     tone: 'warning', head: 'Win back 31416 Skidaway Island.',
-      body: 'Your only underperforming Savannah ZIP (52% share). Farrell lives here. Host one meet-and-greet on Skidaway before May 19, ideally co-hosted by a respected Skidaway resident already maxed to Kingston. A retiree-focused event pairs well with Priority 05.' },
-    { pri: '09', tag: 'REVENUE',       tone: 'navy',    head: 'Run one Atlanta event before May 19.',
-      body: 'ZIPs 30327 and 30305 (Buckhead) gave you $53,200 with zero dollars to either opponent — a donor network outside the district that no rival has touched. A single evening reception in Buckhead can plausibly add $50K+ given the density of maxable donors.' },
-    { pri: '10', tag: 'UPSIDE',        tone: 'default', head: 'Run a national small-dollar ActBlue / WinRed push.',
-      body: 'Your small-dollar rate is 1% — essentially zero. Post-Trump-endorsement, a one-week national email blast to conservative small-dollar lists (WinRed, NRCC Patriot Program, etc.) could plausibly add $50-150K in unitemized. The operation hasn\'t been running this; turning it on for three weeks is free money.' },
-    { pri: '11', tag: 'DEFENSE',       tone: 'default', head: 'Prep the "legacy candidate" response file.',
-      body: 'Opponents\' clearest attack is that you\'re riding your father\'s name. The response is 485 individual donors, 10 bundler firms, 74 ultra-loyalists, and the Trump endorsement — an earned, current machine. Have the talking points, endorsements, and earned-media reel pre-loaded before they land.' },
-  ];
-
-  return (
-    <div>
-      <SectionH eyebrow="Action" title="The 29-day playbook" kicker="Eleven priorities, ordered by impact × urgency. Execute the top three before the end of this week."/>
-      <div style={{ display: 'grid', gap: 10 }}>
-        {items.map(item => (
-          <Card key={item.pri} tone={item.tone === 'danger' ? 'danger' : item.tone === 'warning' ? 'warning' : null} style={{
-            padding: 0,
-            borderLeft: `5px solid ${
-              item.tone === 'danger' ? P.danger :
-              item.tone === 'warning' ? P.warning :
-              item.tone === 'navy' ? P.kingston : P.kingstonLight
-            }`,
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 120px', gap: 18, padding: '16px 22px', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 300, color: P.kingstonAccent, lineHeight: 1, fontStyle: 'italic' }}>{item.pri}</div>
-              <div>
-                <h4 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, color: P.kingston, margin: 0, lineHeight: 1.3 }}>{item.head}</h4>
-                <p style={{ fontFamily: 'DM Sans', fontSize: 13, color: P.ink, lineHeight: 1.6, marginTop: 6, marginBottom: 0 }}>{item.body}</p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <Tag tone={item.tone === 'danger' ? 'danger' : item.tone === 'warning' ? 'warning' : item.tone === 'navy' ? 'navy' : 'default'}>{item.tag}</Tag>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* ============================================================
    TAB 7: MODELS (uses only official government data)
    ============================================================ */
 const TabModels = () => {
@@ -2209,7 +2150,6 @@ const TABS = [
   { id: 'opponents', label: 'Opponents' },
   { id: 'insights',  label: 'Hidden Edges' },
   { id: 'models',    label: 'Models' },
-  { id: 'playbook',  label: 'Playbook' },
 ];
 
 export default function Dashboard() {
@@ -2252,6 +2192,10 @@ export default function Dashboard() {
       <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
       <style>{`
         .dk-root { max-width: 100vw; overflow-x: hidden; }
+        /* Restore list bullets that Tailwind's preflight strips */
+        .dk-root ul { list-style: disc outside; }
+        .dk-root ol { list-style: decimal outside; }
+        .dk-root li { margin-bottom: 4px; }
         @media (max-width: 768px) {
           /* Tighten outer container padding */
           .dk-root [style*="padding: 28px 32px"] { padding: 20px 14px !important; }
@@ -2360,7 +2304,6 @@ export default function Dashboard() {
         {tab === 'opponents' && <TabOpponents/>}
         {tab === 'insights'  && <TabInsights/>}
         {tab === 'models'    && <TabModels/>}
-        {tab === 'playbook'  && <TabPlaybook/>}
       </div>
 
       {/* Footer */}
