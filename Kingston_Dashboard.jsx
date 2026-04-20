@@ -289,6 +289,7 @@ const WhyMatters = ({ children, tone = 'gold' }) => {
       padding: '13px 16px',
       borderRadius: 8,
       marginTop: 14,
+      marginBottom: 16,
       borderLeft: `4px solid ${colors[tone]}`,
       lineHeight: 1.6,
     }}>
@@ -2245,10 +2246,53 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div style={{ fontFamily: 'DM Sans, sans-serif', background: P.bg, color: P.ink, minHeight: '100vh' }}>
+    <div className="dk-root" style={{ fontFamily: 'DM Sans, sans-serif', background: P.bg, color: P.ink, minHeight: '100vh' }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <style>{`
+        .dk-root { max-width: 100vw; overflow-x: hidden; }
+        @media (max-width: 768px) {
+          /* Tighten outer container padding */
+          .dk-root [style*="padding: 28px 32px"] { padding: 20px 14px !important; }
+          .dk-root [style*="padding: 16px 32px"] { padding: 14px 14px !important; }
+          .dk-root [style*="padding: 0 32px"] { padding-left: 14px !important; padding-right: 14px !important; }
+
+          /* Masthead: let the two halves stack/wrap if needed */
+          .dk-root [style*="justify-content: space-between"][style*="align-items: center"] {
+            flex-wrap: wrap; gap: 10px;
+          }
+
+          /* Collapse all multi-column grids to single column */
+          .dk-root [style*="grid-template-columns: repeat(2"],
+          .dk-root [style*="grid-template-columns:repeat(2"],
+          .dk-root [style*="grid-template-columns: repeat(3"],
+          .dk-root [style*="grid-template-columns:repeat(3"],
+          .dk-root [style*="grid-template-columns: repeat(4"],
+          .dk-root [style*="grid-template-columns:repeat(4"],
+          .dk-root [style*="grid-template-columns: repeat(5"],
+          .dk-root [style*="grid-template-columns:repeat(5"],
+          .dk-root [style*="grid-template-columns: 1fr 1fr"],
+          .dk-root [style*="grid-template-columns:1fr 1fr"],
+          .dk-root [style*="grid-template-columns: 1.1fr 1fr"],
+          .dk-root [style*="grid-template-columns:1.1fr 1fr"],
+          .dk-root [style*="grid-template-columns: 1.2fr 1fr"],
+          .dk-root [style*="grid-template-columns:1.2fr 1fr"],
+          .dk-root [style*="grid-template-columns: 1.3fr 1fr"],
+          .dk-root [style*="grid-template-columns:1.3fr 1fr"],
+          .dk-root [style*="grid-template-columns: 1.4fr 1fr"],
+          .dk-root [style*="grid-template-columns:1.4fr 1fr"],
+          .dk-root [style*="grid-template-columns: 1fr 1.2fr"],
+          .dk-root [style*="grid-template-columns:1fr 1.2fr"],
+          .dk-root [style*="grid-template-columns: 70px 1fr 120px"],
+          .dk-root [style*="grid-template-columns:70px 1fr 120px"] {
+            grid-template-columns: 1fr !important;
+          }
+
+          /* Charts and images never exceed their container */
+          .dk-root svg, .dk-root img { max-width: 100%; }
+        }
+      `}</style>
 
       {/* Masthead */}
       <div style={{ background: P.paper, borderBottom: `1px solid ${P.line}`, position: 'sticky', top: 0, zIndex: 10 }}>
