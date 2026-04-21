@@ -144,54 +144,54 @@ const Q = {
 // === DOUBLE-MAX CLUB (gave Kingston $7,000+) ===
 // 74 total — top 15 shown
 const DOUBLE_MAX = [
-  { name: 'Dale C. Critz Jr.',      city: 'Savannah',       occ: 'President (auto dealership)',   amount: 24500 },
-  { name: 'Christian B. Demere',    city: 'Savannah',       occ: 'President & CEO (Colonial Group)', amount: 24500 },
-  { name: 'TJ Hollis',              city: 'Savannah',       occ: 'Attorney',                      amount: 24500 },
-  { name: 'William S. Dorsey III',  city: 'Savannah',       occ: 'Retired',                       amount: 21000 },
-  { name: 'James A. Pattiz',        city: 'Peachtree City', occ: 'Filmmaker',                     amount: 14000 },
-  { name: 'John Skeadas III',       city: 'Savannah',       occ: 'Investment Manager',            amount: 14000 },
-  { name: 'William Pattiz',         city: 'New York, NY',   occ: 'Filmmaker',                     amount: 14000 },
-  { name: 'Jesse Bentley',          city: 'Savannah',       occ: 'Agriculture',                   amount: 10500 },
-  { name: 'Ames McGill Barnett',    city: 'Watkinsville',   occ: 'President/Owner',               amount: 10500 },
-  { name: 'Evan Charles Barker',    city: 'Savannah',       occ: 'Attorney',                      amount: 10500 },
-  { name: 'Ben J. Tarbutton III',   city: 'Sandersville',   occ: 'President',                     amount: 10500 },
-  { name: 'Lauren E. Tait',         city: 'Savannah',       occ: 'Homemaker',                     amount: 10500 },
-  { name: 'Don L. Waters',          city: 'Savannah',       occ: 'Business Owner',                amount: 10500 },
-  { name: 'Trey Myers',             city: 'Savannah',       occ: 'Entrepreneur',                  amount: 10500 },
-  { name: 'Alton Brown Jr.',        city: 'Savannah',       occ: 'Environmental Consultant',      amount: 10500 },
+  { name: 'Dale C. Critz Jr.',      city: 'Savannah',       occ: 'President (Critz auto dealership)',    amount: 24500 },
+  { name: 'TJ Hollis',              city: 'Savannah',       occ: 'Attorney (McManamy Jackson Hollis)',   amount: 24500 },
+  { name: 'Christian B. Demere',    city: 'Savannah',       occ: 'President & CEO (Colonial Group)',     amount: 24500 },
+  { name: 'William S. Dorsey III',  city: 'Savannah',       occ: 'Retired',                              amount: 21000 },
+  { name: 'William Pattiz',         city: 'New York, NY',   occ: 'Filmmaker (Sea Raven Media)',          amount: 14000 },
+  { name: 'James A. Pattiz',        city: 'Peachtree City', occ: 'Filmmaker (Sea Raven)',                amount: 14000 },
+  { name: 'John Skeadas III',       city: 'Savannah',       occ: 'Investment Manager (First Capital City)', amount: 14000 },
+  { name: 'Olivia Molando',         city: 'Atlanta',        occ: 'Executive (Capital Development Partners)', amount: 10500 },
+  { name: 'John Knox Porter Jr.',   city: 'Atlanta',        occ: 'CEO (Capital Development Partners)',   amount: 10500 },
+  { name: 'Don L. Waters',          city: 'Savannah',       occ: 'Business Owner',                       amount: 10500 },
+  { name: 'Byron L. Smith',         city: 'Richmond Hill',  occ: 'Owner (Smith Family Homes)',           amount: 10500 },
+  { name: 'Teresa Hufstetler',      city: 'Thomasville',    occ: 'Homemaker',                            amount: 10500 },
+  { name: 'Steve Hufstetler',       city: 'Thomasville',    occ: 'Real Estate Developer (Teramore)',     amount: 10500 },
+  { name: 'F. Reed Dulany III',     city: 'Savannah',       occ: 'Chairman/CEO (Dulany Industries)',     amount: 10500 },
+  { name: 'Marvin Daniel',          city: 'Richmond Hill',  occ: 'Founder/Chairman (Daniel Defense)',    amount: 10500 },
 ];
 
 const BUNDLERS = [
-  { firm: 'Critz Inc.',                  n: 8, total: 25000 },
-  { firm: 'Colonial Group Inc.',         n: 6, total: 19500 },
-  { firm: 'McManamy Jackson Hollis',     n: 7, total: 17500 },
-  { firm: 'Sterling Seacrest Pritchard', n: 5, total: 14500 },
-  { firm: 'Pintail Site Preparation',    n: 7, total: 11500 },
-  { firm: 'First Capital City Mgmt',     n: 4, total: 10750 },
-  { firm: 'J.C. Lewis Motor Co.',        n: 3, total: 10500 },
-  { firm: 'Howard Barker Lane P.C.',     n: 3, total: 10500 },
-  { firm: 'Sea Raven Media LLC',         n: 3, total: 10500 },
+  { firm: 'Critz Inc.',                  n: 4, total: 51000 },
+  { firm: 'Pintail Site Preparation',    n: 4, total: 37500 },
+  { firm: "Mingledorff's Inc.",          n: 3, total: 32500 },
+  { firm: 'Sterling Seacrest Pritchard', n: 3, total: 19500 },
+  { firm: 'Oliver Maner LLP',            n: 5, total: 10500 },
   { firm: 'Tiber Creek Group',           n: 9, total: 8750  },
+  { firm: 'Weiner Shearouse Weitz Greenberg & Shawe', n: 4, total: 7500 },
+  { firm: 'Osteen Law Group',            n: 3, total: 3500 },
 ];
 
 const SHARED = [
+  { name: 'Ben B. Wall',       city: 'Savannah 31410',   Kingston: 8500, Montgomery: 0,    Farrell: 2500, tone: 'hot' },
   { name: 'Logan R. Abbott',   city: 'Savannah 31406',   Kingston: 500,  Montgomery: 0,    Farrell: 3500, tone: 'hot' },
   { name: 'Martin J. Miller',  city: 'Savannah 31416',   Kingston: 2000, Montgomery: 0,    Farrell: 3300, tone: 'hot' },
-  { name: 'Byron L. Smith',    city: 'Richmond Hill',    Kingston: 0,    Montgomery: 1000, Farrell: 1000, tone: 'warm' },
-  { name: 'Mills Fleming',     city: 'Savannah 31401',   Kingston: 500,  Montgomery: 521,  Farrell: 0,    tone: 'warm' },
+  { name: 'Ryan Schneider',    city: 'Savannah 31406',   Kingston: 1000, Montgomery: 0,    Farrell: 500,  tone: 'warm' },
+  { name: 'Byron L Smith',     city: 'Richmond Hill',    Kingston: 0,    Montgomery: 1000, Farrell: 1000, tone: 'warm' },
+  { name: 'Mills Fleming',     city: 'Savannah 31401',   Kingston: 500,  Montgomery: 520,  Farrell: 0,    tone: 'warm' },
   { name: 'Yong Choe',         city: 'Washington DC',    Kingston: 500,  Montgomery: 0,    Farrell: 500,  tone: 'low' },
   { name: 'Freda M. Smith',    city: 'Savannah 31401',   Kingston: 500,  Montgomery: 0,    Farrell: 500,  tone: 'low' },
 ];
 
 // === DONOR ACQUISITION VELOCITY ===
 const DONOR_VELOCITY = [
-  { month: 'Jun', Kingston: 187, Montgomery: 0,  Farrell: 23 },
-  { month: 'Jul', Kingston: 35,  Montgomery: 0,  Farrell: 6  },
-  { month: 'Aug', Kingston: 50,  Montgomery: 45, Farrell: 8  },
-  { month: 'Sep', Kingston: 79,  Montgomery: 30, Farrell: 36 },
-  { month: 'Oct', Kingston: 41,  Montgomery: 15, Farrell: 8  },
-  { month: 'Nov', Kingston: 33,  Montgomery: 2,  Farrell: 4  },
-  { month: 'Dec', Kingston: 60,  Montgomery: 12, Farrell: 3  },
+  { month: 'Jun', Kingston: 187, Montgomery: 0,  Farrell: 24 },
+  { month: 'Jul', Kingston: 35,  Montgomery: 0,  Farrell: 5  },
+  { month: 'Aug', Kingston: 50,  Montgomery: 32, Farrell: 6  },
+  { month: 'Sep', Kingston: 79,  Montgomery: 38, Farrell: 35 },
+  { month: 'Oct', Kingston: 41,  Montgomery: 7,  Farrell: 11 },
+  { month: 'Nov', Kingston: 33,  Montgomery: 4,  Farrell: 2  },
+  { month: 'Dec', Kingston: 60,  Montgomery: 23, Farrell: 5  },
 ];
 
 // === TIMELINE EVENTS ===
@@ -1640,10 +1640,10 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="08" tone="default" title="10 bundler firms organized $138K in stacked giving"
-          stat={{ value: '$138K', label: 'from 10 firms' }}>
+        <Insight n="08" tone="default" title="8 bundler firms organized $171K in stacked giving"
+          stat={{ value: '$171K', label: 'from 8 firms' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            When 3+ employees of one firm donate within days of each other, someone inside organized it. That person is a <strong>de facto bundler</strong> — your most valuable volunteer asset. Here are the ten firms that did it.
+            When 3+ employees of one firm donate within days of each other, someone inside organized it. That person is a <strong>de facto bundler</strong> — your most valuable volunteer asset. Here are the eight firms that did it.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {BUNDLERS.map(b => (
@@ -1657,7 +1657,7 @@ const TabInsights = () => {
             ))}
           </div>
           <p style={{ fontSize: 12, color: P.muted, marginTop: 10, fontStyle: 'italic', marginBottom: 0 }}>
-            Host a private candidate breakfast with all 10 bundler-organizers before May 19. These are lifetime relationships that pay off for years.
+            Host a private candidate breakfast with all 8 bundler-organizers before May 19. These are lifetime relationships that pay off for years.
           </p>
         </Insight>
 
@@ -1732,7 +1732,7 @@ const TabInsights = () => {
         <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up for you"
           stat={{ value: '$793K', label: 'from father\'s network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: 0, color: P.ink }}>
-            Your top 15 donors include Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, John Skeadas III, Evan Barker — names that map directly onto Jack Kingston's 30-year donor and business network in Savannah. That's an inheritance most candidates can't replicate. The opponents' attack that Kingston is "his father's candidate" is true — and the list is the reason it doesn't matter: 485 donors, 74 of them ultra-loyalists, 10 bundler firms, $1.3M cash. That's not a legacy; that's a <em>machine</em>.
+            Your top 15 donors include Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, John Skeadas III, F. Reed Dulany III — names that map directly onto Jack Kingston's 30-year donor and business network in Savannah. That's an inheritance most candidates can't replicate. The opponents' attack that Kingston is "his father's candidate" is true — and the list is the reason it doesn't matter: 485 donors, 74 of them ultra-loyalists, 8 bundler firms, $1.3M cash. That's not a legacy; that's a <em>machine</em>.
           </p>
         </Insight>
 
