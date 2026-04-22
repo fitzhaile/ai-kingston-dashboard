@@ -121,11 +121,11 @@ const TOP_ZIPS = [
 ];
 
 const INCOME_TIER = [
-  { tier: 'High ($125K+)',        Kingston: 18.0, Montgomery: 27.9, Farrell: 20.2 },
-  { tier: 'Upper-Mid ($75–124K)', Kingston: 17.1, Montgomery: 16.5, Farrell: 21.4 },
-  { tier: 'Middle ($50–74K)',     Kingston: 26.7, Montgomery: 7.9,  Farrell: 46.5 },
-  { tier: 'Low (<$50K)',          Kingston: 7.9,  Montgomery: 10.4, Farrell: 1.1  },
-  { tier: 'Out-of-area',          Kingston: 30.3, Montgomery: 37.3, Farrell: 10.8 },
+  { tier: 'High ($125K+)',        Kingston: 4.3,  Montgomery: 0.1,  Farrell: 0.0  },
+  { tier: 'Upper-Mid ($75–124K)', Kingston: 39.2, Montgomery: 43.9, Farrell: 32.5 },
+  { tier: 'Middle ($50–74K)',     Kingston: 36.5, Montgomery: 18.0, Farrell: 62.4 },
+  { tier: 'Low (<$50K)',          Kingston: 7.6,  Montgomery: 3.7,  Farrell: 2.1  },
+  { tier: 'Out-of-state',         Kingston: 12.5, Montgomery: 34.3, Farrell: 3.1  },
 ];
 
 const GEO = {
