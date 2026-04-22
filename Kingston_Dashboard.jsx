@@ -2295,6 +2295,9 @@ export default function Dashboard() {
 
           /* Charts and images never exceed their container */
           .dk-root svg, .dk-root img { max-width: 100%; }
+
+          /* Bigger nav tabs on mobile — easier to read and a larger tap/scroll target */
+          .dk-root .dk-nav button { font-size: 15px !important; padding: 14px 18px !important; }
         }
       `}</style>
 
@@ -2319,7 +2322,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
-          <div ref={navRef} style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div ref={navRef} className="dk-nav" style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 background: 'none', border: 'none',
