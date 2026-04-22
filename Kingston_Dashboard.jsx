@@ -2190,11 +2190,33 @@ const TABS = [
   { id: 'models',    label: 'Models' },
 ];
 
+const TAB_IDS = new Set(TABS.map(t => t.id));
+const readTabFromHash = () => {
+  if (typeof window === 'undefined') return 'overview';
+  const h = window.location.hash.replace(/^#/, '');
+  return TAB_IDS.has(h) ? h : 'overview';
+};
+
 export default function Dashboard() {
-  const [tab, setTab] = useState('overview');
+  const [tab, setTabState] = useState(readTabFromHash);
   const contentRef = useRef(null);
   const navRef = useRef(null);
   const [navOverflow, setNavOverflow] = useState({ left: false, right: false });
+
+  const setTab = (id) => {
+    if (window.location.hash !== '#' + id) {
+      window.location.hash = id;
+    } else {
+      setTabState(id);
+    }
+  };
+
+  // Keep state in sync with the URL hash (handles back/forward + external links)
+  useEffect(() => {
+    const sync = () => setTabState(readTabFromHash());
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, []);
 
   // Scroll back to top whenever the tab changes
   useEffect(() => {
