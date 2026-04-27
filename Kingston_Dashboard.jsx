@@ -1588,21 +1588,13 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 12, marginBottom: 0 }}>
-            These are your November surrogates. A private candidate dinner with all 74 — before May 19 — is a high-leverage use of the candidate's time.
-          </p>
         </Insight>
 
         <Insight n="02" tone="hot" title="The partial-triple cohort — $63K of unasked runoff capacity"
           stat={{ value: '18', label: 'donors one check short of max' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Of the 74 ultra-loyalists who've given $7,000+, <strong>56 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 18 stopped at roughly $7,000 — primary + general, no runoff deposit. That's <strong>$63,000 in legal runoff capacity from a named list of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling. Nobody on the finance team is asking for that third check.
+            Of the 74 ultra-loyalists who've given $7,000+, <strong>56 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 18 stopped at roughly $7,000 — primary + general, no runoff deposit. That's <strong>$63,000 in legal runoff capacity from a named list of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
           </p>
-          <div style={{ padding: 14, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.danger}` }}>
-            <div style={{ fontSize: 12, color: P.ink, lineHeight: 1.6 }}>
-              <strong style={{ color: P.danger }}>The easiest ask in the file.</strong> Pull the list of 18, sort by giving date, and route them to call-time this week. Even a 50% conversion is ~$32K of runoff dollars from donors who've already said yes twice.
-            </div>
-          </div>
         </Insight>
 
         <Insight n="03" tone="warm" title="The Atlanta Moat — $106K from ZIPs no opponent touches"
@@ -1619,7 +1611,6 @@ const TabInsights = () => {
               <Bar dataKey="other" stackId="a" fill={P.mutedLight} name="All opponents"/>
             </BarChart>
           </ResponsiveContainer>
-          <p style={{ fontSize: 12, color: P.muted, marginTop: 8, marginBottom: 0 }}>One Buckhead reception before May 19 almost certainly adds $50K+ given the density of untapped max-out donors.</p>
         </Insight>
 
         <Insight n="04" tone="gold" title="The defense-industry signature — gun-makers picked a side"
@@ -1637,22 +1628,18 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 12, marginBottom: 0 }}>
-            These are earned-media surrogates. A single Daniel Defense quote in a conservative trade publication carries in a MAGA primary the way a major-newspaper endorsement never does.
-          </p>
         </Insight>
 
         <Insight n="05" tone="warm" title="Six hedger donors — two are actively gettable"
           stat={{ value: '6', label: 'gave to multiple candidates' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Six people gave money to two or more candidates in this race. They are not loyal — they are hedging. Two of them gave Farrell materially more than they gave Kingston. A candidate phone call this week, post-Trump-endorsement, converts them almost certainly.
+            Six people gave money to two or more candidates in this race. They are not loyal — they are hedging. Two of them gave Farrell materially more than they gave Kingston.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {SHARED.map(s => (
               <div key={s.name} style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${s.tone === 'hot' ? P.danger : s.tone === 'warm' ? P.warning : P.mutedLight}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{s.name}</div>
-                  {s.tone === 'hot' && <Tag tone="danger">CALL TODAY</Tag>}
                 </div>
                 <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>{s.city}</div>
                 <div style={{ fontSize: 11, marginTop: 6, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -1682,9 +1669,6 @@ const TabInsights = () => {
               <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>39 below cap · ~$98K of headroom</div>
             </div>
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 0, marginBottom: 0 }}>
-            A second-pass call sheet targeting the 39 women below their primary cap is the single-highest-conversion-rate move available — they've already agreed to write bigger-than-average checks.
-          </p>
         </Insight>
 
         <Insight n="07" tone="warm" title="The retiree gap — Kingston's biggest coalition vulnerability"
@@ -1706,9 +1690,6 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 10, marginBottom: 0 }}>
-            Fix: Fort Stewart and VFW endorsements. A targeted mail drop in 31313 (Hinesville), 31547 (Kingsland), and 31411 (Skidaway retirees).
-          </p>
         </Insight>
 
         <Insight n="08" tone="default" title="Montgomery is burning down to zero — before primary day"
@@ -1716,9 +1697,6 @@ const TabInsights = () => {
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Montgomery has $45,445 cash on hand and burns roughly $23K/month. At that pace, he runs out of money in about 60 days — roughly one week <em>before</em> primary day. He'll likely have to go quiet on paid media in the first week of May unless he raises a surprising amount in April.
           </p>
-          <div style={{ padding: 14, background: P.bg, borderRadius: 8, fontSize: 13, color: P.ink }}>
-            <strong style={{ color: P.kingston }}>Strategic implication:</strong> Don't pick a fight with Montgomery. Let him run out. Spend air on Farrell contrast and Kingston positive.
-          </div>
         </Insight>
 
         <Insight n="09" tone="default" title="8 bundler firms organized $171K in stacked giving"
@@ -1737,25 +1715,19 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, marginTop: 10, fontStyle: 'italic', marginBottom: 0 }}>
-            Host a private candidate breakfast with all 8 bundler-organizers before May 19. These are lifetime relationships that pay off for years.
-          </p>
         </Insight>
 
         <Insight n="10" tone="default" title="The small-dollar desert — and what it means"
           stat={{ value: '1.0%', label: 'Kingston unitemized' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Only <strong>1% of Kingston's individual money is unitemized</strong> (donations under $200). A typical grassroots-email campaign runs 15-30% small-dollar. This is a pure call-time operation — which means the numbers are strong <em>and</em> there's an upside play nobody's running.
+            Only <strong>1% of Kingston's individual money is unitemized</strong> (donations under $200). A typical grassroots-email campaign runs 15-30% small-dollar. This is a pure call-time operation.
           </p>
-          <div style={{ padding: 14, background: P.bg, borderRadius: 8, fontSize: 13, color: P.ink, lineHeight: 1.5 }}>
-            <strong style={{ color: P.kingston }}>The latent opportunity:</strong> With Trump endorsing Kingston on a major MAGA platform, a one-week national email blast to conservative small-dollar lists could plausibly add <strong>$50-150K</strong> in unitemized. It's free money the current operation isn't pursuing.
-          </div>
         </Insight>
 
         <Insight n="11" tone="warm" title="The compliance overhang — 7 donors currently show over the per-cycle cap"
           stat={{ value: '7', label: 'individuals above $10,500' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Seven individuals currently show net receipts above the FEC's <strong>$10,500 per-individual per-cycle cap</strong>. These are almost certainly joint household checks that haven't been fully reattributed to spouses yet — each has a matching spouse in the household at $10,500 net, which is consistent with the campaign's compliance team having flagged but not yet fully processed the splits. Finish the reattributions before the next FEC filing and the audit/opposition-research surface area evaporates.
+            Seven individuals currently show net receipts above the FEC's <strong>$10,500 per-individual per-cycle cap</strong>. These are almost certainly joint household checks that haven't been fully reattributed to spouses yet — each has a matching spouse in the household at $10,500 net, which is consistent with the campaign's compliance team having flagged but not yet fully processed the splits.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 10 }}>
             {overCap.map(d => (
@@ -1765,9 +1737,6 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 0, marginBottom: 0 }}>
-            Technical, not political — but a clean file is a smaller attack surface. A single phone call to the compliance team this week closes it.
-          </p>
         </Insight>
 
         <Insight n="12" tone="gold" title="30 households doubled up — a rare depth signal"
@@ -1797,9 +1766,6 @@ const TabInsights = () => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12, color: P.muted, fontStyle: 'italic', marginTop: 0, marginBottom: 0 }}>
-            Invite both spouses to the candidate dinner — household-level buy-in is surrogate-grade. These 30 addresses are the strongest relationships in the file.
-          </p>
         </Insight>
 
         <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up for you"
