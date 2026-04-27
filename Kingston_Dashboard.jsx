@@ -1595,6 +1595,21 @@ const TabInsights = () => {
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Of the 74 ultra-loyalists who've given $7,000+, <strong>56 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 18 stopped at roughly $7,000 — primary + general, no runoff deposit. That's <strong>$63,000 in legal runoff capacity from a named list of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
           </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
+            <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
+              <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Triple-maxed</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.kingston, marginTop: 2 }}>56 donors · $588K</div>
+              <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>$3,500 primary + $3,500 general + $3,500 runoff</div>
+            </div>
+            <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.danger}` }}>
+              <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Partial-triple</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.danger, marginTop: 2 }}>18 donors · $126K</div>
+              <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>Primary + general only · $63K of unwritten runoff checks</div>
+            </div>
+          </div>
+          <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
+            A runoff check is structurally separate — it can only be spent if a runoff is actually held, so finance operations typically don't ask for it until the runoff is on the calendar. The $7K plateau is consistent with that timing pattern, not a ceiling on these donors' willingness.
+          </p>
         </Insight>
 
         <Insight n="03" tone="warm" title="The Atlanta Moat — $106K from ZIPs no opponent touches"
@@ -1697,6 +1712,23 @@ const TabInsights = () => {
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Montgomery has $45,445 cash on hand and burns roughly $23K/month. At that pace, he runs out of money in about 60 days — roughly one week <em>before</em> primary day. He'll likely have to go quiet on paid media in the first week of May unless he raises a surprising amount in April.
           </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
+            {['Kingston','Farrell','Montgomery'].map(name => {
+              const d = FIN[name];
+              const burn = Math.round(d.spent / d.monthsActive);
+              const runway = (d.cash / burn).toFixed(1);
+              return (
+                <div key={name} style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${C[name].color}` }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C[name].color }}>{name}</div>
+                  <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.kingston, marginTop: 4 }}>{runway} mo</div>
+                  <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>{fmtK(d.cash)} cash · {fmtK(burn)}/mo burn</div>
+                </div>
+              );
+            })}
+          </div>
+          <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
+            Burn typically spikes 2–3× in the final four weeks (media, GOTV, field), so Montgomery's effective exhaust date is likely 10–14 days earlier than the linear projection shows. Kingston has 28× Montgomery's cash; Farrell has 9×.
+          </p>
         </Insight>
 
         <Insight n="09" tone="default" title="8 bundler firms organized $171K in stacked giving"
@@ -1721,6 +1753,22 @@ const TabInsights = () => {
           stat={{ value: '1.0%', label: 'Kingston unitemized' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Only <strong>1% of Kingston's individual money is unitemized</strong> (donations under $200). A typical grassroots-email campaign runs 15-30% small-dollar. This is a pure call-time operation.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
+            {['Kingston','Montgomery','Farrell'].map(name => {
+              const d = FIN[name];
+              const pct = (d.unitemized / d.indiv) * 100;
+              return (
+                <div key={name} style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${C[name].color}` }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C[name].color }}>{name}</div>
+                  <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.kingston, marginTop: 4 }}>{pct.toFixed(1)}%</div>
+                  <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>{fmtK(d.unitemized)} of {fmtK(d.indiv)} individual</div>
+                </div>
+              );
+            })}
+          </div>
+          <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
+            Even Kingston's opponents barely register on small-dollar (Montgomery 4.7%, Farrell 4.5%) — none of the three campaigns has built a digital grassroots engine. The whole GA-1 primary is being run on relationship money, not list money.
           </p>
         </Insight>
 
@@ -1770,8 +1818,27 @@ const TabInsights = () => {
 
         <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up for you"
           stat={{ value: '$793K', label: 'from father\'s network' }}>
-          <p style={{ fontSize: 14, lineHeight: 1.65, margin: 0, color: P.ink }}>
-            Your top 15 donors include Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, John Skeadas III, F. Reed Dulany III — names that map directly onto Jack Kingston's 30-year donor and business network in Savannah. That's an inheritance most candidates can't replicate. The opponents' attack that Kingston is "his father's candidate" is true — and the list is the reason it doesn't matter: 485 donors, 74 of them ultra-loyalists, 8 bundler firms, $1.3M cash. That's not a legacy; that's a <em>machine</em>.
+          <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
+            Your top 15 donors include names that map directly onto Jack Kingston's 30-year donor and business network in Savannah — Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, F. Reed Dulany III, Don Waters. Three generations of Savannah business, all writing $10,500–$24,500 checks. That's an inheritance most candidates can't replicate.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 12 }}>
+            {[
+              { name: 'Dale C. Critz Jr.',     industry: 'Critz auto dealership',     amount: 24500 },
+              { name: 'Christian B. Demere',   industry: 'Colonial Group (logistics)', amount: 24500 },
+              { name: 'TJ Hollis',             industry: 'McManamy Jackson Hollis (law)', amount: 24500 },
+              { name: 'William S. Dorsey III', industry: 'Savannah business',          amount: 21000 },
+              { name: 'F. Reed Dulany III',    industry: 'Dulany Industries',          amount: 10500 },
+              { name: 'Don L. Waters',         industry: 'Savannah business',          amount: 10500 },
+            ].map(d => (
+              <div key={d.name} style={{ padding: '10px 12px', background: P.bg, borderRadius: 6, borderLeft: `3px solid ${P.kingstonAccent}` }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: P.kingston }}>{d.name}</div>
+                <div style={{ fontSize: 10, color: P.muted, marginTop: 2 }}>{d.industry}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 3 }}>{fmtK(d.amount)}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
+            The opponents' attack that Kingston is "his father's candidate" is true — and the list is the reason it doesn't matter: 485 donors, 74 of them ultra-loyalists, 8 bundler firms, $1.3M cash. That's not a legacy; that's a <em>machine</em>.
           </p>
         </Insight>
 
