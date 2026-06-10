@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 /* ============================================================
-   FRIENDS OF JIM KINGSTON — CAMPAIGN INTELLIGENCE
+   GA-1 REPUBLICAN PRIMARY — FUNDRAISING ANALYSIS
    Data: FEC Schedule A (through 3/31/2026) + FEC Form 3 summary (Q1 2026)
    ============================================================ */
 
@@ -197,7 +197,7 @@ const TIMELINE = [
   { date: '2025-06-18', label: 'Kingston registers; launches with $524K month',   who: 'Kingston' },
   { date: '2025-07-17', label: 'Farrell formal announcement at Forest City Gun Club', who: 'Farrell' },
   { date: '2025-08-25', label: 'Montgomery files Statement of Candidacy',         who: 'Montgomery' },
-  { date: '2025-09-15', label: 'Kingston Q3 call-time push ($155K month)',        who: 'Kingston' },
+  { date: '2025-09-15', label: 'Kingston Q3 surge ($155K month)',                 who: 'Kingston' },
   { date: '2026-03-06', label: 'Qualifying deadline — Farrell forced out of commission seat', who: 'Farrell' },
   { date: '2026-04-14', label: 'TRUMP ENDORSES KINGSTON',                         who: 'Kingston', flag: true },
   { date: '2026-05-19', label: 'PRIMARY ELECTION DAY',                            who: 'All', flag: true },
@@ -214,8 +214,6 @@ const RUNWAY = [
   { weeksOut: 4,  day: 'May 18',   Kingston: 1236172, Montgomery: 16410,  Farrell: 384928 },
   { weeksOut: 5,  day: 'Primary',  Kingston: 1235000, Montgomery: 15000,  Farrell: 384000 },
 ];
-
-const DAYS_TO_PRIMARY = Math.max(0, Math.ceil((new Date('2026-05-19') - new Date('2026-04-20')) / 86400000));
 
 /* ============================================================
    FORMATTERS
@@ -435,16 +433,16 @@ const TabOverview = () => {
               <Tag tone="default" style={{ background: 'rgba(255,255,255,0.15)' }}>GA-1 REPUBLICAN PRIMARY</Tag>
             </div>
             <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 600, margin: 0, lineHeight: 1.15, letterSpacing: '-0.015em' }}>
-              You're the frontrunner. Now run like it.
+              A frontrunner built on big checks and a legacy network.
             </h1>
             <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.55, marginTop: 8, marginBottom: 0, opacity: 0.9 }}>
-              Kingston has out-raised Farrell and Montgomery combined 2-to-1. Cash on hand is 3× the rest of the field. The prize now isn't winning — it's winning <em>big enough</em> to skip the June 16 runoff.
+              Kingston has out-raised Farrell and Montgomery combined roughly 2-to-1, with about 3× the field's cash on hand — enough to contest a first-round majority on May 19 and avoid the June 16 runoff.
             </p>
           </div>
           <div style={{ textAlign: 'center', minWidth: 110 }}>
-            <div style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: P.kingstonAccent, marginBottom: 2, fontWeight: 700 }}>Days Left</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 54, fontWeight: 300, lineHeight: 1 }}>{DAYS_TO_PRIMARY}</div>
-            <div style={{ fontSize: 11, marginTop: 4, opacity: 0.8 }}>May 19, 2026</div>
+            <div style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: P.kingstonAccent, marginBottom: 2, fontWeight: 700 }}>Data Through</div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 54, fontWeight: 300, lineHeight: 1 }}>Mar 31</div>
+            <div style={{ fontSize: 11, marginTop: 4, opacity: 0.8 }}>Q1 2026 filing</div>
           </div>
         </div>
       </div>
@@ -453,9 +451,9 @@ const TabOverview = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 28 }}>
         <Card><Stat label="Total Raised"  value={fmtK(FIN.Kingston.receipts)} sub={`${Math.round(FIN.Kingston.receipts/totalField*100)}% of field's money`}/></Card>
         <Card><Stat label="Cash on Hand"  value={fmtK(FIN.Kingston.cash)}     sub="3× the rest of field combined" accent={P.success}/></Card>
-        <Card><Stat label="Unique Donors" value={fmtN(Q.Kingston.donors)}     sub={`vs. ${Q.Montgomery.donors + Q.Farrell.donors} opponents combined`}/></Card>
+        <Card><Stat label="Unique Donors" value={fmtN(Q.Kingston.donors)}     sub={`vs. ${Q.Montgomery.donors + Q.Farrell.donors} for the rest of the field`}/></Card>
         <Card><Stat label="$3.5K Max-Outs" value="280"                         sub="34% of itemized contributions" accent={P.kingstonAccent}/></Card>
-        <Card tone="warning"><Stat label="Unused Donor Room" value="$980K"     sub="legal giving room still in list" accent={P.warning}/></Card>
+        <Card tone="warning"><Stat label="Unused Donor Room" value="$980K"     sub="legal giving room among existing donors" accent={P.warning}/></Card>
       </div>
 
       {/* Candidate cards */}
@@ -472,7 +470,7 @@ const TabOverview = () => {
                   <div style={{ fontSize: 10, letterSpacing: '0.15em', opacity: 0.6, fontWeight: 700 }}>RANK #{idx+1}</div>
                   <div style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 600, marginTop: 2, letterSpacing: '-0.01em' }}>{C[name].label}</div>
                 </div>
-                {isK && <Tag tone="gold">YOU</Tag>}
+                {isK && <Tag tone="gold">SUBJECT</Tag>}
               </div>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: 38, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmtK(d.receipts)}</div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>total receipts</div>
@@ -501,7 +499,7 @@ const TabOverview = () => {
 
       {/* Radar */}
       <Card style={{ padding: 28, marginBottom: 24 }}>
-        <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Note how Kingston dominates every dimension, Farrell scores low on everything except in-district concentration (the only metric he wins on — because he hasn't raised from anyone outside 31xxx)."/>
+        <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Kingston leads on every dimension; Farrell registers only on in-district concentration — a function of raising almost entirely within 31xxx ZIPs."/>
         <ResponsiveContainer width="100%" height={400}>
           <RadarChart data={radarData} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
             <PolarGrid stroke={P.line}/>
@@ -514,13 +512,13 @@ const TabOverview = () => {
           </RadarChart>
         </ResponsiveContainer>
         <WhyMatters>
-          A broader shape signals a more <em>electable</em> candidate — one who can fundraise, mobilize donors, attract institutional support, and show reach beyond a narrow base. Kingston's shape nearly fills the chart; both opponents hug the center on almost every axis. That imbalance is what a victory coalition looks like in data form.
+          A broader shape signals a campaign with more ways to raise — individual donors, institutional money, reach beyond a narrow base. Kingston's shape nearly fills the chart; both challengers hug the center on almost every axis. That imbalance is what a broad fundraising coalition looks like in data form.
         </WhyMatters>
       </Card>
 
       {/* Timeline */}
       <Card style={{ padding: 28 }}>
-        <SectionH eyebrow="Campaign chronology" title="How we got here" kicker="Ten months of campaign activity, mapped against the primary clock."/>
+        <SectionH eyebrow="Campaign chronology" title="How the race took shape" kicker="Ten months of campaign activity, mapped against the primary clock."/>
         <div style={{ position: 'relative', padding: '10px 0 10px 30px', borderLeft: `2px solid ${P.line}` }}>
           {TIMELINE.map((ev, i) => {
             const candColor = ev.who === 'Kingston' ? P.kingston : ev.who === 'Montgomery' ? P.montgomery : ev.who === 'Farrell' ? P.farrell : P.muted;
@@ -567,7 +565,7 @@ const TabMoney = () => {
   // Farrell dramatic donut
   const farrellPie = [
     { name: 'Self-loan',        value: FIN.Farrell.selfLoans, color: P.danger },
-    { name: 'Actual donations', value: FIN.Farrell.indiv,      color: P.farrell },
+    { name: 'Donor contributions', value: FIN.Farrell.indiv,      color: P.farrell },
     { name: 'PACs',             value: FIN.Farrell.pac,        color: P.kingstonAccent },
   ];
   const farrellTotal = farrellPie.reduce((s, p) => s + p.value, 0);
@@ -608,10 +606,10 @@ const TabMoney = () => {
       <Card tone="danger" style={{ padding: 0, marginBottom: 16, overflow: 'hidden' }}>
         <div style={{ background: `linear-gradient(135deg, ${P.danger} 0%, #C45A5A 100%)`, color: '#FBF8F2', padding: '24px 28px' }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Tag tone="default" style={{ background: 'rgba(255,255,255,0.2)', color: '#FBF8F2' }}>SIGNATURE ATTACK LINE</Tag>
+            <Tag tone="default" style={{ background: 'rgba(255,255,255,0.2)', color: '#FBF8F2' }}>KEY FINDING</Tag>
           </div>
           <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, margin: '12px 0 0', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-            Pat Farrell didn't <em>raise</em> $646K. He raised $146K and wrote himself a $500,000 check.
+            Pat Farrell's $646K is mostly his own money — $146K from donors, plus a $500,000 personal loan.
           </h2>
         </div>
         <div style={{ padding: 28, display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 36, alignItems: 'center' }}>
@@ -640,16 +638,16 @@ const TabMoney = () => {
           <div>
             <div style={{ fontSize: 15, lineHeight: 1.7, color: P.ink, fontFamily: 'DM Sans' }}>
               <p style={{ margin: '0 0 14px' }}>
-                Only <strong>130 real donors</strong> have given Farrell money — a total of <strong>{fmtK(FIN.Farrell.indiv)}</strong>. He loaned his own campaign <strong style={{ color: P.danger }}>${(FIN.Farrell.selfLoans/1000).toFixed(0)},000</strong> to make up the difference. For context, Jim Kingston borrowed <strong>$0</strong> and raised <strong>{fmtK(FIN.Kingston.indiv)}</strong> — from <strong>{Q.Kingston.donors} real donors</strong>.
+                Only <strong>130 individual donors</strong> have given Farrell money — a total of <strong>{fmtK(FIN.Farrell.indiv)}</strong>. He loaned his own campaign <strong style={{ color: P.danger }}>${(FIN.Farrell.selfLoans/1000).toFixed(0)},000</strong> to make up the difference. For context, Jim Kingston borrowed <strong>$0</strong> and raised <strong>{fmtK(FIN.Kingston.indiv)}</strong> — from <strong>{Q.Kingston.donors} individual donors</strong>.
               </p>
               <div style={{ background: P.bg, borderRadius: 10, padding: '14px 16px', borderLeft: `4px solid ${P.danger}`, marginTop: 16 }}>
-                <div style={{ fontWeight: 700, color: P.kingston, marginBottom: 4, fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>The FEC trap</div>
+                <div style={{ fontWeight: 700, color: P.kingston, marginBottom: 4, fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>The FECA loan cap</div>
                 <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>
                   Under <strong>52 U.S.C. § 30116(j)</strong>, candidates can only repay themselves up to <strong>$250,000</strong> of personal loans from post-election funds. If Farrell loses May 19, he likely loses <strong>at least $250K of his own money</strong> — possibly the whole $500K if his campaign can't raise it before primary day.
                 </p>
               </div>
               <p style={{ margin: '16px 0 0', fontSize: 14, color: P.muted, fontStyle: 'italic' }}>
-                This is the single most usable oppo fact in the file. Mailers practically write themselves: "Pat Farrell: 22 years in office, $146K from voters, $500K from himself."
+                It is the clearest single signal in Farrell's filing: a campaign financed largely by the candidate rather than by donors — 22 years in office, $146K from voters, $500K from himself.
               </p>
             </div>
           </div>
@@ -741,14 +739,14 @@ const TabMoney = () => {
           </LineChart>
         </ResponsiveContainer>
         <WhyMatters tone="warning">
-          The last two weeks before a primary are when campaigns buy the most TV and mail. Montgomery's line approaches zero by early May — meaning he likely cannot afford paid media in the final stretch when it matters most. Kingston's flat line near $1.2M means he can spend whatever it takes to break 50% and skip the runoff.
+          The last two weeks before a primary are when campaigns buy the most TV and mail. Montgomery's line approaches zero by early May — meaning he likely cannot afford paid media in the final stretch when it matters most. Kingston's reserve near $1.2M leaves room to outspend the field through primary day.
         </WhyMatters>
       </Card>
 
       {/* PAC support */}
       <Card style={{ padding: 22 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>PAC / committee contributions</h3>
-        <p style={{ fontSize: 12, color: P.muted, margin: '0 0 14px' }}>A proxy for Washington and institutional support. Farrell's $250 is essentially zero — no trade group or party entity has bet on him.</p>
+        <p style={{ fontSize: 12, color: P.muted, margin: '0 0 14px' }}>A proxy for Washington and institutional support. Farrell's $250 is essentially zero — no trade group or party entity has contributed.</p>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={[
             { name: 'Kingston',   v: FIN.Kingston.pac },
@@ -766,7 +764,7 @@ const TabMoney = () => {
           </BarChart>
         </ResponsiveContainer>
         <WhyMatters>
-          PAC money signals that Washington insiders, trade associations, and party organizations believe a candidate is electable — and it unlocks relationships that matter after the election for committee assignments, floor time, and vendor introductions. Kingston's $179K says the institutional GOP has already picked him. Farrell's $250 says nobody in that world bet on him.
+          PAC money signals that Washington insiders, trade associations, and party organizations believe a candidate is electable — and it unlocks relationships that matter after the election for committee assignments, floor time, and vendor introductions. Kingston's $179K signals institutional GOP support; Farrell's $250 signals essentially none.
         </WhyMatters>
       </Card>
     </div>
@@ -840,7 +838,7 @@ const TabDonors = () => {
       {/* Quality scorecard */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Donor base quality scorecard</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston wins 5 of 7 cleanly; the two where he doesn't (in-district %, self-funded %) are actually signs of strength in disguise.</p>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because a third of his money comes from Atlanta and out of state.</p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
             <thead>
@@ -877,7 +875,7 @@ const TabDonors = () => {
           </table>
         </div>
         <WhyMatters>
-          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston wins 5 of 7 cleanly; the two where he doesn't (in-district % and self-funded %) are strength signals in disguise.
+          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston leads on five of seven; the two without a winner (average gift, in-district %) reflect the shape of his coalition — the field's largest average gift, and the lowest in-district share because a third of his money comes from Atlanta and out of state.
         </WhyMatters>
       </Card>
 
@@ -903,7 +901,7 @@ const TabDonors = () => {
       </div>
 
       <WhyMatters>
-        Occupation mix predicts two things: <strong>vote propensity</strong> (retirees turn out at 2–3× the rate of working-age voters in primaries) and <strong>coalition breadth</strong> (a base of attorneys, owners, and executives maps directly onto chamber-of-commerce and business groups for GOTV). Kingston runs on a classic professional-class coalition; Montgomery's base skews retired (high turnout, smaller size); Farrell's skews self-employed small-business (narrow, local).
+        Occupation mix predicts two things: <strong>vote propensity</strong> (retirees turn out at 2–3× the rate of working-age voters in primaries) and <strong>coalition breadth</strong> (a base of attorneys, owners, and executives overlaps heavily with chamber-of-commerce and business networks). Kingston runs on a classic professional-class coalition; Montgomery's base skews retired (high turnout, smaller size); Farrell's skews self-employed small-business (narrow, local).
       </WhyMatters>
 
       {/* Top donors & bundlers */}
@@ -924,7 +922,7 @@ const TabDonors = () => {
         </Card>
         <Card style={{ padding: 22 }}>
           <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>Bundler firms</h3>
-          <p style={{ fontSize: 12, color: P.muted, margin: '0 0 12px' }}>Employers with 3+ donations — someone inside organized a push. These are your November surrogates.</p>
+          <p style={{ fontSize: 12, color: P.muted, margin: '0 0 12px' }}>Employers with 3+ donations — someone inside likely organized it, a marker of employer-linked donor networks.</p>
           {BUNDLERS.map((b, i) => (
             <div key={b.firm} style={{ padding: '9px 0', borderBottom: i < BUNDLERS.length-1 ? `1px solid ${P.line}` : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -1168,7 +1166,7 @@ const TabGeography = () => {
               })}
             </div>
             <div style={{ fontSize: 12, color: P.ink, background: P.bg, padding: '14px 16px', borderRadius: 8, marginTop: 14, borderLeft: `4px solid ${P.kingstonAccent}`, lineHeight: 1.6 }}>
-              <strong style={{ color: P.kingston }}>Why this matters:</strong> Wealthy-ZIP donors are the highest-propensity primary voters and the natural network for future bundling. Kingston's dominance here isn't just about the $477K — it's about owning the relationship with nearly every serious political donor in the district's top neighborhoods. Opponents' combined take from these same ZIPs is $128K.
+              <strong style={{ color: P.kingston }}>Why this matters:</strong> Wealthy-ZIP donors are the highest-propensity primary voters and the natural network for future bundling. Kingston's dominance here isn't just about the $482K — he holds relationships with nearly every major political donor in the district's top neighborhoods. Opponents' combined take from these same ZIPs is $128K.
             </div>
           </div>
 
@@ -1242,7 +1240,7 @@ const TabGeography = () => {
           </ScatterChart>
         </ResponsiveContainer>
         <WhyMatters>
-          The two axes together tell a story about <em>vote propensity</em>. ZIPs with higher HHI turn out at meaningfully higher rates in low-turnout primaries — often 50-70% higher than low-income ZIPs. So Kingston's dominance in the upper-right quadrant (high-income, high-share) is doubly valuable: he's not just raising from more donors, he's raising from neighborhoods that will actually show up on May 19.
+          The two axes together tell a story about <em>vote propensity</em>. ZIPs with higher HHI turn out at meaningfully higher rates in low-turnout primaries — often 50-70% higher than low-income ZIPs. Kingston's concentration in the upper-right quadrant (high-income, high-share) is notable: he isn't just raising more, he's raising from neighborhoods that reliably vote in primaries.
         </WhyMatters>
       </Card>
 
@@ -1282,7 +1280,7 @@ const TabGeography = () => {
       </div>
 
       <WhyMatters>
-        Income distribution tells you what kind of general-election coalition each candidate is building. Kingston's balanced income profile (strong at every tier, not just wealthy) means he can transition to broader messaging in November without alienating his primary base. Montgomery's weighted average is actually higher than Kingston's — but it rests on a donor pool barely a quarter the size, so it's a much thinner signal. Farrell has the narrowest income band; his coalition will struggle to stretch into general-election Republican voters who don't already know him.
+        Income distribution indicates the kind of coalition behind each candidate's money. Kingston's balanced income profile (strong at every tier, not just wealthy) is broad enough to extend into a general electorate. Montgomery's weighted average is actually higher than Kingston's — but it rests on a donor pool barely a quarter the size, so it's a much thinner signal. Farrell has the narrowest income band; his coalition will struggle to stretch into general-election Republican voters who don't already know him.
       </WhyMatters>
 
       {/* Neighborhood cards */}
@@ -1320,14 +1318,14 @@ const TabGeography = () => {
    ============================================================ */
 const TabOpponents = () => (
   <div>
-    <SectionH eyebrow="The field" title="You and them" kicker="Bio, strengths, weaknesses, and — for each opponent — specific attack vectors. For Kingston, the risks worth defending against."/>
+    <SectionH eyebrow="The race" title="The field" kicker="Bios, strengths, weaknesses, and each candidate's key vulnerabilities."/>
 
     {/* KINGSTON */}
     <Card style={{ padding: 0, marginBottom: 16, overflow: 'hidden', border: `2px solid ${P.kingstonAccent}` }}>
       <div style={{ background: `linear-gradient(135deg, ${P.kingston} 0%, ${P.kingstonLight} 100%)`, color: '#FBF8F2', padding: '24px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>Home team</div>
+            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>The frontrunner</div>
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Jim Kingston</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>34 · Son of Rep. Jack Kingston (GA-1, 1993–2015) · Savannah native · Trump-endorsed</div>
           </div>
@@ -1341,13 +1339,13 @@ const TabOpponents = () => (
         <div>
           <Tag tone="success">Strengths</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Trump endorsement</strong> in a MAGA-era GOP primary — opponents can't match it</li>
+            <li><strong>Trump endorsement</strong> (Apr 14) — neither challenger has one</li>
             <li>$1.82M raised — 7× Montgomery, 3× Farrell; $1.29M cash on hand ≈ 3× the rest of the field combined</li>
             <li>583 unique donors — 4.5× Farrell's count; donor velocity ~60/month sustained</li>
             <li>76 ultra-loyalists (≥$7K); 8 bundler firms organizing stacked giving across employee rosters</li>
             <li>Legacy network: Jack Kingston's 30-year Savannah donor and business base showing up intact</li>
             <li>Atlanta moat — $109K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5K</li>
-            <li>Zero self-funding, zero debt — pure outside support signal for future PAC/institutional money</li>
+            <li>Zero self-funding, zero debt — entirely outside money, no candidate financing on the books</li>
           </ul>
         </div>
         <div>
@@ -1357,18 +1355,18 @@ const TabOpponents = () => (
             <li><strong>Small-dollar desert.</strong> Only 1% of individual dollars are unitemized (&lt;$200) — no real grassroots email machine</li>
             <li>"Legacy candidate" framing — dad's name is the easiest attack angle</li>
             <li>31416 Skidaway Island underperformance — only 59% share in a wealthy coastal ZIP Farrell lives in</li>
-            <li>Not a combat vet — loses raw biographical contrast with Montgomery absent veteran endorsements</li>
+            <li>Lacks the military biography that anchors Montgomery's appeal in a military-heavy district</li>
             <li>Heavy top-end concentration: 13% of donors = 46% of individual dollars; widens political-optics attack surface</li>
           </ul>
         </div>
         <div>
-          <Tag tone="warning">Defensive posture</Tag>
+          <Tag tone="warning">Risks to the lead</Tag>
           <ol style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Own the "machine" narrative.</strong> 583 donors, 8 bundler firms, Trump endorsement, $1.3M cash — frame the legacy as an earned operation, not an inheritance.</li>
-            <li><strong>Close the retiree gap.</strong> Fort Stewart/VFW endorsements + targeted mail in 31313, 31547, 31411 before Montgomery locks the bloc.</li>
-            <li><strong>Flip Skidaway.</strong> Co-hosted event with a Skidaway-resident maxed Kingston donor; neutralizes Farrell's home-ZIP advantage.</li>
-            <li><strong>Bank the unwritten runoff checks.</strong> 21 proven max-intent donors sit ~$59K short of the full $10,500 triple-max — collect those before the runoff window closes.</li>
-            <li><strong>Turn on a small-dollar channel.</strong> WinRed national push post-endorsement plausibly adds $50–150K in unitemized — closes the one real capacity gap on the list.</li>
+            <li><strong>The legacy network cuts both ways.</strong> 46% of individual dollars come from 13% of donors — a concentration that invites the "inherited machine" attack.</li>
+            <li><strong>Retiree gap.</strong> Retirees are 7% of Kingston's donors vs. Montgomery's 28% — the highest-turnout primary bloc is where his coalition is thinnest.</li>
+            <li><strong>Farrell's home turf holds.</strong> Kingston's 59% share in ZIP 31416 is his lowest among wealthy ZIPs — the only one where a challenger tops 40%.</li>
+            <li><strong>Runoff capacity is finite.</strong> 21 proven max-out donors sit ~$59K short of the $10,500 triple-max — capacity that matters only if the race goes to a runoff.</li>
+            <li><strong>No small-dollar base.</strong> At 1% unitemized, there is no digital fundraising channel to tap if big-check capacity runs out.</li>
           </ol>
         </div>
       </div>
@@ -1393,7 +1391,7 @@ const TabOpponents = () => (
       <div style={{ background: `linear-gradient(135deg, ${P.farrell} 0%, ${P.farrellLight} 100%)`, color: '#FBF8F2', padding: '24px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>Opponent #1</div>
+            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>Challenger #1</div>
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Pat Farrell</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>64 · Chatham County Commissioner (2004–2026) · Skidaway Island resident · Georgia Southern grad, mechanical engineering</div>
           </div>
@@ -1412,13 +1410,13 @@ const TabOpponents = () => (
             <li>$500K personal commitment signals confidence in his own campaign</li>
             <li>1,000-acre Jenkins County cattle ranch — rural authenticity angle</li>
             <li>Only candidate who's held elected office in the district</li>
-            <li>Owns ZIP 31416 (Skidaway), competitive in 31411</li>
+            <li>Strongest ZIP: 31416, with 41% of dollars — his best share anywhere</li>
           </ul>
         </div>
         <div>
           <Tag tone="danger">Weaknesses</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>77% self-funded.</strong> Only $146K from actual donors</li>
+            <li><strong>77% self-funded.</strong> Only $146K from individual donors</li>
             <li>Raised just <strong>$250 from PACs</strong> — zero institutional backing</li>
             <li>Only 130 donors · 14% repeat rate · narrow base</li>
             <li>Only 5 out-of-state donors in the entire filing</li>
@@ -1429,13 +1427,13 @@ const TabOpponents = () => (
           </ul>
         </div>
         <div>
-          <Tag tone="warning">Attack vectors</Tag>
+          <Tag tone="warning">Vulnerabilities</Tag>
           <ol style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>"Bought his way in."</strong> $146K from real supporters, $500K from himself. Mailer math writes itself.</li>
-            <li><strong>"Chatham County insider."</strong> 22 years on the Commission is a swampy résumé in a Trump-era primary.</li>
-            <li><strong>"Couldn't get even $250 from Washington."</strong> Even trade-group PACs skipped him.</li>
-            <li><strong>"Lost his seat automatically."</strong> Had to be told his seat was vacated.</li>
-            <li>Position Kingston as momentum + grassroots + Trump; Farrell is the status quo.</li>
+            <li><strong>Candidate-financed.</strong> 77% of receipts are a personal loan; $146K came from donors.</li>
+            <li><strong>Establishment résumé.</strong> 22 years on the county commission cuts against the anti-establishment mood of a Trump-era primary.</li>
+            <li><strong>No institutional support.</strong> $250 in PAC money — effectively zero.</li>
+            <li><strong>Qualifying fallout.</strong> Lost his commission seat automatically upon qualifying — a costly news cycle in March.</li>
+            <li><strong>Sharpest contrast in the field</strong> with Kingston's fully donor-funded operation.</li>
           </ol>
         </div>
       </div>
@@ -1460,7 +1458,7 @@ const TabOpponents = () => (
       <div style={{ background: `linear-gradient(135deg, ${P.montgomery} 0%, ${P.montgomeryLight} 100%)`, color: '#FBF8F2', padding: '24px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>Opponent #2</div>
+            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', opacity: 0.75, fontWeight: 700 }}>Challenger #2</div>
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Brian Montgomery</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>Lt. Col. USA (Ret.) · West Point · Ranger · 82nd Airborne, 3rd ID (Fort Stewart) · 2× Iraq · Savannah ~10 yrs</div>
           </div>
@@ -1494,13 +1492,13 @@ const TabOpponents = () => (
           </ul>
         </div>
         <div>
-          <Tag tone="warning">Attack vectors</Tag>
+          <Tag tone="warning">Vulnerabilities</Tag>
           <ol style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Don't attack Montgomery personally.</strong> He's a decorated combat vet. Going negative loses votes in a military-heavy district.</li>
-            <li>Compete for his veterans: earn 2–3 Fort Stewart endorsements, specific port/VA commitments.</li>
-            <li>Position Kingston as the <em>electable</em> conservative: Trump backing, war chest, institutional support. Montgomery's story is noble; the math isn't there.</li>
-            <li>Watch for late veteran endorsement plays — have your own response-ready veteran list.</li>
-            <li>Leave the door open: if Montgomery drops out or endorses Kingston in runoff, his coalition moves cleanly.</li>
+            <li><strong>Biography hasn't converted.</strong> The field's strongest résumé has produced the field's smallest fundraising total ($252K).</li>
+            <li><strong>Cash crunch.</strong> $45K on hand and a ~2-month runway point to going dark on paid media before May 19.</li>
+            <li><strong>Endorsement undercut.</strong> Trump's endorsement of Kingston undercuts the MAGA lane his profile is built for.</li>
+            <li><strong>Thin institutional support.</strong> $8,500 in PAC money — no veterans' group or trade backing on the books.</li>
+            <li><strong>Movable coalition.</strong> His retiree-and-military base is the likeliest to consolidate behind another candidate if he exits.</li>
           </ol>
         </div>
       </div>
@@ -1524,9 +1522,9 @@ const TabOpponents = () => (
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         <div style={{ fontFamily: 'Fraunces, serif', fontSize: 42, color: P.warning, lineHeight: 1, fontStyle: 'italic' }}>⚑</div>
         <div>
-          <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: 0, color: P.kingston }}>The master framing</h3>
+          <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: 0, color: P.kingston }}>The shape of the field</h3>
           <p style={{ fontFamily: 'DM Sans', fontSize: 14, lineHeight: 1.65, color: P.ink, marginTop: 8, marginBottom: 0 }}>
-            Your two opponents represent two distinct weaknesses in a Trump-era GOP primary: Farrell is the <strong>22-year establishment insider who bought his own campaign</strong>; Montgomery is the <strong>decorated veteran the President didn't pick</strong>. Kingston sits cleanly in the middle — young enough for the next generation, legacy name for continuity, Trump-endorsed for the base, broad coalition for electability. Protect that framing.
+            The two challengers embody distinct weaknesses in a Trump-era GOP primary: Farrell, the <strong>22-year insider financing his own campaign</strong>; Montgomery, the <strong>decorated veteran without the President's endorsement</strong>. Kingston's file sits between them — a legacy name, the Trump endorsement, and the field's broadest donor coalition.
           </p>
         </div>
       </div>
@@ -1575,9 +1573,9 @@ const TabInsights = () => {
   return (
     <div>
       <SectionH
-        eyebrow="Hidden edges"
-        title="The insights that sit under the surface"
-        kicker="These are the findings most campaign dashboards miss. Each one is specific, actionable, and based on the underlying data — not vibes. Use them."
+        eyebrow="Below the surface"
+        title="The patterns that sit under the surface"
+        kicker="Patterns a surface read of the filings misses — each specific and grounded in the underlying data."
       />
 
       <div style={{ display: 'grid', gap: 14 }}>
@@ -1597,10 +1595,10 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="02" tone="hot" title="The partial-triple cohort — $59K of unasked runoff capacity"
+        <Insight n="02" tone="hot" title="The partial-triple cohort — $59K of uncollected runoff capacity"
           stat={{ value: '21', label: 'donors one check short of max' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Of the 76 ultra-loyalists who've given $7,000+, <strong>55 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 21 stopped between $7,000 and $10,000 — short of the runoff deposit. That's <strong>$59,000 in legal runoff capacity from a named list of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
+            Of the 76 ultra-loyalists who've given $7,000+, <strong>55 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 21 stopped between $7,000 and $10,000 — short of the runoff deposit. That's <strong>$59,000 in legal runoff capacity from a specific, identifiable cohort of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
@@ -1635,7 +1633,7 @@ const TabInsights = () => {
           </ResponsiveContainer>
         </Insight>
 
-        <Insight n="04" tone="gold" title="The defense-industry signature — gun-makers picked a side"
+        <Insight n="04" tone="gold" title="The defense-industry signature — gun-makers concentrated behind Kingston"
           stat={{ value: 'Daniel Defense', label: 'maxed for Kingston' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             <strong>Marvin Daniel — founder and chairman of Daniel Defense</strong>, one of the most politically recognizable firearms manufacturers in the country — has triple-maxed Kingston at $10,500. He's not alone: <strong>Steve Hufstetler</strong> (Teramore Development, defense-adjacent real estate) and <strong>F. Reed Dulany III</strong> (Dulany Industries, maritime/industrial) have also triple-maxed. That's a small-but-specific industry signature in a GOP primary: gun + defense + heavy industry names writing $10,500 checks. Endorsement-by-checkbook, before any press release.
@@ -1652,7 +1650,7 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="05" tone="warm" title="Nine hedger donors — two are actively gettable"
+        <Insight n="05" tone="warm" title="Nine hedger donors — two lean toward Farrell"
           stat={{ value: '9', label: 'gave to multiple candidates' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Nine people gave money to two or more candidates in this race. They are not loyal — they are hedging. Two of them gave Farrell materially more than they gave Kingston.
@@ -1677,7 +1675,7 @@ const TabInsights = () => {
         <Insight n="06" tone="gold" title="Women out-give men per donor — by 33%"
           stat={{ value: '$3,776', label: 'avg female vs $2,833 male' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. His <strong>80 female donors average $3,776 each</strong>; his <strong>370 male donors average $2,833 each</strong>. That's a <strong>33% per-donor premium for women</strong> — and women are underrepresented in the base (14% of donors by head, 19% by dollars). The campaign is almost certainly under-asking women.
+            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. His <strong>80 female donors average $3,776 each</strong>; his <strong>370 male donors average $2,833 each</strong>. That's a <strong>33% per-donor premium for women</strong> — and women are underrepresented in the base (14% of donors by head, 19% by dollars). The pattern suggests meaningful untapped capacity among women in Kingston's file.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
@@ -1696,7 +1694,7 @@ const TabInsights = () => {
         <Insight n="07" tone="warm" title="The retiree gap — Kingston's biggest coalition vulnerability"
           stat={{ value: '7%', label: 'retirees in Kingston base' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Kingston's donor base is 7% retirees. Montgomery's is <strong>28%</strong>. In a GOP primary, retirees vote at 2-3× the rate of working-age voters. This is the one dimension where Montgomery's coalition is meaningfully stronger than yours.
+            Kingston's donor base is 7% retirees. Montgomery's is <strong>28%</strong>. In a GOP primary, retirees vote at 2-3× the rate of working-age voters. This is the one dimension where Montgomery's coalition is meaningfully stronger than Kingston's.
           </p>
           <div style={{ marginTop: 12 }}>
             {retireeData.map(d => (
@@ -1741,7 +1739,7 @@ const TabInsights = () => {
         <Insight n="09" tone="default" title="8 bundler firms organized $121K in stacked giving"
           stat={{ value: '$121K', label: 'from 8 firms' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            When 3+ employees of one firm donate within days of each other, someone inside organized it. That person is a <strong>de facto bundler</strong> — your most valuable volunteer asset. Here are the eight firms that did it.
+            When 3+ employees of one firm donate within days of each other, someone inside organized it. That person is a <strong>de facto bundler</strong> — the organizer behind the cluster. Here are the eight firms where it happened.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {BUNDLERS.map(b => (
@@ -1782,7 +1780,7 @@ const TabInsights = () => {
         <Insight n="11" tone="warm" title="Zero compliance exposure — every big donor nets at or under the cap"
           stat={{ value: '0', label: 'donors over the $10,500 cap' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            A naive read of the raw FEC file makes the biggest donors look like they gave $14,000–$24,500 — over the <strong>$10,500 per-individual per-cycle cap</strong>. They didn't. Those inflated figures are reattribution and primary/general/runoff redesignation memo entries; once netted, every one of these donors lands at or under the legal maximum (shown below). The file is clean — there is no compliance overhang for opposition research to surface.
+            A naive read of the raw FEC file makes the biggest donors look like they gave $14,000–$24,500 — over the <strong>$10,500 per-individual per-cycle cap</strong>. They didn't. Those inflated figures are reattribution and primary/general/runoff redesignation memo entries; once netted, every one of these donors lands at or under the legal maximum (shown below). The file is clean — there is no compliance exposure.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 10 }}>
             {overCap.map(d => (
@@ -1823,10 +1821,10 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up for you"
+        <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up in the data"
           stat={{ value: '$739K', label: 'from father\'s network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Your top donors include names that map directly onto Jack Kingston's 30-year donor and business network in Savannah — Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, F. Reed Dulany III, Don Waters. Three generations of Savannah business, all writing $10,500 max checks. That's an inheritance most candidates can't replicate.
+            Kingston's top donors include names that map directly onto Jack Kingston's 30-year donor and business network in Savannah — Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, F. Reed Dulany III, Don Waters. Three generations of Savannah business, all writing $10,500 max checks. That's an inheritance most candidates can't replicate.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 12 }}>
             {[
@@ -1845,7 +1843,7 @@ const TabInsights = () => {
             ))}
           </div>
           <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
-            The opponents' attack that Kingston is "his father's candidate" is true — and the list is the reason it doesn't matter: 583 donors, 76 of them ultra-loyalists, 8 bundler firms, $1.3M cash. That's not a legacy; that's a <em>machine</em>.
+            The challengers' charge that Kingston is "his father's candidate" is true — and the list is the reason the label carries less weight than it might: 583 donors, 76 ultra-loyalists, 8 bundler firms, $1.3M cash — an organized operation, not just a famous name.
           </p>
         </Insight>
 
@@ -1898,10 +1896,10 @@ const TabModels = () => {
               <Tag tone="success">HIGH CONFIDENCE</Tag>
             </div>
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.kingston, margin: '8px 0 0', letterSpacing: '-0.01em' }}>
-              Opponent cash-exhaustion date
+              Challenger cash-exhaustion date
             </h3>
             <p style={{ fontSize: 13, color: P.muted, margin: '4px 0 0', maxWidth: 720 }}>
-              When each opponent runs out of money at current burn rate. Critical for mail / TV planning in the final two weeks.
+              When each challenger runs out of money at the current burn rate — and when their paid-media spending likely has to stop.
             </p>
           </div>
         </div>
@@ -1972,10 +1970,10 @@ const TabModels = () => {
             <Tag tone="success">HIGH CONFIDENCE</Tag>
           </div>
           <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.kingston, margin: '8px 0 0', letterSpacing: '-0.01em' }}>
-            Unused donor capacity in Kingston's list
+            Unused donor capacity in Kingston's donor file
           </h3>
           <p style={{ fontSize: 13, color: P.muted, margin: '4px 0 0', maxWidth: 720 }}>
-            How many dollars the campaign can legally raise from donors already in the file — without finding a single new name.
+            How many dollars could still legally be raised from donors already in the file — without a single new name.
           </p>
         </div>
         <div style={{ padding: 24, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 28 }}>
@@ -2167,7 +2165,7 @@ const TabModels = () => {
             Historical victory threshold (50%+1 scenarios)
           </h3>
           <p style={{ fontSize: 13, color: P.muted, margin: '4px 0 0', maxWidth: 720 }}>
-            How many votes Kingston needs to skip the runoff, projected from the most recent open-seat GA-1 GOP primary (2014).
+            The vote threshold for a first-round majority, projected from the most recent open-seat GA-1 GOP primary (2014).
           </p>
         </div>
         <div style={{ padding: 24, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 28 }}>
@@ -2202,7 +2200,7 @@ const TabModels = () => {
               </div>
             ))}
             <div style={{ padding: '10px 14px', background: '#EDF2E8', borderRadius: 8, fontSize: 12, color: P.ink, lineHeight: 1.5 }}>
-              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 583 donors represent roughly 0.9% of the expected primary electorate. Each donor converting 50–60 additional voters in their network (friends, family, neighbors) gets Kingston over 50%+1 in the base scenario.
+              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 583 donors represent roughly 0.9% of the expected primary electorate. Each donor's network converting 50–60 additional voters corresponds to Kingston clearing 50%+1 in the base scenario.
             </div>
           </div>
         </div>
@@ -2298,8 +2296,8 @@ const TABS = [
   { id: 'money',     label: 'Money' },
   { id: 'donors',    label: 'Donors' },
   { id: 'geography', label: 'Geography' },
-  { id: 'opponents', label: 'Opponents' },
-  { id: 'insights',  label: 'Hidden Edges' },
+  { id: 'opponents', label: 'The Field' },
+  { id: 'insights',  label: 'Findings' },
   { id: 'models',    label: 'Models' },
 ];
 
@@ -2425,13 +2423,13 @@ export default function Dashboard() {
               color: P.kingstonAccent, fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, fontStyle: 'italic',
             }}>K</div>
             <div>
-              <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>Friends of Jim Kingston</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Campaign Intelligence</div>
+              <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>A Campaign-Finance Analysis</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Primary</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>May 19, 2026 · <span style={{ color: P.warning }}>{DAYS_TO_PRIMARY} days</span></div>
+            <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Republican Primary</div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Mar 31, 2026</div>
           </div>
         </div>
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
