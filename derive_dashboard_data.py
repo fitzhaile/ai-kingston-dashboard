@@ -3,7 +3,10 @@
 Derive every Schedule-A-based dashboard constant from FEC itemized individual
 contributions, through 3/31/2026.
 
-Methodology (reconciles to FEC Form 3 itemized totals within ~0.15%):
+Methodology (derived itemized totals land within 0.2% of FEC Form 3 for
+Kingston, 1.8% for Montgomery, and 5.5% for Farrell — the API export nets out
+some refund/redesignation activity; Form 3 totals remain the authoritative
+figures for the dashboard's financial-summary panels):
   - scope:   entity_type == 'IND' (individual contributions only; matches the
              original congresscontributions.csv export exactly through 12/31/2025)
   - dedup:   by transaction_id, which removes the duplicated "SEE REATTRIBUTION
@@ -12,7 +15,10 @@ Methodology (reconciles to FEC Form 3 itemized totals within ~0.15%):
   - per-donor aggregation: by contributor_name (NET, i.e. refunds/redesignations
              subtracted)
 
-Run:  python3 derive_dashboard_data.py
+Run:  python3 derive_dashboard_data.py            (print every derived constant)
+      python3 derive_dashboard_data.py --check    (also diff the constants against
+            Kingston_Dashboard.jsx and exit 1 on any mismatch — guards the
+            CLAUDE.md "No fabricated data" rule)
 Input: congresscontributions_through_march2026.csv  (FEC Schedule A, cycle 2026,
        contribution_receipt_date <= 2026-03-31, pulled from api.open.fec.gov)
 """
@@ -81,6 +87,7 @@ for t in ['K','M','F']:
 
 # --- CUMULATIVE / MONTHLY (P2026 primary, dedup) ---
 print("\n[CUMULATIVE / MONTHLY]  primary (P2026), Jun 2025 .. Mar 2026")
+MONTHLY_D = {}; CUM_D = {}
 for t in ['K','M','F']:
     dd = [r for r in dedup(comm(t)) if r['election_type'] == 'P2026']
     mm = defaultdict(float)
@@ -88,6 +95,7 @@ for t in ['K','M','F']:
     monthly = [int(round(mm.get(k, 0))) for k, _ in MONTHS]
     cum = []; s = 0
     for v in monthly: s += v; cum.append(s)
+    MONTHLY_D[t] = monthly; CUM_D[t] = cum
     print(f"  {t} MONTHLY    = {monthly}")
     print(f"  {t} CUMULATIVE = {cum}")
 
@@ -112,6 +120,7 @@ for b in ORDER:
 
 # --- Q metrics ---
 print("\n[Q metrics]  donors / repeatRate / top20Pct / avgGift / maxed")
+Q_D = {}
 for t in ['K','M','F']:
     dd = dedup(comm(t)); net = netby(dd)
     pos = sorted([v for v in net.values() if v > 0], reverse=True)
@@ -122,6 +131,8 @@ for t in ['K','M','F']:
     posrows = [r for r in dd if amt(r) > 0]
     avg_gift = sum(amt(r) for r in posrows) / len(posrows)
     maxed = sum(1 for v in net.values() if v >= 3500)
+    Q_D[t] = {'donors': len(pos), 'repeat': round(repeat, 1), 'top20': round(top20, 1),
+              'avg': int(round(avg_gift)), 'maxed': maxed}
     print(f"  {t}: donors={len(pos)}  repeat={repeat:.1f}%  top20={top20:.1f}%  avgGift(per-contrib)=${avg_gift:,.0f}  maxed={maxed}")
 
 # --- ultra-loyalists / triple-max / over-cap ---
@@ -135,6 +146,23 @@ print(f"  total: {len(ge7)} donors, ${sum(v for _,v in ge7):,.0f}")
 print(f"  triple-max (=$10,500): {len(trip)} donors, ${sum(v for _,v in trip):,.0f}")
 print(f"  partial ($7,000-10,499): {len(part)} donors, ${sum(v for _,v in part):,.0f}")
 print(f"  OVER $10,500 cap: {len(over)}  (compliance-overhang artifact -> should be 0)")
+
+# --- MODEL 2 (Kingston unused donor capacity) ---
+# General room nets out partial general-election gifts: a donor who already
+# gave $3,000 toward the general has $500 of legal room left, not $3,500.
+print("\n[MODEL 2]  Kingston unused donor capacity")
+elnet = defaultdict(lambda: defaultdict(float))
+for r in Kd: elnet[r['contributor_name']][r['election_type']] += amt(r)
+donors_pos = [n for n, v in Knet.items() if v > 0]
+pmaxed = [n for n in donors_pos if elnet[n].get('P2026', 0) >= 3500]
+m2_below = [n for n in donors_pos if elnet[n].get('P2026', 0) < 3500]
+proom = sum(3500 - elnet[n].get('P2026', 0) for n in m2_below)
+gnot = [n for n in pmaxed if elnet[n].get('G2026', 0) < 3500]
+groom = sum(3500 - min(3500, elnet[n].get('G2026', 0)) for n in gnot)
+print(f"  itemized rows={len(Kd)}  rows at exactly $3,500={sum(1 for r in Kd if amt(r) == 3500)}")
+print(f"  primary-maxed donors={len(pmaxed)}  below-cap donors={len(m2_below)}  primary room=${proom:,.0f} (avg ${proom/len(m2_below):,.0f})")
+print(f"  primary-maxed but not general-maxed={len(gnot)}  general room=${groom:,.0f}")
+print(f"  total addressable without a single new donor: ${proom + groom:,.0f}")
 
 # --- DOUBLE_MAX (existing 15 named donors, corrected) ---
 meta = {}
@@ -173,30 +201,44 @@ for e, (v, ds) in sorted(emp.items(), key=lambda x: -len(x[1][1])):
         print(f"     {e[:40]:40} ${v:>8,.0f}  n={len(ds)}")
 
 # --- SHARED (cross-candidate) ---
-print("\n[SHARED]  donors to 2+ candidates")
+# Names are normalized (periods stripped, whitespace collapsed) before the
+# cross-candidate join: committees punctuate the same donor differently
+# ('SMITH, BYRON L.' vs 'SMITH, BYRON L'), which previously hid three hedgers.
+def normname(n): return ' '.join(n.replace('.', '').split())
+print("\n[SHARED]  donors to 2+ candidates (names normalized across committees)")
 allnet = defaultdict(lambda: defaultdict(float)); cmeta = {}
 for t in ['K','M','F']:
     for r in dedup(comm(t)):
-        allnet[r['contributor_name']][t] += amt(r)
-        cmeta[r['contributor_name']] = (r['contributor_city'], r['contributor_state'], r['contributor_zip'][:5])
+        n = normname(r['contributor_name'])
+        allnet[n][t] += amt(r)
+        cmeta[n] = (r['contributor_city'], r['contributor_state'], r['contributor_zip'][:5])
 for n, d in sorted([(n, d) for n, d in allnet.items() if sum(1 for t in d if d[t] > 0) >= 2],
                    key=lambda x: -sum(x[1].values())):
     c, s, z = cmeta[n]
     print(f"  {n:22} {c} {z}  K={int(d.get('K',0))} M={int(d.get('M',0))} F={int(d.get('F',0))}")
 
-# --- OCCUPATIONS (per contribution row, dedup) ---
-print("\n[OCCUPATIONS]  per contribution row (top 10)")
+# --- OCCUPATIONS (per donor, net > 0; the dashboard chart is labeled
+#     "Donor occupations", so count each donor once, not each contribution) ---
+print("\n[OCCUPATIONS]  per donor (top 10)")
+OCC_D = {}
 for t in ['K','M','F']:
-    c = Counter(r['contributor_occupation'].strip() for r in dedup(comm(t)) if amt(r) > 0 and r['contributor_occupation'].strip())
+    dd = dedup(comm(t)); net = netby(dd); occ = {}
+    for r in dd:
+        if r['contributor_occupation'].strip():
+            occ[r['contributor_name']] = r['contributor_occupation'].strip().upper()
+    c = Counter(occ[n] for n, v in net.items() if v > 0 and n in occ)
+    OCC_D[t] = c
     print(f"  {t}: " + " | ".join(f"{o}={n}" for o, n in c.most_common(10)))
 
 # --- retiree % (per donor) ---
 print("\n[retiree %]  retired donors / donors")
+RET_D = {}
 for t in ['K','M','F']:
     dd = dedup(comm(t)); net = netby(dd); occ = {}
     for r in dd: occ[r['contributor_name']] = r['contributor_occupation'].strip().upper()
     don = [n for n, v in net.items() if v > 0]
     ret = sum(1 for n in don if occ[n] == 'RETIRED')
+    RET_D[t] = round(ret / len(don) * 100)
     print(f"  {t}: {ret}/{len(don)} = {ret/len(don)*100:.0f}%")
 
 # --- gender (Kingston) ---
@@ -227,18 +269,20 @@ hh = defaultdict(list)
 for n, v in Knet.items():
     if v >= 3500: hh[lz[n]].append((n, v))
 multi = {k: v for k, v in hh.items() if len(v) >= 2}
-tot = sum(v for vs in multi.values() for _, v in vs)
-print(f"  households={len(multi)}  combined=${tot:,.0f}  ({tot/sum(v for v in Knet.values() if v>0)*100:.0f}% of itemized)")
+HH_TOT = sum(v for vs in multi.values() for _, v in vs)
+print(f"  households={len(multi)}  combined=${HH_TOT:,.0f}  ({HH_TOT/sum(v for v in Knet.values() if v>0)*100:.0f}% of itemized)")
 for (ln, z), mem in sorted(multi.items(), key=lambda x: -sum(v for _, v in x[1]))[:16]:
     print(f"    {ln:14} {z}  n={len(mem)} ${sum(v for _, v in mem):,.0f}")
 
 # --- GEO (P2026, dedup) ---
 print("\n[GEO]  primary $ by region (out-of-state / Atlanta GA-30 / in-district GA-rest)")
+GEO_D = {}
 for t in ['K','M','F']:
     d = [r for r in dedup(comm(t)) if r['election_type'] == 'P2026']
     out = sum(amt(r) for r in d if r['contributor_state'] != 'GA')
     atl = sum(amt(r) for r in d if r['contributor_state'] == 'GA' and r['contributor_zip'][:2] == '30')
     ind = sum(amt(r) for r in d if r['contributor_state'] == 'GA' and r['contributor_zip'][:2] != '30')
+    GEO_D[t] = (int(round(ind)), int(round(atl)), int(round(out)), round(ind / (ind + atl + out) * 100, 1))
     print(f"  {t}: inDist={ind:,.0f}  atlanta={atl:,.0f}  outState={out:,.0f}  inDistPct={ind/(ind+atl+out)*100:.1f}%")
 
 # --- TOP_ZIPS (dedup, all elections) ---
@@ -249,10 +293,12 @@ zsum = {t: defaultdict(float) for t in ['K','M','F']}
 for t in ['K','M','F']:
     for r in dedup(comm(t)): zsum[t][r['contributor_zip'][:5]] += amt(r)
 for zp in ZLIST:
-    print(f"  {zp}: K={int(zsum['K'][zp]):>7} M={int(zsum['M'][zp]):>6} F={int(zsum['F'][zp]):>6}")
+    h = HHI.get(zp)
+    print(f"  {zp}: K={int(zsum['K'][zp]):>7} M={int(zsum['M'][zp]):>6} F={int(zsum['F'][zp]):>6}  HHI={h if h is not None else 'no ACS estimate'}")
 
 # --- INCOME_TIER (% of classifiable $) + weighted avg ---
 print("\n[INCOME_TIER]  % of classifiable $ (out-of-state + GA-with-HHI)")
+TIER_D = {}
 for t in ['K','M','F']:
     net = netby(dedup(comm(t))); st = {}; zp = {}
     for r in dedup(comm(t)): st[r['contributor_name']] = r['contributor_state']; zp[r['contributor_name']] = r['contributor_zip'][:5]
@@ -266,9 +312,11 @@ for t in ['K','M','F']:
             td[tt] += v
     tot = sum(td.values())
     p = {k: td[k] / tot * 100 for k in td}
+    TIER_D[t] = p
     print(f"  {t}: High={p.get('High',0):.1f} UpperMid={p.get('UpperMid',0):.1f} Middle={p.get('Middle',0):.1f} Low={p.get('Low',0):.1f} Out={p.get('Out',0):.1f}")
 
 print("\n[weighted avg donor ZIP income]  over donors with known ZIP HHI")
+WAVG_D = {}
 for t in ['K','M','F']:
     net = netby(dedup(comm(t))); zp = {}
     for r in dedup(comm(t)): zp[r['contributor_name']] = r['contributor_zip'][:5]
@@ -277,12 +325,199 @@ for t in ['K','M','F']:
         if v <= 0: continue
         total += v; h = HHI.get(zp[n])
         if h: wsum += v * h; wbase += v
+    WAVG_D[t] = (int(round(wsum / wbase)), round(wbase / total * 100, 1))
     print(f"  {t}: ${wsum/wbase:,.0f}  coverage={wbase/total*100:.1f}%")
 
 # --- wealthy-zip + atlanta moat ---
+# The dashboard's wealth section is scoped to GEORGIA wealthy ZIPs ("Georgia's
+# wealthiest neighborhoods"), so GA-only is the figure it displays; the
+# all-states total is printed alongside for context.
 WZ = [z for z, h in HHI.items() if h >= 90000]
-print("\n[wealthy ZIP (HHI>=90k)]  Kingston / Montgomery / Farrell")
+zst = {}
 for t in ['K','M','F']:
-    print(f"  {t}: ${sum(zsum[t][z] for z in WZ):,.0f}")
+    for r in dedup(comm(t)): zst[r['contributor_zip'][:5]] = r['contributor_state']
+WZGA = [z for z in WZ if zst.get(z) == 'GA']
+print("\n[wealthy ZIP (ACS HHI>=90k)]  GA-only (dashboard figure) / all states")
+WGA_D = {}
+for t in ['K','M','F']:
+    WGA_D[t] = int(round(sum(zsum[t][z] for z in WZGA)))
+    print(f"  {t}: GA-only=${WGA_D[t]:,.0f}   all-states=${sum(zsum[t][z] for z in WZ):,.0f}")
+print(f"  qualifying GA ZIPs with any money: {sum(1 for z in WZGA if zsum['K'][z] or zsum['M'][z] or zsum['F'][z])}")
 ATL = ['30327','30305','30269','30342','30309']
-print(f"[Atlanta moat 5 ZIPs]  K=${sum(zsum['K'][z] for z in ATL):,.0f}  opp=${sum(zsum['M'][z]+zsum['F'][z] for z in ATL):,.0f}")
+MOAT_K = int(round(sum(zsum['K'][z] for z in ATL)))
+MOAT_OPP = int(round(sum(zsum['M'][z] + zsum['F'][z] for z in ATL)))
+print(f"[Atlanta moat 5 ZIPs]  K=${MOAT_K:,.0f}  opp=${MOAT_OPP:,.0f}")
+
+# ============================================================================
+# SELF-CHECK MODE (--check): compare every dashboard constant in the JSX
+# against the values derived above. Prints a plain-English PASS/FAIL line per
+# item and exits 1 on any mismatch, so a number that cannot be reproduced from
+# source data cannot survive a verification run. Guards the CLAUDE.md rule
+# "No fabricated data". Use --jsx <path> to point at a different file (testing).
+# ============================================================================
+import sys
+if '--check' in sys.argv:
+    import re
+    jsx_path = 'Kingston_Dashboard.jsx'
+    if '--jsx' in sys.argv:
+        jsx_path = sys.argv[sys.argv.index('--jsx') + 1]
+    src = open(jsx_path).read()
+    failures = []
+
+    def chk(label, dashboard_has, derived):
+        if dashboard_has == derived:
+            print(f"  PASS  {label}")
+        else:
+            failures.append(label)
+            print(f"  FAIL  {label}")
+            print(f"        dashboard has {dashboard_has!r}")
+            print(f"        derived       {derived!r}")
+
+    def chk_text(label, needle):
+        if needle in src:
+            print(f"  PASS  {label}")
+        else:
+            failures.append(label)
+            print(f"  FAIL  {label} — expected to find the text {needle!r}; the prose or stat is stale")
+
+    print("\n" + "=" * 72)
+    print(f"SELF-CHECK — comparing {jsx_path} against freshly derived values")
+    print("=" * 72)
+
+    # -- TOP_ZIPS: dollars per candidate + ACS income (null where no estimate) --
+    block = re.search(r'const TOP_ZIPS = \[(.*?)\];', src, re.S).group(1)
+    rows_j = re.findall(r"zip: '(\d{5})'.*?hhi: (null|\d+),\s*Kingston: (\d+),\s*Montgomery: (\d+),\s*Farrell: (\d+)", block)
+    chk('TOP_ZIPS row count', len(rows_j), len(ZLIST))
+    for zp, h, k, mn, f in rows_j:
+        chk(f'TOP_ZIPS {zp} dollars K/M/F', (int(k), int(mn), int(f)),
+            (int(zsum['K'][zp]), int(zsum['M'][zp]), int(zsum['F'][zp])))
+        chk(f'TOP_ZIPS {zp} ACS income', None if h == 'null' else int(h), HHI.get(zp))
+
+    # -- CUMULATIVE / MONTHLY --
+    for arr_name, store in (('CUMULATIVE', CUM_D), ('MONTHLY', MONTHLY_D)):
+        b = re.search(r'const %s = \[(.*?)\];' % arr_name, src, re.S).group(1)
+        rj = re.findall(r"Kingston: (\d+),\s*Montgomery: (\d+),\s*Farrell: (\d+)", b)
+        for i, t in enumerate('KMF'):
+            chk(f'{arr_name} {t}', [int(r[i]) for r in rj], store[t])
+
+    # -- AMOUNT_DIST --
+    SHORT2BUCKET = {'<$100': '<$100', '$100': '$100', '$250': '$250', '$500': '$500',
+                    '$1K': '$1K', '$2.5K': '$2.5K', '$3.5K max': '$3.5K',
+                    '$3.5–7K': '$3.5-7K', '$7K (2×)': '$7K', '>$7K': '>$7K'}
+    b = re.search(r'const AMOUNT_DIST = \[(.*?)\];', src, re.S).group(1)
+    for short, k, mn, f in re.findall(r"short: '([^']+)',\s*Kingston: (\d+),\s*Montgomery: (\d+),\s*Farrell: (\d+)", b):
+        bk_key = SHORT2BUCKET[short]
+        chk(f'AMOUNT_DIST {bk_key}', (int(k), int(mn), int(f)),
+            (cnts['K'][bk_key], cnts['M'][bk_key], cnts['F'][bk_key]))
+
+    # -- Q metrics + GEO --
+    qb = re.search(r'const Q = \{(.*?)\};', src, re.S).group(1)
+    gb = re.search(r'const GEO = \{(.*?)\};', src, re.S).group(1)
+    for t, nm in (('K', 'Kingston'), ('M', 'Montgomery'), ('F', 'Farrell')):
+        mq = re.search(nm + r":\s*\{ donors: (\d+),\s*repeatRate: ([\d.]+),\s*top20Pct: ([\d.]+),\s*avgGift: (\d+),\s*inDistPct: ([\d.]+),\s*maxed: (\d+)", qb)
+        chk(f'Q {nm} (donors/repeat/top20/avgGift/maxed)',
+            (int(mq.group(1)), float(mq.group(2)), float(mq.group(3)), int(mq.group(4)), int(mq.group(6))),
+            (Q_D[t]['donors'], Q_D[t]['repeat'], Q_D[t]['top20'], Q_D[t]['avg'], Q_D[t]['maxed']))
+        chk(f'Q {nm} inDistPct', float(mq.group(5)), GEO_D[t][3])
+        mg = re.search(nm + r":\s*\{ inDist: (\d+),\s*atlanta: (\d+),\s*outState: (\d+)", gb)
+        chk(f'GEO {nm}', tuple(int(x) for x in mg.groups()), GEO_D[t][:3])
+
+    # -- INCOME_TIER --
+    b = re.search(r'const INCOME_TIER = \[(.*?)\];', src, re.S).group(1)
+    TIERKEY = {'High': 'High', 'Upper-Mid': 'UpperMid', 'Middle': 'Middle', 'Low': 'Low', 'Out-of-state': 'Out'}
+    tier_rows = re.findall(r"tier: '([^']+)',\s*Kingston: ([\d.]+),\s*Montgomery: ([\d.]+),\s*Farrell: ([\d.]+)", b)
+    chk('INCOME_TIER row count', len(tier_rows), 5)
+    for label, k, mn, f in tier_rows:
+        key = TIERKEY[label.split(' (')[0].strip()]
+        chk(f'INCOME_TIER {key}', (float(k), float(mn), float(f)),
+            tuple(round(TIER_D[t].get(key, 0), 1) for t in 'KMF'))
+
+    # -- OCCUPATIONS (per donor) --
+    ob = re.search(r'const OCCUPATIONS = \{(.*?)\n\};', src, re.S).group(1)
+    for t, nm in (('K', 'Kingston'), ('M', 'Montgomery'), ('F', 'Farrell')):
+        sub = re.search(nm + r": \[(.*?)\],", ob, re.S).group(1)
+        entries = re.findall(r"occ: '([^']+)',\s*n: (\d+)", sub)
+        for occ_name, n in entries:
+            chk(f'OCCUPATIONS {nm} "{occ_name}"', int(n), OCC_D[t].get(occ_name.upper(), 0))
+
+    # -- Retiree shares --
+    for nm, r_, o in re.findall(r"\{ name: '(\w+)', retirees: (\d+), other: (\d+) \}", src):
+        chk(f'Retiree share {nm}', int(r_), RET_D[nm[0]])
+
+    # -- SHARED (compare the multiset of K/M/F amount triples) --
+    b = re.search(r'const SHARED = \[(.*?)\];', src, re.S).group(1)
+    got = sorted(tuple(int(x) for x in r) for r in
+                 re.findall(r"Kingston: (\d+),\s*Montgomery: (\d+),\s*Farrell: (\d+),\s*tone", b))
+    want = sorted((int(d.get('K', 0)), int(d.get('M', 0)), int(d.get('F', 0)))
+                  for n, d in allnet.items() if sum(1 for t in d if d[t] > 0) >= 2)
+    chk('SHARED donor count (cross-candidate, normalized names)', len(got), len(want))
+    chk('SHARED amount triples', got, want)
+    chk_text('SHARED count in Insight 05 stat', f"value: '{len(want)}'")
+
+    # -- BUNDLERS (compare the multiset of (donor-count, total) pairs) --
+    b = re.search(r'const BUNDLERS = \[(.*?)\];', src, re.S).group(1)
+    got = sorted((int(n), int(tt)) for n, tt in re.findall(r"n: (\d+),\s*total: (\d+)", b))
+    want_b = []
+    for disp_name, keyfrag in FIRMS.items():
+        ftot = 0.0; fdonors = set()
+        for e, (v, ds) in emp.items():
+            if keyfrag in e: ftot += v; fdonors |= ds
+        want_b.append((len(fdonors), int(round(ftot))))
+    for e, (v, ds) in emp.items():
+        if len(ds) >= 3 and not any(kf in e for kf in FIRMS.values()):
+            want_b.append((len(ds), int(round(v))))
+    chk('BUNDLERS cluster count (every employer with 3+ donors)', len(got), len(want_b))
+    chk('BUNDLERS (donors, total) pairs', got, sorted(want_b))
+    btotal = sum(tt for _, tt in want_b)
+    chk_text('Bundler stat total', f"value: '${btotal/1000:.0f}K'")
+    chk_text('Bundler stat firm count', f"label: 'from {len(want_b)} firms'")
+
+    # -- Weighted avg donor ZIP income + wealthy-ZIP GA totals --
+    for nm, wa, cv in re.findall(r"\{ name: '(\w+)',\s*wAvg: (\d+),\s*cov: ([\d.]+) \}", src):
+        chk(f'Weighted avg ZIP income {nm}', (int(wa), float(cv)), WAVG_D[nm[0]])
+    for nm, tt in re.findall(r"name: '(\w+)',\s*total: (\d+),\s*color", src):
+        chk(f'Wealthy-ZIP GA-only total {nm}', int(tt), WGA_D[nm[0]])
+    chk_text('Wealthy-ZIP header dollars', f"${WGA_D['K']:,} came from Georgia ZIPs")
+
+    # -- Key prose figures (expected strings are built from derived values) --
+    at35 = sum(1 for r in Kd if amt(r) == 3500)
+    chk_text('Model 2 donors/rows line', f"{len(donors_pos)} unique donors, {len(Kd)} itemized contributions")
+    chk_text('Model 2 at-cap/maxed line', f"{at35} contributions at exactly $3,500 (primary cap); {len(pmaxed)} donors net-maxed")
+    chk_text('Model 2 general-room donors', f"{len(gnot)} of those have not given $3,500 to general")
+    chk_text('Model 2 below-cap line', f"{len(m2_below)} donors below primary cap, avg remaining capacity ${proom/len(m2_below):,.0f}")
+    chk_text('Model 2 primary room', f"${proom:,.0f}")
+    chk_text('Model 2 general room', f"${groom:,.0f}")
+    chk_text('Model 2 total addressable', f"${proom + groom:,.0f}")
+    chk_text('Ultra-loyalist stat', f"value: '${sum(v for _, v in ge7)/1000:.0f}K'")
+    chk_text('Ultra-loyalist donor count', f"label: 'from {len(ge7)} donors'")
+    chk_text('Triple-max line', f"{len(trip)} donors · ${sum(v for _, v in trip)/1000:.0f}K")
+    chk_text('Partial-triple line', f"{len(part)} donors · ${sum(v for _, v in part)/1000:.0f}K")
+    chk_text('Runoff capacity', f"${len(part)*10500 - sum(v for _, v in part):,.0f} in legal runoff capacity")
+    chk_text('Over-cap stat (compliance)', f"value: '{len(over)}'")
+    chk_text('Household count', f"{len(multi)} Kingston households")
+    chk_text('Household combined net', f"${HH_TOT:,.0f} net")
+    chk_text('Atlanta moat Kingston', f"${MOAT_K:,.0f} combined")
+    chk_text('Atlanta moat opponents', f"${MOAT_OPP:,.0f} total")
+
+    # -- FIN: not derivable from the Schedule A CSV (it is FEC Form 3 summary
+    #    data), so only internal consistency is checked here --
+    fb = re.search(r'const FIN = \{(.*?)\};', src, re.S).group(1)
+    for nm in ('Kingston', 'Montgomery', 'Farrell'):
+        mf = re.search(nm + r":\s*\{ receipts: (\d+),\s*indiv: (\d+),\s*itemized: (\d+),\s*unitemized: (\d+),\s*pac: (\d+),\s*selfLoans: (\d+),\s*selfContrib: (\d+)", fb)
+        rec, ind, it, un, pac, sl, sc = (int(x) for x in mf.groups())
+        chk(f'FIN {nm} internal consistency (itemized+unitemized≈indiv, parts≈receipts, ±$1)',
+            (abs(it + un - ind) <= 1, abs(ind + pac + sl + sc - rec) <= 1), (True, True))
+    print("  NOTE  FIN values come from FEC Form 3 summary filings and cannot be re-derived")
+    print("        from the Schedule A CSV — verify them against fec.gov when refreshing data.")
+
+    print("-" * 72)
+    if failures:
+        print(f"SELF-CHECK FAILED — {len(failures)} item(s) above did not match the derived data:")
+        for fl in failures:
+            print(f"  - {fl}")
+        print("Next step: for each item, either the dashboard constant is stale (re-derive and")
+        print("update it) or the derivation changed (update the dashboard and its prose to")
+        print('match). A number that cannot be re-derived must not ship — see CLAUDE.md →')
+        print('"No fabricated data".')
+        sys.exit(1)
+    print("SELF-CHECK PASSED — every checked dashboard constant matches the derived data.")
