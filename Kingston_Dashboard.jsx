@@ -914,7 +914,7 @@ const TabDonors = () => {
       </div>
 
       <WhyMatters>
-        Occupation mix predicts two things: <strong>vote propensity</strong> (retirees turn out at 2–3× the rate of working-age voters in primaries) and <strong>coalition breadth</strong> (a base of attorneys, owners, and executives overlaps heavily with chamber-of-commerce and business networks). Kingston runs on a classic professional-class coalition; Montgomery's base skews retired (high turnout, smaller size); Farrell's skews self-employed small-business (narrow, local).
+        Occupation mix is a read on <strong>coalition breadth</strong>: a base of attorneys, owners, and executives overlaps heavily with chamber-of-commerce and business networks. Kingston runs on a classic professional-class coalition; Montgomery's base skews retired (smaller base); Farrell's skews self-employed small-business (narrower, more local). It is not a turnout measure — occupation says nothing about who actually votes, and this dataset carries no voter-file or turnout data.
       </WhyMatters>
 
       {/* Top donors & bundlers */}
@@ -1182,7 +1182,7 @@ const TabGeography = () => {
               })}
             </div>
             <div style={{ fontSize: 12, color: P.ink, background: P.bg, padding: '14px 16px', borderRadius: 8, marginTop: 14, borderLeft: `4px solid ${P.kingstonAccent}`, lineHeight: 1.6 }}>
-              <strong style={{ color: P.kingston }}>Why this matters:</strong> Wealthy-ZIP donors are the highest-propensity primary voters and the natural network for future bundling. Kingston's dominance here isn't just about the $628K — he holds relationships with nearly every major political donor in the district's top neighborhoods. Opponents' combined take from these same ZIPs is $140K.
+              <strong style={{ color: P.kingston }}>Why this matters:</strong> Wealthy ZIPs are the natural network for future bundling, and Kingston has consolidated them — his <strong>$628K</strong> from these neighborhoods dwarfs opponents' combined <strong>$140K</strong>. Whether those donors also vote at higher rates is a separate question this fundraising data can't answer.
             </div>
           </div>
 
@@ -1367,7 +1367,7 @@ const TabOpponents = () => (
         <div>
           <Tag tone="danger">Weaknesses</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Retiree gap.</strong> 7% of donors are retirees vs Montgomery's 28% — and retirees turn out 2–3× in GOP primaries</li>
+            <li><strong>Retiree mix.</strong> 7% of donors are retirees vs Montgomery's 28% — a coalition-composition difference; this data can't measure its turnout impact</li>
             <li><strong>Small-dollar desert.</strong> Only 1% of individual dollars are unitemized (&lt;$200) — no real grassroots email machine</li>
             <li>"Legacy candidate" framing — dad's name is the easiest attack angle</li>
             <li>31416 (Isle of Hope/Oatland) underperformance — 59% share, his lowest in the Savannah core and Farrell's best ZIP anywhere (41%)</li>
@@ -1635,10 +1635,10 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="03" tone="warm" title="The Atlanta Moat — $109K from ZIPs no opponent touches"
+        <Insight n="03" tone="warm" title="The Atlanta Moat — $109K where opponents barely register"
           stat={{ value: '$109K', label: 'Atlanta network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$109,450 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs. This is donor territory no rival has touched.
+            Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$109,450 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs — about 5% of Kingston's haul. This is donor territory the field has almost entirely ceded to him.
           </p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={atlantaZips} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
@@ -1693,7 +1693,7 @@ const TabInsights = () => {
         <Insight n="06" tone="gold" title="Women out-give men per donor — by 33%"
           stat={{ value: '$3,776', label: 'avg female vs $2,833 male' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. His <strong>80 female donors average $3,776 each</strong>; his <strong>370 male donors average $2,833 each</strong>. That's a <strong>33% per-donor premium for women</strong> — and women are underrepresented in the base (14% of donors by head, 19% by dollars). The pattern suggests meaningful untapped capacity among women in Kingston's file.
+            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. By <strong>name-inferred gender</strong>, his 80 female donors average <strong>$3,776 each</strong> and his 370 male donors average <strong>$2,833 each</strong> — a <strong>33% per-donor premium for women</strong>, who are also underrepresented in the base (14% of donors by head, 19% by dollars). Gender isn't an FEC field, so it's inferred from first names and the names a dictionary can't place are left unclassified — read this as a strong directional signal, not a precise count.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
@@ -1709,10 +1709,10 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="07" tone="warm" title="The retiree gap — Kingston's biggest coalition vulnerability"
+        <Insight n="07" tone="warm" title="The retiree gap — a coalition-composition difference"
           stat={{ value: '7%', label: 'retirees in Kingston base' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Kingston's donor base is 7% retirees. Montgomery's is <strong>28%</strong>. In a GOP primary, retirees vote at 2-3× the rate of working-age voters. This is the one dimension where Montgomery's coalition is meaningfully stronger than Kingston's.
+            Kingston's donor base is 7% retirees. Montgomery's is <strong>28%</strong> — the dimension where the two coalitions look most different in composition. Retirees are often assumed to vote at higher rates in low-turnout primaries, but this dataset has no turnout or voter-file data, so it can show the donor-mix gap without quantifying any electoral edge.
           </p>
           <div style={{ marginTop: 12 }}>
             {retireeData.map(d => (
@@ -1754,10 +1754,10 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="09" tone="default" title="10 bundler firms organized $133K in stacked giving"
+        <Insight n="09" tone="default" title="10 employer clusters account for $133K in stacked giving"
           stat={{ value: '$133K', label: 'from 10 firms' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            When 3+ employees of one firm donate within days of each other, someone inside organized it. That person is a <strong>de facto bundler</strong> — the organizer behind the cluster. Here are the ten employers where it happened — including OrthoAtlanta, whose 12 physicians all gave within the last nine days of March.
+            When 3+ employees of one firm donate within days of each other, it is <strong>consistent with someone inside organizing the giving</strong> — a likely bundler — though shared employer and timing alone don't prove coordination. Here are the ten employer clusters, including OrthoAtlanta, whose 12 physicians all gave within the last nine days of March.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {BUNDLERS.map(b => (
@@ -1775,7 +1775,7 @@ const TabInsights = () => {
         <Insight n="10" tone="default" title="The small-dollar desert — and what it means"
           stat={{ value: '1.0%', label: 'Kingston unitemized' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Only <strong>1% of Kingston's individual money is unitemized</strong> (donations under $200). A typical grassroots-email campaign runs 15-30% small-dollar. This is a pure call-time operation.
+            Only <strong>1% of Kingston's individual money is unitemized</strong> (donations under $200) — almost everything arrives as itemized, above-$200 checks. This is a call-time operation, not a small-dollar email program.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
             {['Kingston','Montgomery','Farrell'].map(name => {
@@ -1795,10 +1795,10 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="11" tone="warm" title="Zero compliance exposure — every big donor nets at or under the cap"
+        <Insight n="11" tone="warm" title="No over-the-cap totals — every big donor nets at or under the cap"
           stat={{ value: '0', label: 'donors over the $10,500 cap' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            A naive read of the raw FEC file makes the biggest donors look like they gave $14,000–$24,500 — over the <strong>$10,500 per-individual per-cycle cap</strong>. They didn't. Those inflated figures are reattribution and primary/general/runoff redesignation memo entries; once netted, every one of these donors lands at or under the legal maximum (shown below). The file is clean — there is no compliance exposure.
+            A naive read of the raw FEC file makes the biggest donors look like they gave $14,000–$24,500 — over the <strong>$10,500 per-individual per-cycle cap</strong>. They didn't. Those inflated figures are reattribution and primary/general/runoff redesignation memo entries; once netted, every one of these donors lands at or under the legal maximum (shown below). Net of those memo entries, no donor in the file exceeds the cap — the apparent over-limit totals are an artifact of the raw rows, not actual over-limit giving.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 10 }}>
             {overCap.map(d => (
@@ -1813,7 +1813,7 @@ const TabInsights = () => {
         <Insight n="12" tone="gold" title="40 households doubled up — a rare depth signal"
           stat={{ value: '40', label: 'households w/ 2+ max-givers' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            The FEC's $3,500 cap is per individual, not per household — so when two people at the same address <em>both</em> max out, that's two independent political decisions, not one donor writing a bigger check. <strong>40 Kingston households have 2+ family members who each netted $3,500 or more.</strong> Combined, they account for <strong>$621,000 net</strong> — well over one in every three Kingston dollars. This is uncommon in a typical primary and a stronger signal of commitment than any single donor's max check.
+            The FEC's $3,500 cap is per individual, not per household — so when two people who <em>share a surname and ZIP</em> both max out, that reads as two independent decisions, not one donor writing a bigger check. <strong>40 Kingston households — clusters that share a surname and ZIP — have 2+ members who each netted $3,500 or more</strong>, together accounting for <strong>$621,000 net</strong> — well over one in every three Kingston dollars. Households are inferred from shared surname + ZIP, so a few may be unrelated namesakes; even so, it is an uncommon depth of repeat max-giving.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 8, marginBottom: 12 }}>
             {[
@@ -2030,7 +2030,7 @@ const TabModels = () => {
           </div>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <strong style={{ color: P.kingston }}>Source:</strong> FEC Schedule A (Itemized Individual Contributions), aggregated by (contributor_name + 5-digit ZIP) for Committee C00908624. File timestamp 2026-04-20T09:27:54.{' '}
+          <strong style={{ color: P.kingston }}>Source:</strong> FEC Schedule A (Itemized Individual Contributions), aggregated by contributor_name (net of refunds) for Committee C00908624. File timestamp 2026-04-20T09:27:54.{' '}
           <strong style={{ color: P.kingston }}>Statute:</strong> 52 U.S.C. § 30116(a)(1)(A) — $3,500 per individual per election limit (2025–26 cycle, indexed biennially per FEC announcement).
         </div>
       </Card>
@@ -2218,7 +2218,7 @@ const TabModels = () => {
               </div>
             ))}
             <div style={{ padding: '10px 14px', background: '#EDF2E8', borderRadius: 8, fontSize: 12, color: P.ink, lineHeight: 1.5 }}>
-              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 583 donors represent roughly 0.9% of the expected primary electorate. Each donor's network converting 50–60 additional voters corresponds to Kingston clearing 50%+1 in the base scenario.
+              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 583 donors are roughly 0.9% of the expected primary electorate in the base scenario. How a donor base converts into votes is not something this data can model — the turnout figures here are scenarios, not a forecast.
             </div>
           </div>
         </div>
@@ -2294,7 +2294,7 @@ const TabModels = () => {
             <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, marginTop: 8, marginBottom: 8 }}>
               Every input used in these six models is sourced from (a) FEC official filings retrievable at{' '}
               <span style={{ fontFamily: 'ui-monospace, monospace' }}>fec.gov/data</span>, (b) federal statute and controlling case law (U.S. Code, C.F.R., and Supreme Court decisions), or (c) Georgia Secretary of State election archives at{' '}
-              <span style={{ fontFamily: 'ui-monospace, monospace' }}>sos.ga.gov</span>. No polling, no private data, no academic regressions, no inferred numbers. Every calculation is deterministic arithmetic on disclosed values.
+              <span style={{ fontFamily: 'ui-monospace, monospace' }}>sos.ga.gov</span>. No polling, no private data, no academic regressions. Most calculations are deterministic arithmetic on disclosed values; the two models that require an assumption — post-loss fundraising in Model 03 and turnout in Model 05 — state it explicitly and carry a lower confidence rating.
             </p>
             <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.muted, marginTop: 0, marginBottom: 0 }}>
               Confidence ratings: <strong>HIGH</strong> = result follows directly from inputs with no meaningful assumptions. <strong>MEDIUM-HIGH</strong> = structural analog exists but magnitude carries uncertainty (±20%).
