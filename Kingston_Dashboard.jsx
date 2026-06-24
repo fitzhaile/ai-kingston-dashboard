@@ -5,6 +5,8 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ScatterChart, Scatter, ZAxis, ComposedChart, ReferenceLine, ReferenceArea
 } from 'recharts';
+import { geoMercator, geoPath } from 'd3-geo';
+import GEO_ZIPS from './geo_zips.json';
 
 /* ============================================================
    GA-1 REPUBLICAN PRIMARY — FUNDRAISING ANALYSIS
@@ -965,6 +967,122 @@ const TabDonors = () => {
 /* ============================================================
    TAB 4: GEOGRAPHY & INCOME
    ============================================================ */
+/* ============================================================
+   GEOGRAPHIC MAPS — real GA ZCTA boundaries (geo_zips.json, built by
+   derive_geo_data.py from Census TIGER ZCTAs). Choropleth + bubble,
+   per candidate, bubbles colored by neighborhood income. d3-geo projection.
+   ============================================================ */
+const GEO_TIERS = [
+  { key: 'High',     label: 'High · $125K+',       min: 125000, color: '#1E3A5F' },
+  { key: 'UpperMid', label: 'Upper-mid · $75–124K', min: 75000,  color: '#3A6B8C' },
+  { key: 'Middle',   label: 'Middle · $50–74K',     min: 50000,  color: '#D4A94A' },
+  { key: 'Low',      label: 'Low · <$50K',          min: 0,      color: '#C4723E' },
+];
+const tierOf = (hhi) => (hhi == null ? null : GEO_TIERS.find(t => hhi >= t.min));
+
+const GeoMaps = () => {
+  const [cand, setCand] = useState('Kingston');
+  const [hover, setHover] = useState(null);
+  const key = cand[0];                       // 'K' | 'M' | 'F'
+  const W = 330, H = 420, pad = 12;
+  const feats = GEO_ZIPS.features;
+  const district = useMemo(() => ({ type: 'Feature', geometry: GEO_ZIPS.district }), []);
+  const candColor = C[cand].color;
+  const usd = (n) => '$' + Math.round(n).toLocaleString();
+  // Single projection fit to the real GA-1 boundary, so the district frames the map.
+  const proj = useMemo(() => geoMercator().fitExtent([[pad, pad], [W - pad, H - pad]], district), [district]);
+  const path = useMemo(() => geoPath(proj), [proj]);
+  const districtPath = useMemo(() => path(district), [path, district]);
+  const maxAmt = useMemo(() => Math.max(1, ...feats.map(f => f.properties[key])), [key, feats]);
+  const rowRef = useRef(null);
+  const onMove = (p) => (e) => {
+    const r = rowRef.current.getBoundingClientRect();
+    setHover({ p, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
+  };
+  const off = () => setHover(null);
+  const choro = (f) => {
+    const v = f.properties[key]; const op = v > 0 ? 0.14 + 0.86 * Math.sqrt(v / maxAmt) : 0.05;
+    return <path key={f.properties.zip} d={path(f)} fill={candColor} fillOpacity={op} stroke="#fff" strokeWidth={0.4}
+      onMouseMove={onMove(f.properties)} onMouseLeave={off} />;
+  };
+  const bubble = (f) => {
+    const p = proj([f.properties.lon, f.properties.lat]); if (!p) return null;
+    const r = 2 + Math.sqrt(f.properties[key] / maxAmt) * 26; const tier = tierOf(f.properties.hhi);
+    return <circle key={f.properties.zip} cx={p[0]} cy={p[1]} r={r} fill={tier ? tier.color : '#9A9A9A'} fillOpacity={0.74} stroke="#fff" strokeWidth={0.7}
+      onMouseMove={onMove(f.properties)} onMouseLeave={off} />;
+  };
+  const bubbleFeats = feats.filter(f => f.properties[key] > 0).sort((a, b) => b.properties[key] - a.properties[key]);
+
+  const Frame = ({ title, children }) => (
+    <div style={{ flex: 1, minWidth: 220 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{title}</div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', background: P.bg, borderRadius: 10, border: `1px solid ${P.line}` }}>
+        {children}
+      </svg>
+    </div>
+  );
+
+  return (
+    <Card style={{ padding: 22, marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: 0, color: P.kingston }}>Where the money is — inside GA-1</h3>
+          <p style={{ fontSize: 12, color: P.muted, margin: '4px 0 0', maxWidth: 580 }}>The real 1st Congressional District (current 119th-Congress lines). The choropleth shades each in-district ZIP by <strong style={{ color: candColor }}>{cand}'s</strong> dollars; the bubbles size by dollars and color by neighborhood income. Out-of-district money (Atlanta, out-of-state) sits in the breakdown below.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['Kingston', 'Montgomery', 'Farrell'].map(c => (
+            <button key={c} onClick={() => setCand(c)} style={{
+              border: `1px solid ${cand === c ? C[c].color : P.line}`, background: cand === c ? C[c].color : P.paper,
+              color: cand === c ? '#fff' : P.muted, borderRadius: 8, padding: '6px 12px', fontSize: 12,
+              fontWeight: 700, cursor: 'pointer', fontFamily: 'DM Sans',
+            }}>{c}</button>
+          ))}
+        </div>
+      </div>
+
+      <div ref={rowRef} style={{ position: 'relative', display: 'flex', gap: 14, marginTop: 14, flexWrap: 'wrap' }}>
+        <Frame title="Choropleth — dollars by ZIP">
+          <path d={districtPath} fill="none" stroke={P.kingston} strokeWidth={1.2} strokeOpacity={0.5} />
+          {feats.map(choro)}
+        </Frame>
+        <Frame title="Bubbles — size = dollars · color = income">
+          <path d={districtPath} fill={P.paper} stroke={P.kingston} strokeWidth={1.2} strokeOpacity={0.5} />
+          {feats.map(f => <path key={'g' + f.properties.zip} d={path(f)} fill={P.line} fillOpacity={0.35} stroke="#fff" strokeWidth={0.3}
+            onMouseMove={onMove(f.properties)} onMouseLeave={off} />)}
+          {bubbleFeats.map(bubble)}
+        </Frame>
+        {hover && (
+          <div style={{
+            position: 'absolute', top: Math.max(2, hover.y - 6),
+            left: hover.x < hover.w - 190 ? hover.x + 14 : undefined,
+            right: hover.x < hover.w - 190 ? undefined : hover.w - hover.x + 14,
+            pointerEvents: 'none', zIndex: 10, background: P.paper,
+            border: `1px solid ${P.kingston}`, borderRadius: 8, boxShadow: '0 8px 20px rgba(31,58,95,0.18)',
+            padding: '8px 11px', fontFamily: 'DM Sans', fontSize: 12, whiteSpace: 'nowrap',
+          }}>
+            <div style={{ fontWeight: 700, color: P.kingston }}>{hover.p.zip}{hover.p.city ? ' · ' + hover.p.city : ''}</div>
+            <div style={{ color: P.ink, marginTop: 2 }}><strong style={{ color: candColor }}>{usd(hover.p[key])}</strong> to {cand}</div>
+            <div style={{ color: P.muted, marginTop: 1 }}>{hover.p.hhi != null ? '$' + (hover.p.hhi / 1000).toFixed(0) + 'K median income' : 'income n/a'}</div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {GEO_TIERS.map(t => (
+            <span key={t.key} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: P.muted }}>
+              <span style={{ width: 10, height: 10, borderRadius: 3, background: t.color, display: 'inline-block' }} />{t.label}
+            </span>
+          ))}
+        </div>
+        <div style={{ fontSize: 12, color: P.mutedLight, minHeight: 18 }}>
+          Hover any ZIP or bubble for its dollars &amp; income · {feats.length} in-district ZIPs
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 const TabGeography = () => {
   const zipForChart = TOP_ZIPS.slice(0, 15).map(z => ({
     ...z,
@@ -978,21 +1096,10 @@ const TabGeography = () => {
     'Out-of-state': GEO[name].outState,
   }));
 
-  // HHI vs K-share scatter. 31416 is excluded — it has no published ACS income
-  // estimate, so it cannot be placed on the income axis.
-  const scatterData = TOP_ZIPS.filter(z => z.hhi != null).map(z => {
-    const tot = z.Kingston + z.Montgomery + z.Farrell;
-    return {
-      zip: z.zip, nbhd: z.nbhd,
-      hhi: z.hhi / 1000,
-      kShare: (z.Kingston / tot) * 100,
-      total: tot,
-    };
-  });
-
   return (
     <div>
       <SectionH eyebrow="The map" title="Geography & income" kicker="Every candidate's donor map tells a different story."/>
+      <GeoMaps/>
 
       {/* WEALTH PROFILE — prominent visualization of Kingston's wealthy-neighborhood concentration */}
       <Card style={{ padding: 0, marginBottom: 16, overflow: 'hidden', border: `2px solid ${P.kingstonAccent}` }}>
@@ -1238,37 +1345,6 @@ const TabGeography = () => {
             <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 12 }}/>
           </BarChart>
         </ResponsiveContainer>
-      </Card>
-
-      {/* Scatter: HHI vs K-share */}
-      <Card style={{ padding: 26, marginBottom: 16 }}>
-        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>ZIP income vs. Kingston's share</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 14px', maxWidth: 740 }}>
-          Each dot is one ZIP. X-axis: median household income. Y-axis: Kingston's share of dollars raised there. Bubble size: total raised. The trend is striking: Kingston wins almost everywhere, with near-total dominance in wealthy ZIPs.
-        </p>
-        <ResponsiveContainer width="100%" height={340}>
-          <ScatterChart margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="2 4" stroke={P.line}/>
-            <XAxis type="number" dataKey="hhi" name="HHI ($K)" tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} label={{ value: 'ZIP median household income ($K)', position: 'bottom', fill: P.muted, fontSize: 12, fontFamily: 'DM Sans' }}/>
-            <YAxis type="number" dataKey="kShare" name="Kingston %" tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} domain={[0, 100]} label={{ value: "Kingston's share (%)", angle: -90, position: 'left', fill: P.muted, fontSize: 12, fontFamily: 'DM Sans' }}/>
-            <ZAxis type="number" dataKey="total" range={[50, 1200]}/>
-            <Tooltip content={({ active, payload }) => {
-              if (!active || !payload || !payload.length) return null;
-              const d = payload[0].payload;
-              return (
-                <div style={{ background: P.paper, border: `1px solid ${P.kingston}`, borderRadius: 8, padding: '10px 12px', fontFamily: 'DM Sans', fontSize: 12 }}>
-                  <div style={{ fontWeight: 700, color: P.kingston }}>{d.zip} · {d.nbhd}</div>
-                  <div>HHI: ${d.hhi}K · K share: {d.kShare.toFixed(0)}% · Total: {fmtK(d.total)}</div>
-                </div>
-              );
-            }}/>
-            <ReferenceLine y={50} stroke={P.warning} strokeDasharray="3 3" label={{ value: '50% parity', fill: P.warning, fontSize: 10, position: 'right' }}/>
-            <Scatter name="ZIPs" data={scatterData} fill={P.kingston} fillOpacity={0.65}/>
-          </ScatterChart>
-        </ResponsiveContainer>
-        <WhyMatters>
-          The two axes together tell a story about <em>vote propensity</em>. ZIPs with higher HHI turn out at meaningfully higher rates in low-turnout primaries — often 50-70% higher than low-income ZIPs. Kingston's concentration in the upper-right quadrant (high-income, high-share) is notable: he isn't just raising more, he's raising from neighborhoods that reliably vote in primaries.
-        </WhyMatters>
       </Card>
 
       {/* Income tier + weighted avg */}
