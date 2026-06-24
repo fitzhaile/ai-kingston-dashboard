@@ -2693,6 +2693,12 @@ export default function Dashboard() {
     }
   };
 
+  // Tap the nav scroll affordances to advance the tab strip
+  const scrollNav = (dir) => {
+    const el = navRef.current;
+    if (el) el.scrollBy({ left: dir * Math.max(140, el.clientWidth * 0.6), behavior: 'smooth' });
+  };
+
   // Keep state in sync with the URL hash (handles back/forward + external links)
   useEffect(() => {
     const sync = () => setTabState(readTabFromHash());
@@ -2826,9 +2832,9 @@ export default function Dashboard() {
               }}>{t.label}</button>
             ))}
           </div>
-          <div aria-hidden="true" style={{
+          <div role="button" aria-label="Scroll tabs right" onClick={() => scrollNav(1)} style={{
             position: 'absolute', top: 0, right: 0, bottom: 0, width: 44,
-            pointerEvents: 'none',
+            pointerEvents: navOverflow.right ? 'auto' : 'none', cursor: 'pointer',
             background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 65%)`,
             opacity: navOverflow.right ? 1 : 0,
             transition: 'opacity 0.2s',
@@ -2836,9 +2842,9 @@ export default function Dashboard() {
             paddingRight: 10, paddingBottom: 1,
             color: P.kingston, fontSize: 22, fontWeight: 700, lineHeight: 1,
           }}>›</div>
-          <div aria-hidden="true" style={{
+          <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
             position: 'absolute', top: 0, left: 0, bottom: 0, width: 44,
-            pointerEvents: 'none',
+            pointerEvents: navOverflow.left ? 'auto' : 'none', cursor: 'pointer',
             background: `linear-gradient(to left, rgba(255,255,255,0), ${P.paper} 65%)`,
             opacity: navOverflow.left ? 1 : 0,
             transition: 'opacity 0.2s',
