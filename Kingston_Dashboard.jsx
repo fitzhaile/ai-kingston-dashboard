@@ -2748,9 +2748,10 @@ export default function Dashboard() {
           .dk-root [style*="justify-content: space-between"][style*="align-items: center"] {
             flex-wrap: wrap; gap: 10px;
           }
-          /* Masthead meta (district + date): when it wraps below the title, left-align
-             and indent it under the title text (logo 38 + gap 14) instead of the edge */
-          .dk-root .dk-masthead-meta { text-align: left !important; margin-left: 52px; }
+          /* On mobile, drop the logo and left-align everything (eyebrow, title, and the
+             district/date block) flush to the same edge */
+          .dk-root .dk-masthead-logo { display: none !important; }
+          .dk-root .dk-masthead-meta { text-align: left !important; }
 
           /* Collapse all multi-column grids to single column */
           .dk-root [style*="grid-template-columns: repeat(2"],
@@ -2790,7 +2791,7 @@ export default function Dashboard() {
       <div style={{ background: P.paper, borderBottom: `1px solid ${P.line}`, position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{
+            <div className="dk-masthead-logo" style={{
               width: 38, height: 38, borderRadius: 10,
               background: `linear-gradient(135deg, ${P.kingston}, ${P.kingstonLight})`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
