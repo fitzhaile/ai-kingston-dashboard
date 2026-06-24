@@ -2748,13 +2748,14 @@ export default function Dashboard() {
           .dk-root [style*="justify-content: space-between"][style*="align-items: center"] {
             flex-wrap: wrap; gap: 10px;
           }
-          /* On mobile, drop the logo and left-align everything (eyebrow, title, and the
-             district/date block) flush to the same edge */
-          .dk-root .dk-masthead-logo { display: none !important; }
-          .dk-root .dk-masthead-meta { text-align: left !important; }
-          /* Larger masthead title on mobile (wraps to two lines) so it reads as the
-             page title at the content's scale, not a small label */
-          .dk-root .dk-masthead-title { font-size: 26px !important; line-height: 1.1; }
+          /* Mobile masthead: logo + district/date sit together on the top row (date
+             next to the logo); the eyebrow + title wrap to the row below at the 14px
+             edge shared with the nav and content */
+          .dk-root .dk-masthead-inner { flex-wrap: wrap !important; gap: 13px 17px !important; }
+          .dk-root .dk-masthead-text { order: 2; flex-basis: 100%; }
+          .dk-root .dk-masthead-meta { order: 1; margin-left: 0 !important; text-align: left !important; }
+          .dk-root .dk-masthead-title { font-size: 18px !important; line-height: 1.2; }
+          .dk-root .dk-nav { padding-left: 14px !important; padding-right: 14px !important; }
           /* Hide the redundant oversized "Mar 31" hero stat on mobile (the date is in
              the masthead); it dominates the small screen and skews the hierarchy */
           .dk-root .dk-hero-date { display: none !important; }
@@ -2795,20 +2796,18 @@ export default function Dashboard() {
 
       {/* Masthead */}
       <div style={{ background: P.paper, borderBottom: `1px solid ${P.line}`, position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div className="dk-masthead-logo" style={{
-              width: 38, height: 38, borderRadius: 10,
-              background: `linear-gradient(135deg, ${P.kingston}, ${P.kingstonLight})`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingstonAccent, fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, fontStyle: 'italic',
-            }}>K</div>
-            <div>
-              <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>A Campaign-Finance Analysis</div>
-              <div className="dk-masthead-title" style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
-            </div>
+        <div className="dk-masthead-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div className="dk-masthead-logo" style={{
+            width: 38, height: 38, borderRadius: 10,
+            background: `linear-gradient(135deg, ${P.kingston}, ${P.kingstonLight})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: P.kingstonAccent, fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, fontStyle: 'italic',
+          }}>K</div>
+          <div className="dk-masthead-text">
+            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>A Campaign-Finance Analysis</div>
+            <div className="dk-masthead-title" style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
           </div>
-          <div className="dk-masthead-meta" style={{ textAlign: 'right' }}>
+          <div className="dk-masthead-meta" style={{ textAlign: 'right', marginLeft: 'auto' }}>
             <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Republican Primary</div>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Mar 31, 2026</div>
           </div>
