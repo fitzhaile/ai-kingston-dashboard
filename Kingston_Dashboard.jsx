@@ -465,7 +465,7 @@ const TabOverview = () => {
               Kingston has out-raised Farrell and Montgomery combined roughly 2-to-1, with about 3× the field's cash on hand — enough to contest a first-round majority on May 19 and avoid the June 16 runoff.
             </p>
           </div>
-          <div style={{ textAlign: 'center', minWidth: 110 }}>
+          <div className="dk-hero-date" style={{ textAlign: 'center', minWidth: 110 }}>
             <div style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: P.kingstonAccent, marginBottom: 2, fontWeight: 700 }}>Data Through</div>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 54, fontWeight: 300, lineHeight: 1 }}>Mar 31</div>
             <div style={{ fontSize: 11, marginTop: 4, opacity: 0.8 }}>Q1 2026 filing</div>
@@ -2755,6 +2755,9 @@ export default function Dashboard() {
           /* Larger masthead title on mobile (wraps to two lines) so it reads as the
              page title at the content's scale, not a small label */
           .dk-root .dk-masthead-title { font-size: 26px !important; line-height: 1.1; }
+          /* Hide the redundant oversized "Mar 31" hero stat on mobile (the date is in
+             the masthead); it dominates the small screen and skews the hierarchy */
+          .dk-root .dk-hero-date { display: none !important; }
 
           /* Collapse all multi-column grids to single column */
           .dk-root [style*="grid-template-columns: repeat(2"],
