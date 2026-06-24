@@ -2752,6 +2752,9 @@ export default function Dashboard() {
              district/date block) flush to the same edge */
           .dk-root .dk-masthead-logo { display: none !important; }
           .dk-root .dk-masthead-meta { text-align: left !important; }
+          /* Larger masthead title on mobile (wraps to two lines) so it reads as the
+             page title at the content's scale, not a small label */
+          .dk-root .dk-masthead-title { font-size: 26px !important; line-height: 1.1; }
 
           /* Collapse all multi-column grids to single column */
           .dk-root [style*="grid-template-columns: repeat(2"],
@@ -2799,7 +2802,7 @@ export default function Dashboard() {
             }}>K</div>
             <div>
               <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>A Campaign-Finance Analysis</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
+              <div className="dk-masthead-title" style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
             </div>
           </div>
           <div className="dk-masthead-meta" style={{ textAlign: 'right' }}>
