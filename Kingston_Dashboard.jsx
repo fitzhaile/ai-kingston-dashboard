@@ -2748,6 +2748,9 @@ export default function Dashboard() {
           .dk-root [style*="justify-content: space-between"][style*="align-items: center"] {
             flex-wrap: wrap; gap: 10px;
           }
+          /* Masthead meta (district + date): when it wraps below the title, left-align
+             and indent it under the title text (logo 38 + gap 14) instead of the edge */
+          .dk-root .dk-masthead-meta { text-align: left !important; margin-left: 52px; }
 
           /* Collapse all multi-column grids to single column */
           .dk-root [style*="grid-template-columns: repeat(2"],
@@ -2798,7 +2801,7 @@ export default function Dashboard() {
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div className="dk-masthead-meta" style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Republican Primary</div>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Mar 31, 2026</div>
           </div>
