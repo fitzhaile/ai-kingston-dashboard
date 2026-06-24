@@ -2748,8 +2748,8 @@ export default function Dashboard() {
             opacity: navOverflow.right ? 1 : 0,
             transition: 'opacity 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-            paddingRight: 10, paddingBottom: 3,
-            color: P.kingston, fontSize: 20, fontWeight: 700, lineHeight: 1,
+            paddingRight: 10, paddingBottom: 1,
+            color: P.kingston, fontSize: 22, fontWeight: 700, lineHeight: 1,
           }}>›</div>
           <div aria-hidden="true" style={{
             position: 'absolute', top: 0, left: 0, bottom: 0, width: 44,
