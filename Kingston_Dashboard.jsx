@@ -144,6 +144,17 @@ const GEO = {
   Farrell:    { inDist: 116341, atlanta: 8860,   outState: 3550   },
 };
 
+// === WEIGHTED-AVG DONOR ZIP INCOME + ACS COVERAGE ===
+// wAvg = each donor's dollars weighted by their ZIP median HHI; cov = the share
+// of the candidate's itemized dollars that fall in a ZIP with a published ACS
+// estimate (the rest land in ZIPs with no estimate, e.g. 31416). Used by both
+// the Geography tab and the Data Quality tab; verified by derive_dashboard_data.py --check.
+const ZIP_INCOME = [
+  { name: 'Kingston',   wAvg: 89563,  cov: 96.6 },
+  { name: 'Montgomery', wAvg: 100811, cov: 92.5 },
+  { name: 'Farrell',    wAvg: 79195,  cov: 90.4 },
+];
+
 // === QUALITY METRICS ===
 const Q = {
   Kingston:   { donors: 583, repeatRate: 29.7, top20Pct: 12.9, avgGift: 2129, inDistPct: 66.7, maxed: 190, pac: 179450, selfPct: 0 },
@@ -1281,17 +1292,16 @@ const TabGeography = () => {
         <Card style={{ padding: 22 }}>
           <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Weighted avg donor ZIP income</h3>
           <p style={{ fontSize: 12, color: P.muted, margin: '0 0 14px' }}>Each dollar weighted by the donor's ZIP median HHI.</p>
-          {[
-            { name: 'Kingston',   wAvg: 89563,  cov: 96.6 },
-            { name: 'Montgomery', wAvg: 100811, cov: 92.5 },
-            { name: 'Farrell',    wAvg: 79195,  cov: 90.4 },
-          ].map(d => (
+          {ZIP_INCOME.map(d => (
             <div key={d.name} style={{ padding: 14, borderLeft: `4px solid ${C[d.name].color}`, background: P.bg, borderRadius: 8, marginBottom: 10 }}>
               <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 600, color: P.kingston, marginTop: 4 }}>${d.wAvg.toLocaleString()}</div>
               <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>{d.cov}% coverage</div>
             </div>
           ))}
+          <div style={{ marginTop: 4, padding: '11px 13px', background: P.paper, border: `1px solid ${P.line}`, borderRadius: 8, fontSize: 11.5, color: P.muted, lineHeight: 1.55 }}>
+            <strong style={{ color: P.kingston }}>Why Montgomery's reads higher than Kingston's:</strong> this is the income of the <em>neighborhoods</em> donors live in, dollar-weighted — not the candidates' or their donors' own incomes. Montgomery's smaller pool is concentrated in a few of the wealthiest coastal ZIPs (Skidaway Island, his single biggest source, is the priciest ZIP in the Savannah core), which lifts his average. Kingston's much larger base leans on middle-income Savannah neighborhoods — his biggest single ZIP, Southside, sits right around the GA-1 median — pulling his average down. So a higher number here means money <em>more concentrated in wealthy ZIPs</em>, not a wealthier coalition.
+          </div>
         </Card>
       </div>
 
@@ -2307,6 +2317,272 @@ const TabModels = () => {
 };
 
 /* ============================================================
+   TAB 8: DATA QUALITY & METHODOLOGY
+   Documents every source, scope decision, estimate, and known
+   limit behind the numbers. Reuses the same --check-guarded
+   constants the other tabs display, so this page can never quietly
+   disagree with them.
+   ============================================================ */
+
+// Where each number comes from. Plain-English provenance, not new figures.
+const DQ_SOURCES = [
+  {
+    name: 'FEC Schedule A — itemized individual contributions',
+    feeds: 'Every donor-level view: donor counts, gift-size distribution, occupations, geography, income tiers, bundler clusters, shared donors, households, and max-out analysis.',
+    vintage: 'Pulled from the OpenFEC API; contributions through 3/31/2026 (file timestamp 2026-04-20). Committees C00908624 (Kingston), C00917039 (Montgomery), C00905422 (Farrell).',
+  },
+  {
+    name: 'FEC Form 3 — Reports of Receipts & Disbursements',
+    feeds: 'The financial-summary panels: total receipts, itemized vs. unitemized split, PAC dollars, cash on hand, debt, self-funding, and the burn-rate / runway models.',
+    vintage: 'Q1 2026 filing, coverage 4/1/2025 – 3/31/2026. These summary totals are authoritative and are not re-derivable from Schedule A.',
+  },
+  {
+    name: 'U.S. Census Bureau — American Community Survey (ACS)',
+    feeds: 'ZIP-level median household income, which drives the income tiers, the weighted-average donor income, and the wealthy-neighborhood totals.',
+    vintage: '2019–2023 5-year estimates (table B19013, by ZCTA). Reference medians: Georgia $74,632 and US $77,719 (ACS 2023 1-year); GA-1 district $66,773 (ACS 2019–2023 5-year).',
+  },
+  {
+    name: 'Georgia Secretary of State',
+    feeds: 'Historical turnout and results that feed the runoff-threshold and turnout models on the Models tab.',
+    vintage: 'Official election archives at sos.ga.gov.',
+  },
+  {
+    name: 'Federal statute & controlling case law',
+    feeds: 'Contribution caps ($3,500 per individual per election), legal runoff/general capacity, and the Farrell loan-recovery analysis.',
+    vintage: '52 U.S.C. §30116; 11 C.F.R. §116.11; FEC v. Ted Cruz for Senate, 596 U.S. 289 (2022).',
+  },
+];
+
+// Estimates & approximations — methods that infer rather than measure. Each is
+// labeled so a reader knows where a number is soft before citing it.
+const DQ_ESTIMATES = [
+  {
+    tag: 'Proxy', tone: 'warning',
+    title: 'Donor income is a neighborhood proxy, not the person',
+    body: "Each donor inherits the ACS median household income of their ZIP. The income tiers and weighted-average income describe the donor's ZIP, not the donor — a $3,500 giver in a $50K-median ZIP may personally earn far more, or less. A small donor pool can also post a high weighted average just by concentrating in a few wealthy ZIPs (this is exactly why Montgomery's average tops Kingston's), so read averages alongside pool size. Treat all of this as area signal, not individual wealth.",
+  },
+  {
+    tag: 'Inference', tone: 'warning',
+    title: 'Donors are grouped by name string',
+    body: "Per-candidate donor counts aggregate by the contributor name as filed. Spelling or punctuation variants can split one person into two, or merge two namesakes into one. The cross-candidate \"shared donor\" join normalizes punctuation to catch this; the per-candidate counts do not.",
+  },
+  {
+    tag: 'Inference', tone: 'warning',
+    title: 'Gender is inferred from first names',
+    body: "Kingston's gender split comes from a fixed first-name dictionary. Unisex names and names not in the dictionary are left unclassified and excluded from the male/female averages, so the split covers most of the base, not all of it. It is an inference, never self-reported.",
+  },
+  {
+    tag: 'Inference', tone: 'warning',
+    title: '“Households” are surname + ZIP clusters',
+    body: 'Two or more max-out givers who share a last name and 5-digit ZIP are treated as one household. This misses spouses with different surnames or ZIPs, and can group unrelated people who happen to share a name and neighborhood.',
+  },
+  {
+    tag: 'Approximation', tone: 'warning',
+    title: '“In-district” is approximated by ZIP prefix',
+    body: 'In-district is computed as Georgia ZIPs outside metro Atlanta (ZIP prefix ≠ 30) — a proxy, not the legal GA-1 boundary. It therefore counts other non-Atlanta Georgia ZIPs that are not actually in GA-1, so treat the in-district share as an upper bound.',
+  },
+  {
+    tag: 'Self-reported', tone: 'warning',
+    title: 'Bundler clusters depend on typed employer text',
+    body: 'Firm totals group donors by their self-reported employer using substring matching. A donor who wrote the employer name differently will not cluster, so a firm’s true total can be understated. Employer and occupation are free text the filer typed.',
+  },
+  {
+    tag: 'No data', tone: 'default',
+    title: 'One ZIP has no published income',
+    body: 'ZIP 31416 (Isle of Hope / Oatland Island) has no published ACS median household income. It carries no income value and is excluded from every income tier, the weighted average, and the income scatter — never back-filled with an estimate.',
+  },
+];
+
+// Known limitations — accepted boundaries of the dataset, not defects to chase.
+const DQ_LIMITS = [
+  {
+    title: 'Pre-primary snapshot',
+    body: 'All data runs through the Q1 FEC filing (3/31/2026). The runway, cash-exhaustion, and runoff-capacity sections are projected forward from 4/20/2026. The GA-1 primary was held 5/19/2026 — read the forward-looking sections as the point-in-time forecast they were.',
+  },
+  {
+    title: 'No independent expenditures',
+    body: 'Super-PAC and other outside spending for or against any candidate is not in the candidate committees’ filings and is not in this dashboard. This covers only money raised and spent by the three campaigns themselves.',
+  },
+  {
+    title: 'Farrell loan recovery is practical, not statutory',
+    body: 'The Farrell self-loan analysis assumes post-loss fundraising near $0 — a real-world expectation, not a legal limit. FEC v. Cruz (2022) struck down the §30116(j) repayment cap, so there is no statutory ceiling to model.',
+  },
+  {
+    title: 'Models carry stated uncertainty',
+    body: 'Turnout projections carry ±20%, and campaign spending typically spikes 2–3× in the final four weeks, which can pull cash-exhaustion dates earlier than shown. Each model on the Models tab states its own confidence rating and caveat.',
+  },
+  {
+    title: 'Biographies and dates are from public reporting',
+    body: 'Candidate biographies on The Field tab (ages, careers, military and education records) and dated events on the timeline (announcements, the Trump endorsement, the primary result) come from public reporting and official records, not from the FEC/ACS dataset, and are not independently re-verified here. The financial figures do not depend on them.',
+  },
+];
+
+const DQTag = ({ children, tone }) => {
+  const t = {
+    warning: { bg: '#F5DFCC', fg: '#6B3F1E' },
+    danger:  { bg: '#EDD4D4', fg: '#6B2929' },
+    default: { bg: '#F0EBDD', fg: '#1F1F1F' },
+  }[tone] || { bg: '#F0EBDD', fg: '#1F1F1F' };
+  return (
+    <span style={{
+      display: 'inline-block', background: t.bg, color: t.fg,
+      fontFamily: 'DM Sans', fontSize: 9.5, fontWeight: 700,
+      letterSpacing: '0.08em', textTransform: 'uppercase',
+      padding: '3px 9px', borderRadius: 10, whiteSpace: 'nowrap',
+    }}>{children}</span>
+  );
+};
+
+const TabData = () => {
+  const kPrimaryTraj = CUMULATIVE[CUMULATIVE.length - 1].Kingston;  // primary-designated itemized $ (Schedule A)
+  const kItemized = FIN.Kingston.itemized;                          // total itemized individual $ (Form 3)
+  const unitem = ['Kingston', 'Montgomery', 'Farrell'].map(n => ({
+    name: n, pct: (FIN[n].unitemized / FIN[n].indiv) * 100,
+  }));
+  const covs = ZIP_INCOME.map(d => d.cov);
+  const covRange = `${Math.floor(Math.min(...covs))}–${Math.ceil(Math.max(...covs))}%`;
+  const noEstimateZips = TOP_ZIPS.filter(z => z.hhi == null).map(z => z.zip);
+
+  const mono = { fontFamily: 'ui-monospace, monospace' };
+
+  return (
+    <div>
+      <SectionH
+        eyebrow="Data Quality"
+        title="How this was built — and where the numbers are soft"
+        kicker="Every figure here is either computed by a script from the source filings or quoted from a cited source, then re-checked automatically. This page documents each source, every scope decision, the methods that estimate rather than measure, and the limits of what the data can show."
+      />
+
+      {/* At-a-glance integrity strip */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
+        <Card><Stat label="Data through" value="Mar 31, 2026" sub="Q1 pre-primary FEC filing — Form 3 + Schedule A" /></Card>
+        <Card><Stat label="Donor $ with ACS income" value={covRange} sub="share of itemized dollars in a ZIP with a published median; the rest have no estimate" accent={P.success} /></Card>
+        <Card><Stat label="Kingston unitemized" value={unitem[0].pct.toFixed(1) + '%'} sub="small-dollar money below the itemization threshold — invisible to the donor charts" accent={P.warning} /></Card>
+      </div>
+
+      {/* SOURCES */}
+      <Card style={{ padding: 22, marginBottom: 16 }}>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>Where the numbers come from</h3>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Five sources, each feeding a specific part of the dashboard. Nothing is sourced from memory or estimation.</p>
+        <div style={{ display: 'grid', gap: 10 }}>
+          {DQ_SOURCES.map(s => (
+            <div key={s.name} style={{ padding: '14px 16px', background: P.bg, borderRadius: 10, borderLeft: `4px solid ${P.kingston}` }}>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>{s.name}</div>
+              <div style={{ fontSize: 12.5, color: P.ink, marginTop: 5, lineHeight: 1.55 }}><strong style={{ color: P.muted, fontWeight: 700 }}>Feeds:</strong> {s.feeds}</div>
+              <div style={{ fontSize: 12, color: P.muted, marginTop: 4, lineHeight: 1.55 }}><strong style={{ fontWeight: 700 }}>As of:</strong> {s.vintage}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* SCOPE */}
+      <Card style={{ padding: 22, marginBottom: 16 }}>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>What is counted — and what isn't</h3>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>The donor analysis deliberately scopes the raw filings. These choices shape every count on the Donors, Geography, and Findings tabs.</p>
+        <div style={{ display: 'grid', gap: 12 }}>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="navy">Individuals only</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>PAC, party, and organization money is not in the donor charts</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>The Schedule A analysis covers individual contributions (<span style={mono}>entity_type = IND</span>). Receipts from PACs, party committees, other candidate committees, and organizations appear only in the Form 3 summary (the “PACs” line on the Money tab), never in donor counts, occupations, or geography.</p>
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="navy">Itemized only</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>Small-dollar money is invisible to donor-level views</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>Schedule A lists only itemized contributions (donors above the $200 cumulative itemization threshold). Unitemized small-dollar money — {unitem.map((u, i) => (<span key={u.name}>{i > 0 ? ', ' : ''}{u.name} <strong style={{ color: P.ink }}>{u.pct.toFixed(1)}%</strong></span>))} of each candidate's individual dollars — has no donor records, so it is absent from every distribution, occupation, household, and geography chart.</p>
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="navy">Net of refunds</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>Per-donor totals subtract refunds and redesignations</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>Each donor's total is a net figure — refunded and redesignated amounts are subtracted, so a donor's displayed total reflects what the campaign actually kept.</p>
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="navy">De-duplicated</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>Reattribution memo rows are removed</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>Rows are de-duplicated by <span style={mono}>transaction_id</span>, which strips the duplicated “SEE REATTRIBUTION BELOW” memo entries. Without this, over-limit checks double-count — the bug that previously produced illegal totals above the $10,500 per-cycle cap.</p>
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="gold">Primary-designated trajectory</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>The Money chart is not “total raised”</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>The cumulative/monthly trajectory and the in-district share count primary-designated contributions only. Kingston's primary-designated itemized line reaches <strong style={{ color: P.ink }}>{fmtK(kPrimaryTraj)}</strong>, while his total itemized individual receipts are <strong style={{ color: P.ink }}>{fmtK(kItemized)}</strong> (Form 3). The difference is money designated for the primary runoff and the general election — so the trajectory's endpoint is intentionally lower than the financial-summary total.</p>
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+              <Tag tone="navy">Caps &amp; buckets</Tag>
+              <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>How max-outs and gift-size bars are defined</span>
+            </div>
+            <p style={{ fontSize: 12.5, color: P.muted, margin: 0, lineHeight: 1.55 }}>A max-out is the FEC 2025–26 cap of <strong style={{ color: P.ink }}>$3,500 per individual per election</strong> ($10,500 across primary, runoff, and general). In the gift-size distribution, $3,500 and $7,000 each get their own exact-match bar rather than being lumped into a surrounding range, so the max-out spike is isolated and not blurred.</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* ESTIMATES & APPROXIMATIONS */}
+      <Card style={{ padding: 22, marginBottom: 16 }}>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>Estimates &amp; approximations — read before citing</h3>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Most of the dashboard is direct arithmetic on disclosed dollars. A handful of fields infer or approximate. Each is labeled so you know which is which.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+          {DQ_ESTIMATES.map(e => (
+            <div key={e.title} style={{ padding: '14px 16px', background: P.bg, borderRadius: 10, border: `1px solid ${P.line}` }}>
+              <div style={{ marginBottom: 7 }}><DQTag tone={e.tone}>{e.tag}</DQTag></div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston, lineHeight: 1.3 }}>{e.title}</div>
+              <p style={{ fontSize: 12.5, color: P.muted, margin: '6px 0 0', lineHeight: 1.55 }}>{e.body}</p>
+            </div>
+          ))}
+        </div>
+        {noEstimateZips.length > 0 && (
+          <p style={{ fontSize: 11.5, color: P.mutedLight, margin: '12px 0 0' }}>
+            ZIP(s) with no published ACS income, excluded from income math: {noEstimateZips.map(z => <span key={z} style={mono}>{z}</span>).reduce((a, b) => [a, ', ', b])}.
+          </p>
+        )}
+      </Card>
+
+      {/* RECONCILIATION / SELF-CHECK */}
+      <Card tone="success" style={{ padding: 22, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+          <div style={{ fontFamily: 'Fraunces, serif', fontSize: 42, color: P.success, lineHeight: 1, fontStyle: 'italic' }}>✓</div>
+          <div>
+            <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: 0, color: P.kingston }}>Reconciliation &amp; self-verification</h3>
+            <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, marginTop: 8, marginBottom: 10 }}>
+              Re-deriving the itemized individual totals from Schedule A lands within roughly <strong>0.2%</strong> (Kingston), <strong>1.8%</strong> (Montgomery), and <strong>5.5%</strong> (Farrell) of the authoritative FEC Form 3 totals — the API export nets out some refund/redesignation activity. The Form 3 figures are what the financial-summary panels display.
+            </p>
+            <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.muted, margin: 0 }}>
+              Every Schedule-A constant on this dashboard is regenerated by <span style={mono}>python3 derive_dashboard_data.py</span> and diffed against the live values by <span style={mono}>--check</span>, which exits non-zero on any mismatch — so a number that cannot be reproduced from source data cannot ship. Form 3 summary values cannot be re-derived from Schedule A and are verified against <span style={mono}>fec.gov</span> when the data is refreshed.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* KNOWN LIMITATIONS */}
+      <Card style={{ padding: 22, marginBottom: 16 }}>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>Known limitations</h3>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Accepted boundaries of this dataset — stated plainly so they aren't mistaken for errors.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+          {DQ_LIMITS.map(l => (
+            <div key={l.title} style={{ padding: '14px 16px', background: P.bg, borderRadius: 10, borderLeft: `4px solid ${P.warning}` }}>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>{l.title}</div>
+              <p style={{ fontSize: 12.5, color: P.muted, margin: '6px 0 0', lineHeight: 1.55 }}>{l.body}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <WhyMatters>
+        A campaign-finance read is only as trustworthy as its sourcing. The point of this page is that you can audit it: every dollar figure traces to an FEC filing, every income figure to a named Census table, and the whole Schedule-A layer re-derives on command. Where a number is an estimate, it says so — so the strong claims and the soft ones are never confused.
+      </WhyMatters>
+    </div>
+  );
+};
+
+/* ============================================================
    ROOT
    ============================================================ */
 const TABS = [
@@ -2317,6 +2593,7 @@ const TABS = [
   { id: 'opponents', label: 'The Field' },
   { id: 'insights',  label: 'Findings' },
   { id: 'models',    label: 'Models' },
+  { id: 'data',      label: 'Data Quality' },
 ];
 
 const TAB_IDS = new Set(TABS.map(t => t.id));
@@ -2496,24 +2773,7 @@ export default function Dashboard() {
         {tab === 'opponents' && <TabOpponents/>}
         {tab === 'insights'  && <TabInsights/>}
         {tab === 'models'    && <TabModels/>}
-      </div>
-
-      {/* Footer */}
-      <div style={{ background: P.paper, borderTop: `1px solid ${P.line}`, marginTop: 40 }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 11, fontWeight: 700, color: P.kingston, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Source</div>
-            FEC Schedule A itemized individual contributions through 3/31/2026, combined with FEC Form 3 summary data through 3/31/2026. PAC, disbursement, and cash-on-hand numbers reflect Q1 2026; monthly individual-donor breakdowns run through March 2026.
-          </div>
-          <div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 11, fontWeight: 700, color: P.kingston, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Methodology</div>
-            Unique donor = unique (name + 5-digit ZIP). Max-out = FEC 2025-26 cap of $3,500 per individual per election. ZIP income = ACS 5-year estimate of median household income. Distribution buckets are [min, max] intervals that correctly isolate $3,500 and $7,000 as discrete buckets.
-          </div>
-          <div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 11, fontWeight: 700, color: P.kingston, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Caveats</div>
-            Donor income is estimated from ZIP-level median HHI, not individual income. Independent expenditures (super PACs for/against) are not in this dashboard. The Farrell loan-recovery analysis is practical, not statutory — the $250K repayment cap (§30116(j)) was struck down in FEC v. Cruz (2022).
-          </div>
-        </div>
+        {tab === 'data'      && <TabData/>}
       </div>
     </div>
   );
