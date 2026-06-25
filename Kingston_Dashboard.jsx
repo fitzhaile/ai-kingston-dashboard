@@ -1974,6 +1974,18 @@ const TabModels = () => {
     };
   });
 
+  // Projected cash-on-hand: straight-line decline from each candidate's actual
+  // 4/29 cash at their average monthly burn, sampled weekly to ~mid-July.
+  const cashRunway = [];
+  for (let day = 0; day <= 77; day += 7) {
+    const row = { day };
+    ['Kingston', 'Farrell', 'Montgomery'].forEach(name => {
+      const f = FIN[name];
+      row[name] = Math.max(0, Math.round(f.cash - (f.spent / f.monthsActive / 30.44) * day));
+    });
+    cashRunway.push(row);
+  }
+
   // MODEL 5: Historical turnout precedent (using 2014 GA-1 open-seat primary as analog)
   const turnoutScenarios = [
     { scenario: 'Low (2014 analog × 1.0)',    ballots: 55000, winThreshold: 27501 },
@@ -2054,6 +2066,25 @@ const TabModels = () => {
               </div>
             ))}
           </div>
+        </div>
+        <div style={{ padding: '0 24px 20px' }}>
+          <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px' }}>Challenger cash-on-hand, projected to $0</div>
+          <div style={{ fontSize: 11, color: P.muted, margin: '0 0 12px' }}>Kingston ({fmtK(FIN.Kingston.cash)}) sits off the top of this scale — at his average burn he doesn't run dry until {cashModel.find(c => c.name === 'Kingston').exhaustDate}.</div>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={cashRunway} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke={P.line} vertical={false}/>
+              <XAxis dataKey="day" type="number" domain={[0, 77]} ticks={[0, 20, 48, 77]}
+                tickFormatter={(d) => { const dt = new Date('2026-04-29'); dt.setDate(dt.getDate() + d); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }}
+                tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} axisLine={{ stroke: P.line }} tickLine={false}/>
+              <YAxis tickFormatter={fmtK} tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} axisLine={false} tickLine={false}/>
+              <Tooltip formatter={(v) => fmtK(v)} labelFormatter={(d) => { const dt = new Date('2026-04-29'); dt.setDate(dt.getDate() + d); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }}/>
+              <ReferenceLine x={20} stroke={P.danger} strokeDasharray="4 3" label={{ value: 'Primary', fill: P.danger, fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}/>
+              <ReferenceLine x={48} stroke={P.muted} strokeDasharray="4 3" label={{ value: 'Runoff', fill: P.muted, fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}/>
+              <Line type="monotone" dataKey="Farrell"    stroke={P.farrell}    strokeWidth={2.5} dot={false}/>
+              <Line type="monotone" dataKey="Montgomery" stroke={P.montgomery} strokeWidth={2.5} dot={false}/>
+              <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 10 }}/>
+            </LineChart>
+          </ResponsiveContainer>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
           <strong style={{ color: P.kingston }}>Source:</strong> FEC Form 3 Reports of Receipts and Disbursements —{' '}

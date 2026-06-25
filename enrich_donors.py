@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enrich the congresscontributions.csv with:
+Enrich the FEC contributions CSV (CSV_IN below) with:
   - gender (inferred from first name)
   - zip_median_hhi (from Census Bureau ACS 5-year estimates, B19013)
   - zip_income_tier (High/Upper-Mid/Middle/Low)
@@ -14,7 +14,7 @@ import time
 import urllib.request
 from collections import defaultdict, Counter
 
-CSV_IN = "/Users/fhaile/Dropbox/Sites/FH Website/ai-dashboards/ai-kingston-dashboard/congresscontributions.csv"
+CSV_IN = "/Users/fhaile/Dropbox/Sites/FH Website/ai-dashboards/ai-kingston-dashboard/congresscontributions_through_april2026.csv"
 CSV_OUT = "/Users/fhaile/Dropbox/Sites/FH Website/ai-dashboards/ai-kingston-dashboard/donors_enriched.csv"
 
 CANDIDATE_BY_COMMITTEE = {

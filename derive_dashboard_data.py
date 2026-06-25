@@ -8,7 +8,7 @@ Kingston, 1.9% for Montgomery, and 5.1% for Farrell — the API export nets out
 some refund/redesignation activity; Form 3 totals remain the authoritative
 figures for the dashboard's financial-summary panels):
   - scope:   entity_type == 'IND' (individual contributions only; matches the
-             original congresscontributions.csv export exactly through 12/31/2025)
+             original FEC export exactly through 12/31/2025)
   - dedup:   by transaction_id, which removes the duplicated "SEE REATTRIBUTION
              BELOW" memo rows that otherwise double-count over-limit checks
              (the bug that produced illegal >$10,500 donor totals)
