@@ -3,8 +3,8 @@
 Derive every Schedule-A-based dashboard constant from FEC itemized individual
 contributions, through 4/29/2026 (the last pre-primary FEC report).
 
-Methodology (derived itemized totals land within 0.2% of FEC Form 3 for
-Kingston, 1.8% for Montgomery, and 5.5% for Farrell — the API export nets out
+Methodology (derived itemized totals land within 0.3% of FEC Form 3 for
+Kingston, 1.9% for Montgomery, and 5.1% for Farrell — the API export nets out
 some refund/redesignation activity; Form 3 totals remain the authoritative
 figures for the dashboard's financial-summary panels):
   - scope:   entity_type == 'IND' (individual contributions only; matches the
@@ -80,7 +80,7 @@ print("DASHBOARD CONSTANTS — DERIVED THROUGH 4/29/2026 (IND, dedup-by-transact
 print("="*72)
 
 # --- itemized totals (checksum vs FEC) ---
-print("\n[itemized individual totals]   FEC Form 3: K 1,622,210 | M 216,349 | F 139,401")
+print("\n[itemized individual totals]   FEC Form 3: K 1,659,885 | M 225,957 | F 149,276")
 for t in ['K','M','F']:
     dd = dedup(comm(t))
     print(f"  {t}: ${sum(amt(r) for r in dd):>12,.0f}")

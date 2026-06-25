@@ -10,7 +10,7 @@ import GEO_ZIPS from './geo_zips.json';
 
 /* ============================================================
    GA-1 REPUBLICAN PRIMARY — FUNDRAISING ANALYSIS
-   Data: FEC Schedule A (through 3/31/2026) + FEC Form 3 summary (Q1 2026)
+   Data: FEC Schedule A (through 4/29/2026) + FEC Form 3 summary (pre-primary)
    ============================================================ */
 
 const P = {
@@ -39,7 +39,7 @@ const C = {
   Farrell:    { color: P.farrell,    light: P.farrellLight,    label: 'Farrell' },
 };
 
-// === FEC FINANCIAL SUMMARY (THROUGH Q1 2026) ===
+// === FEC FINANCIAL SUMMARY (THROUGH THE 4/29/2026 PRE-PRIMARY REPORT) ===
 const FIN = {
   Kingston:   { receipts: 1862606, indiv: 1681156, itemized: 1659885, unitemized: 21270, pac: 181450, selfLoans: 0, selfContrib: 0, spent: 913390, cash: 949215, debt: 0, monthsActive: 11 },
   Montgomery: { receipts: 267832,  indiv: 238518,  itemized: 225957,  unitemized: 12561, pac: 8500,   selfLoans: 0, selfContrib: 20815, spent: 222692, cash: 45140,   debt: 0, monthsActive: 10 },
@@ -167,7 +167,7 @@ const Q = {
 };
 
 // === TRIPLE-MAX CLUB (gave Kingston $7,000+, primary+general+runoff) ===
-// 76 total — top 15 shown. $10,500 = the legal per-cycle maximum (3 elections × $3,500)
+// 77 total — top 15 shown. $10,500 = the legal per-cycle maximum (3 elections × $3,500)
 const DOUBLE_MAX = [
   { name: 'Dale C. Critz Jr.',      city: 'Savannah',       occ: 'President (Critz Inc.)',               amount: 10500 },
   { name: 'TJ Hollis',              city: 'Savannah',       occ: 'Attorney (McManamy Jackson Hollis)',   amount: 10500 },
@@ -467,8 +467,8 @@ const TabOverview = () => {
           </div>
           <div className="dk-hero-date" style={{ textAlign: 'center', minWidth: 110 }}>
             <div style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: P.kingstonAccent, marginBottom: 2, fontWeight: 700 }}>Data Through</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 54, fontWeight: 300, lineHeight: 1 }}>Mar 31</div>
-            <div style={{ fontSize: 11, marginTop: 4, opacity: 0.8 }}>Q1 2026 filing</div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 54, fontWeight: 300, lineHeight: 1 }}>Apr 29</div>
+            <div style={{ fontSize: 11, marginTop: 4, opacity: 0.8 }}>Pre-primary filing</div>
           </div>
         </div>
       </div>
@@ -478,12 +478,12 @@ const TabOverview = () => {
         <Card><Stat label="Total Raised"  value={fmtK(FIN.Kingston.receipts)} sub={`${Math.round(FIN.Kingston.receipts/totalField*100)}% of field's money`}/></Card>
         <Card><Stat label="Cash on Hand"  value={fmtK(FIN.Kingston.cash)}     sub="9× the rest of field combined" accent={P.success}/></Card>
         <Card><Stat label="Unique Donors" value={fmtN(Q.Kingston.donors)}     sub={`vs. ${Q.Montgomery.donors + Q.Farrell.donors} for the rest of the field`}/></Card>
-        <Card><Stat label="$3.5K Max-Outs" value="280"                         sub="34% of itemized contributions" accent={P.kingstonAccent}/></Card>
-        <Card tone="warning"><Stat label="Unused Donor Room" value="$980K"     sub="legal giving room among existing donors" accent={P.warning}/></Card>
+        <Card><Stat label="$3.5K Max-Outs" value="281"                         sub="30% of itemized contributions" accent={P.kingstonAccent}/></Card>
+        <Card tone="warning"><Stat label="Unused Donor Room" value="$1.04M"    sub="legal giving room among existing donors" accent={P.warning}/></Card>
       </div>
 
       {/* Candidate cards */}
-      <SectionH eyebrow="The Field" title="Three candidates, one seat" kicker="All three financial pictures side by side, through FEC filings ending March 31, 2026."/>
+      <SectionH eyebrow="The Field" title="Three candidates, one seat" kicker="All three financial pictures side by side, through FEC filings ending April 29, 2026."/>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
         {['Kingston', 'Farrell', 'Montgomery'].map((name, idx) => {
           const d = FIN[name];
@@ -549,7 +549,7 @@ const TabOverview = () => {
           {TIMELINE.map((ev, i) => {
             const candColor = ev.who === 'Kingston' ? P.kingston : ev.who === 'Montgomery' ? P.montgomery : ev.who === 'Farrell' ? P.farrell : P.muted;
             const date = new Date(ev.date);
-            const isPast = date < new Date('2026-04-20');
+            const isPast = date < new Date('2026-04-29');
             return (
               <div key={i} style={{ position: 'relative', paddingBottom: 22, opacity: isPast ? 1 : 0.6 }}>
                 <div style={{
@@ -599,7 +599,7 @@ const TabMoney = () => {
   return (
     <div>
       <SectionH eyebrow="The money" title="Where it came from, where it's going"
-        kicker="Ten months of primary-election fundraising, plus Q1 2026 summary data on total receipts, disbursements, and cash on hand."/>
+        kicker="Eleven months of primary-election fundraising, plus pre-primary (through April 29) summary data on total receipts, disbursements, and cash on hand."/>
 
       {/* Cumulative chart */}
       <Card style={{ padding: 24, marginBottom: 16 }}>
@@ -664,7 +664,7 @@ const TabMoney = () => {
           <div>
             <div style={{ fontSize: 15, lineHeight: 1.7, color: P.ink, fontFamily: 'DM Sans' }}>
               <p style={{ margin: '0 0 14px' }}>
-                Only <strong>130 individual donors</strong> have given Farrell money — a total of <strong>{fmtK(FIN.Farrell.indiv)}</strong>. He loaned his own campaign <strong style={{ color: P.danger }}>${(FIN.Farrell.selfLoans/1000).toFixed(0)},000</strong> to make up the difference. For context, Jim Kingston borrowed <strong>$0</strong> and raised <strong>{fmtK(FIN.Kingston.indiv)}</strong> — from <strong>{Q.Kingston.donors} individual donors</strong>.
+                Only <strong>137 individual donors</strong> have given Farrell money — a total of <strong>{fmtK(FIN.Farrell.indiv)}</strong>. He loaned his own campaign <strong style={{ color: P.danger }}>${(FIN.Farrell.selfLoans/1000).toFixed(0)},000</strong> to make up the difference. For context, Jim Kingston borrowed <strong>$0</strong> and raised <strong>{fmtK(FIN.Kingston.indiv)}</strong> — from <strong>{Q.Kingston.donors} individual donors</strong>.
               </p>
               <div style={{ background: P.bg, borderRadius: 10, padding: '14px 16px', borderLeft: `4px solid ${P.danger}`, marginTop: 16 }}>
                 <div style={{ fontWeight: 700, color: P.kingston, marginBottom: 4, fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>What happens to the $500K?</div>
@@ -788,7 +788,7 @@ const TabMoney = () => {
           </BarChart>
         </ResponsiveContainer>
         <WhyMatters>
-          PAC money signals that Washington insiders, trade associations, and party organizations believe a candidate is electable — and it unlocks relationships that matter after the election for committee assignments, floor time, and vendor introductions. Kingston's $179K signals institutional GOP support; Farrell's $250 signals essentially none.
+          PAC money signals that Washington insiders, trade associations, and party organizations believe a candidate is electable — and it unlocks relationships that matter after the election for committee assignments, floor time, and vendor introductions. Kingston's $181K signals institutional GOP support; Farrell's $250 signals essentially none.
         </WhyMatters>
       </Card>
     </div>
@@ -820,7 +820,7 @@ const TabDonors = () => {
           <div>
             <Tag tone="warning">THE $3,500 CLIFF</Tag>
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, margin: '8px 0 0', color: P.kingston, letterSpacing: '-0.01em' }}>
-              280 contributions to Kingston hit exactly $3,500.
+              281 contributions to Kingston hit exactly $3,500.
             </h3>
             <p style={{ fontSize: 14, color: P.muted, margin: '6px 0 0', maxWidth: 760 }}>
               That's the federal max-per-election limit. It's the single biggest signal in the distribution — and it's why the chart spikes so dramatically at one specific bucket. 34% of Kingston's itemized contributions hit the cap exactly. Montgomery: 23. Farrell: 8.
@@ -843,7 +843,7 @@ const TabDonors = () => {
         <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           <div style={{ padding: '12px 14px', background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
             <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Kingston at the cap</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.kingston, marginTop: 2 }}>280 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $980,000</span></div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.kingston, marginTop: 2 }}>281 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $983,500</span></div>
           </div>
           <div style={{ padding: '12px 14px', background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.montgomery}` }}>
             <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Montgomery at the cap</div>
@@ -855,7 +855,7 @@ const TabDonors = () => {
           </div>
         </div>
         <WhyMatters tone="warning">
-          A $3,500-exactly check means a donor consulted their calendar, wrote for the legal maximum, and made a strategic bet on the race. 280 such contributions came in for Kingston. These are not casual supporters — they're the hardest-to-acquire donor profile, and they're 9× more common on Kingston's side than on both opponents' combined (280 vs. 31). A primary where one candidate has an order-of-magnitude advantage on maxed-out donors is not a close primary.
+          A $3,500-exactly check means a donor consulted their calendar, wrote for the legal maximum, and made a strategic bet on the race. 281 such contributions came in for Kingston. These are not casual supporters — they're the hardest-to-acquire donor profile, and they're 8.5× more common on Kingston's side than on both opponents' combined (281 vs. 33). A primary where one candidate has an order-of-magnitude advantage on maxed-out donors is not a close primary.
         </WhyMatters>
       </Card>
 
@@ -1136,7 +1136,7 @@ const TabGeography = () => {
                 <g>
                   <rect x="215" y="4" width="130" height="42" fill="#FFFFFF" stroke={P.kingston} strokeWidth="1.5" rx="4"/>
                   <text x="280" y="22" textAnchor="middle" fontSize="10" fontWeight="700" fill={P.kingston} fontFamily="DM Sans, sans-serif" letterSpacing="0.5">KINGSTON DONORS</text>
-                  <text x="280" y="39" textAnchor="middle" fontSize="13" fontWeight="600" fill={P.kingston} fontFamily="Fraunces, serif">$90K weighted avg</text>
+                  <text x="280" y="39" textAnchor="middle" fontSize="13" fontWeight="600" fill={P.kingston} fontFamily="Fraunces, serif">$89K weighted avg</text>
                   <line x1="280" y1="46" x2="292" y2="88" stroke={P.kingston} strokeWidth="1.5"/>
                   <circle cx="292" cy="95" r="7" fill={P.kingston} stroke="#FFFFFF" strokeWidth="2"/>
                 </g>
@@ -1442,9 +1442,9 @@ const TabOpponents = () => (
             <li><strong>Trump endorsement</strong> (Apr 14) — neither challenger has one</li>
             <li>$1.86M raised — 7× Montgomery, 3× Farrell; $949K cash on hand ≈ 9× the rest of the field combined</li>
             <li>609 unique donors — 4.4× Farrell's count; donor velocity ~55/month sustained</li>
-            <li>76 ultra-loyalists (≥$7K); 10 bundler firms organizing stacked giving across employee rosters</li>
+            <li>77 ultra-loyalists (≥$7K); 11 bundler firms organizing stacked giving across employee rosters</li>
             <li>Legacy network: Jack Kingston's 30-year Savannah donor and business base showing up intact</li>
-            <li>Atlanta moat — $109K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5K</li>
+            <li>Atlanta moat — $111K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5K</li>
             <li>Zero self-funding, zero debt — entirely outside money, no candidate financing on the books</li>
           </ul>
         </div>
@@ -1456,7 +1456,7 @@ const TabOpponents = () => (
             <li>"Legacy candidate" framing — dad's name is the easiest attack angle</li>
             <li>31416 (Isle of Hope/Oatland) underperformance — 59% share, his lowest in the Savannah core and Farrell's best ZIP anywhere (41%)</li>
             <li>Lacks the military biography that anchors Montgomery's appeal in a military-heavy district</li>
-            <li>Heavy top-end concentration: 13% of donors = 46% of individual dollars; widens political-optics attack surface</li>
+            <li>Heavy top-end concentration: 13% of donors = 45% of individual dollars; widens political-optics attack surface</li>
           </ul>
         </div>
         <div>
@@ -1465,7 +1465,7 @@ const TabOpponents = () => (
             <li><strong>The legacy network cuts both ways.</strong> 46% of individual dollars come from 13% of donors — a concentration that invites the "inherited machine" attack.</li>
             <li><strong>Retiree gap.</strong> Retirees are 7% of Kingston's donors vs. Montgomery's 28% — the highest-turnout primary bloc is where his coalition is thinnest.</li>
             <li><strong>Farrell's strongest ZIP holds.</strong> Kingston's 59% share in 31416 is his lowest in the Savannah core — the only ZIP he leads where a challenger tops 40%.</li>
-            <li><strong>Runoff capacity is finite.</strong> 21 proven max-out donors sit ~$59K short of the $10,500 triple-max — capacity that matters only if the race goes to a runoff.</li>
+            <li><strong>Runoff capacity is finite.</strong> 22 proven max-out donors sit ~$62K short of the $10,500 triple-max — capacity that matters only if the race goes to a runoff.</li>
             <li><strong>No small-dollar base.</strong> At 1% unitemized, there is no digital fundraising channel to tap if big-check capacity runs out.</li>
           </ol>
         </div>
@@ -1518,7 +1518,7 @@ const TabOpponents = () => (
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
             <li><strong>77% self-funded.</strong> Only $146K from individual donors</li>
             <li>Raised just <strong>$250 from PACs</strong> — zero institutional backing</li>
-            <li>Only 130 donors · 14% repeat rate · narrow base</li>
+            <li>Only 137 donors · 15% repeat rate · narrow base</li>
             <li>Only 5 out-of-state donors in the entire filing</li>
             <li>Represented 1 of district's 17 counties</li>
             <li>Lost his Commission seat involuntarily on qualifying — bad news cycle in March</li>
@@ -1539,7 +1539,7 @@ const TabOpponents = () => (
       </div>
       <div style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
         {[
-          { l: 'Donors',       v: '130' },
+          { l: 'Donors',       v: '137' },
           { l: 'Cash',         v: fmtK(FIN.Farrell.cash) },
           { l: 'Debt',         v: fmtK(FIN.Farrell.debt), c: P.danger },
           { l: 'PAC $',        v: '$250' },
@@ -1584,7 +1584,7 @@ const TabOpponents = () => (
           <Tag tone="danger">Weaknesses</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
             <li><strong>$45K cash on hand at April 29.</strong> He spent only what he raised, never building a closing war chest</li>
-            <li>Only 143 donors · top 20 = 50% of money (fragile concentration)</li>
+            <li>Only 150 donors · top 20 = 48% of money (fragile concentration)</li>
             <li>Recent Savannah resident ("nearly a decade") vs. lifers Kingston/Farrell</li>
             <li>Trump endorsed Kingston, not him — strips his MAGA messaging of its main asset</li>
             <li>Only $8,500 in PAC support — no VFW, no trade group endorsement</li>
@@ -1604,7 +1604,7 @@ const TabOpponents = () => (
       </div>
       <div style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
         {[
-          { l: 'Donors', v: '143' },
+          { l: 'Donors', v: '150' },
           { l: 'Cash', v: fmtK(FIN.Montgomery.cash), c: P.danger },
           { l: 'Runway', v: '~2 mo', c: P.danger },
           { l: 'PAC $', v: fmtK(FIN.Montgomery.pac) },
@@ -1682,10 +1682,10 @@ const TabInsights = () => {
 
       <div style={{ display: 'grid', gap: 14 }}>
 
-        <Insight n="01" tone="hot" title="The 76-person Ultra-Loyalist Club"
+        <Insight n="01" tone="hot" title="The 77-person Ultra-Loyalist Club"
           stat={{ value: '$747K', label: 'from 77 donors' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            76 donors gave Kingston $7,000 or more (primary + general, plus runoff where applicable). That's <strong>13% of the donor base producing 46% of the money.</strong> The top tier — Critz, Demere, Hollis, Dorsey — each hit the full $10,500 triple-max, and several of their spouses maxed out too, so the strongest households total ~$21,000. The $10,500 individual triple-max cap holds across the board.
+            77 donors gave Kingston $7,000 or more (primary + general, plus runoff where applicable). That's <strong>13% of the donor base producing 45% of the money.</strong> The top tier — Critz, Demere, Hollis, Dorsey — each hit the full $10,500 triple-max, and several of their spouses maxed out too, so the strongest households total ~$21,000. The $10,500 individual triple-max cap holds across the board.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 12 }}>
             {DOUBLE_MAX.slice(0, 10).map(d => (
@@ -1711,7 +1711,7 @@ const TabInsights = () => {
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.danger}` }}>
               <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Partial-triple</div>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.danger, marginTop: 2 }}>22 donors · $170K</div>
-              <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>Primary + general only · $59K of unwritten runoff checks</div>
+              <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>Primary + general only · $62K of unwritten runoff checks</div>
             </div>
           </div>
           <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
@@ -1719,7 +1719,7 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="03" tone="warm" title="The Atlanta Moat — $109K where opponents barely register"
+        <Insight n="03" tone="warm" title="The Atlanta Moat — $111K where opponents barely register"
           stat={{ value: '$111K', label: 'Atlanta network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$110,950 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs — about 5% of Kingston's haul. This is donor territory the field has almost entirely ceded to him.
@@ -1774,20 +1774,20 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="06" tone="gold" title="Women out-give men per donor — by 33%"
-          stat={{ value: '$3,776', label: 'avg female vs $2,833 male' }}>
+        <Insight n="06" tone="gold" title="Women out-give men per donor — by 24%"
+          stat={{ value: '$3,509', label: 'avg female vs $2,823 male' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. By <strong>name-inferred gender</strong>, his 80 female donors average <strong>$3,776 each</strong> and his 370 male donors average <strong>$2,833 each</strong> — a <strong>33% per-donor premium for women</strong>, who are also underrepresented in the base (14% of donors by head, 19% by dollars). Gender isn't an FEC field, so it's inferred from first names and the names a dictionary can't place are left unclassified — read this as a strong directional signal, not a precise count.
+            Most campaigns assume women write smaller checks than men. On Kingston's file the opposite is true. By <strong>name-inferred gender</strong>, his 88 female donors average <strong>$3,509 each</strong> and his 378 male donors average <strong>$2,823 each</strong> — a <strong>24% per-donor premium for women</strong>, who are also underrepresented in the base (14% of donors by head, 19% by dollars). Gender isn't an FEC field, so it's inferred from first names and the names a dictionary can't place are left unclassified — read this as a strong directional signal, not a precise count.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
               <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Men</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, color: P.kingston, marginTop: 2 }}>370 donors · $2,833 avg</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, color: P.kingston, marginTop: 2 }}>378 donors · $2,823 avg</div>
               <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>242 below cap · ~$604K of headroom</div>
             </div>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingstonAccent}` }}>
               <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Women</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, color: P.kingston, marginTop: 2 }}>80 donors · $3,776 avg</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, color: P.kingston, marginTop: 2 }}>88 donors · $3,509 avg</div>
               <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>45 below cap · ~$113K of headroom</div>
             </div>
           </div>
@@ -1838,7 +1838,7 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="09" tone="default" title="10 employer clusters account for $133K in stacked giving"
+        <Insight n="09" tone="default" title="11 employer clusters account for $139K in stacked giving"
           stat={{ value: '$139K', label: 'from 11 firms' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             When 3+ employees of one firm donate within days of each other, it is <strong>consistent with someone inside organizing the giving</strong> — a likely bundler — though shared employer and timing alone don't prove coordination. Here are the ten employer clusters, including OrthoAtlanta, whose 12 physicians all gave within the last nine days of March.
@@ -1924,7 +1924,7 @@ const TabInsights = () => {
         </Insight>
 
         <Insight n="13" tone="gold" title="The legacy network is deep — and it's showing up in the data"
-          stat={{ value: '$739K', label: 'from father\'s network' }}>
+          stat={{ value: '$747K', label: 'from father\'s network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             Kingston's top donors include names that map directly onto Jack Kingston's 30-year donor and business network in Savannah — Dale Critz Jr. (auto), Christian Demere (Colonial Group logistics), TJ Hollis (McManamy Jackson Hollis law firm), William Dorsey III, F. Reed Dulany III, Don Waters. Three generations of Savannah business, all writing $10,500 max checks. That's an inheritance most candidates can't replicate.
           </p>
@@ -1945,7 +1945,7 @@ const TabInsights = () => {
             ))}
           </div>
           <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: P.ink }}>
-            The challengers' charge that Kingston is "his father's candidate" is true — and the list is the reason the label carries less weight than it might: 583 donors, 76 ultra-loyalists, 10 bundler firms, $1.3M cash — an organized operation, not just a famous name.
+            The challengers' charge that Kingston is "his father's candidate" is true — and the list is the reason the label carries less weight than it might: 609 donors, 77 ultra-loyalists, 11 bundler firms, $949K cash — an organized operation, not just a famous name.
           </p>
         </Insight>
 
@@ -1963,7 +1963,7 @@ const TabModels = () => {
     const d = FIN[name];
     const monthlyBurn = d.spent / d.monthsActive;
     const runwayMonths = d.cash / monthlyBurn;
-    const exhaustDate = new Date('2026-04-20');
+    const exhaustDate = new Date('2026-04-29');
     exhaustDate.setDate(exhaustDate.getDate() + Math.round(runwayMonths * 30));
     return {
       name, cash: d.cash, spent: d.spent, monthsActive: d.monthsActive,
@@ -2001,7 +2001,7 @@ const TabModels = () => {
               Challenger cash-exhaustion date
             </h3>
             <p style={{ fontSize: 13, color: P.muted, margin: '4px 0 0', maxWidth: 720 }}>
-              When each challenger runs out of money at the current burn rate — and when their paid-media spending likely has to stop.
+              When each challenger runs out of money at the average burn rate, projected from their actual cash at April 29. April's spending was front-loaded into the final push, so the average burn overstates the steady-state rate — read these as outer-bound dates, not forecasts.
             </p>
           </div>
         </div>
@@ -2011,9 +2011,9 @@ const TabModels = () => {
             <div style={{ padding: '14px 16px', background: P.bg, borderRadius: 8, fontFamily: 'ui-monospace, monospace', fontSize: 13, color: P.ink, lineHeight: 1.7, marginBottom: 16 }}>
               monthly_burn = total_disbursements ÷ months_active<br/>
               runway_months = cash_on_hand ÷ monthly_burn<br/>
-              exhaust_date = today + (runway_months × 30 days)
+              exhaust_date = Apr 29 + (runway_months × 30 days)
             </div>
-            <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>INPUTS (FEC Form 3, 4/1/2025 – 3/31/2026)</div>
+            <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>INPUTS (FEC Form 3, 4/1/2025 – 4/29/2026)</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 12 }}>
               <thead>
                 <tr style={{ borderBottom: `1px solid ${P.line}` }}>
@@ -2114,7 +2114,7 @@ const TabModels = () => {
           </div>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <strong style={{ color: P.kingston }}>Source:</strong> FEC Schedule A (Itemized Individual Contributions), aggregated by contributor_name (net of refunds) for Committee C00908624. File timestamp 2026-04-20T09:27:54.{' '}
+          <strong style={{ color: P.kingston }}>Source:</strong> FEC Schedule A (Itemized Individual Contributions), aggregated by contributor_name (net of refunds) for Committee C00908624. Schedule A through 4/29/2026, pulled from the OpenFEC API.{' '}
           <strong style={{ color: P.kingston }}>Statute:</strong> 52 U.S.C. § 30116(a)(1)(A) — $3,500 per individual per election limit (2025–26 cycle, indexed biennially per FEC announcement).
         </div>
       </Card>
@@ -2170,7 +2170,7 @@ const TabModels = () => {
           </div>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <strong style={{ color: P.kingston }}>Sources:</strong> FEC Form 3 (Farrell Committee C00905422, covering 4/1/2025 – 3/31/2026) · <em>FEC v. Ted Cruz for Senate</em>, 596 U.S. 289 (2022), which struck down the $250,000 post-election repayment cap in 52 U.S.C. § 30116(j) and its implementing rule, 11 C.F.R. § 116.11.{' '}
+          <strong style={{ color: P.kingston }}>Sources:</strong> FEC Form 3 (Farrell Committee C00905422, covering 4/1/2025 – 4/29/2026) · <em>FEC v. Ted Cruz for Senate</em>, 596 U.S. 289 (2022), which struck down the $250,000 post-election repayment cap in 52 U.S.C. § 30116(j) and its implementing rule, 11 C.F.R. § 116.11.{' '}
           <strong style={{ color: P.kingston }}>Why not HIGH confidence:</strong> the loan and debt figures are filed facts, but "post-loss fundraising ≈ $0" is an assumption from practice, not a disclosed value.
         </div>
       </Card>
@@ -2251,7 +2251,7 @@ const TabModels = () => {
           </div>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <strong style={{ color: P.kingston }}>Source:</strong> FEC Form 3 lines 11(a), 11(c), 13(a), 11(d) for each committee (C00908624, C00917039, C00905422). Coverage 4/1/2025 – 3/31/2026.{' '}
+          <strong style={{ color: P.kingston }}>Source:</strong> FEC Form 3 lines 11(a), 11(c), 13(a), 11(d) for each committee (C00908624, C00917039, C00905422). Coverage 4/1/2025 – 4/29/2026.{' '}
           <strong style={{ color: P.kingston }}>Interpretation:</strong> A GAR above 95% signals a genuine grassroots coalition. Below 50% signals the campaign is functionally candidate-funded.
         </div>
       </Card>
@@ -2302,7 +2302,7 @@ const TabModels = () => {
               </div>
             ))}
             <div style={{ padding: '10px 14px', background: '#EDF2E8', borderRadius: 8, fontSize: 12, color: P.ink, lineHeight: 1.5 }}>
-              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 583 donors are roughly 0.9% of the expected primary electorate in the base scenario. How a donor base converts into votes is not something this data can model — the turnout figures here are scenarios, not a forecast.
+              <strong style={{ color: P.success }}>Implication:</strong> Kingston's 609 donors are roughly 1% of the expected primary electorate in the base scenario. How a donor base converts into votes is not something this data can model — the turnout figures here are scenarios, not a forecast.
             </div>
           </div>
         </div>
@@ -2364,7 +2364,7 @@ const TabModels = () => {
           </div>
         </div>
         <div style={{ padding: '16px 24px', background: P.bg, borderTop: `1px solid ${P.line}`, fontSize: 12, color: P.muted, lineHeight: 1.6 }}>
-          <strong style={{ color: P.kingston }}>Source:</strong> FEC Form 3 lines 16 (total receipts), 13(a) (loans), 11(d) (candidate contrib), 22 (total disbursements). Coverage 4/1/2025 – 3/31/2026.{' '}
+          <strong style={{ color: P.kingston }}>Source:</strong> FEC Form 3 lines 16 (total receipts), 13(a) (loans), 11(d) (candidate contrib), 22 (total disbursements). Coverage 4/1/2025 – 4/29/2026.{' '}
           <strong style={{ color: P.kingston }}>Interpretation:</strong> Kingston spends 29¢ to raise each $1 — classic call-time operation with moderate overhead. Farrell spends $1.62 per earned-receipts dollar: his $500K self-loan is propping up a cash-negative fundraising operation.
         </div>
       </Card>
@@ -2403,12 +2403,12 @@ const DQ_SOURCES = [
   {
     name: 'FEC Schedule A — itemized individual contributions',
     feeds: 'Every donor-level view: donor counts, gift-size distribution, occupations, geography, income tiers, bundler clusters, shared donors, households, and max-out analysis.',
-    vintage: 'Pulled from the OpenFEC API; contributions through 3/31/2026 (file timestamp 2026-04-20). Committees C00908624 (Kingston), C00917039 (Montgomery), C00905422 (Farrell).',
+    vintage: 'Pulled from the OpenFEC API; contributions through 4/29/2026 (the last pre-primary report). Committees C00908624 (Kingston), C00917039 (Montgomery), C00905422 (Farrell).',
   },
   {
     name: 'FEC Form 3 — Reports of Receipts & Disbursements',
     feeds: 'The financial-summary panels: total receipts, itemized vs. unitemized split, PAC dollars, cash on hand, debt, self-funding, and the burn-rate / runway models.',
-    vintage: 'Q1 2026 filing, coverage 4/1/2025 – 3/31/2026. These summary totals are authoritative and are not re-derivable from Schedule A.',
+    vintage: 'Pre-primary filing, coverage 4/1/2025 – 4/29/2026. These summary totals are authoritative and are not re-derivable from Schedule A.',
   },
   {
     name: 'U.S. Census Bureau — American Community Survey (ACS)',
@@ -2471,7 +2471,7 @@ const DQ_ESTIMATES = [
 const DQ_LIMITS = [
   {
     title: 'Pre-primary snapshot',
-    body: 'All data runs through the Q1 FEC filing (3/31/2026). The runway, cash-exhaustion, and runoff-capacity sections are projected forward from 4/20/2026. The GA-1 primary was held 5/19/2026 — read the forward-looking sections as the point-in-time forecast they were.',
+    body: 'All data runs through the pre-primary FEC filing (4/29/2026) — the last report before the May 19 primary, so the final three weeks are not yet captured (they arrive in the Q2 filing, ~July 15). The Money-tab cash drawdown is actuals; the Models-tab cash-exhaustion and runoff-capacity sections are forward projections from the 4/29 figures, and April spending was front-loaded, so the steady-burn runway runs long.',
   },
   {
     title: 'No independent expenditures',
@@ -2529,7 +2529,7 @@ const TabData = () => {
 
       {/* At-a-glance integrity strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
-        <Card><Stat label="Data through" value="Mar 31, 2026" sub="Q1 pre-primary FEC filing — Form 3 + Schedule A" /></Card>
+        <Card><Stat label="Data through" value="Apr 29, 2026" sub="Pre-primary FEC filing — Form 3 + Schedule A" /></Card>
         <Card><Stat label="Donor $ with ACS income" value={covRange} sub="share of itemized dollars in a ZIP with a published median; the rest have no estimate" accent={P.success} /></Card>
         <Card><Stat label="Kingston unitemized" value={unitem[0].pct.toFixed(1) + '%'} sub="small-dollar money below the itemization threshold — invisible to the donor charts" accent={P.warning} /></Card>
       </div>
@@ -2760,7 +2760,7 @@ export default function Dashboard() {
           .dk-root .dk-masthead-meta { order: 1; margin-left: 0 !important; text-align: left !important; }
           .dk-root .dk-masthead-title { font-size: 18px !important; line-height: 1.2; }
           .dk-root .dk-nav { padding-left: 14px !important; padding-right: 14px !important; }
-          /* Hide the redundant oversized "Mar 31" hero stat on mobile (the date is in
+          /* Hide the redundant oversized "Apr 29" hero stat on mobile (the date is in
              the masthead); it dominates the small screen and skews the hierarchy */
           .dk-root .dk-hero-date { display: none !important; }
 
@@ -2813,7 +2813,7 @@ export default function Dashboard() {
           </div>
           <div className="dk-masthead-meta" style={{ textAlign: 'right', marginLeft: 'auto' }}>
             <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Republican Primary</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Mar 31, 2026</div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Apr 29, 2026</div>
           </div>
         </div>
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
