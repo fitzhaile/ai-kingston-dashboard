@@ -423,10 +423,22 @@ const Insight = ({ n, title, tone = 'default', children, stat }) => {
   );
 };
 
+// Track mobile viewport so charts get responsive props (Recharts sizes by prop, not CSS)
+const useIsMobile = () => {
+  const [m, setM] = useState(typeof window !== 'undefined' && window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setM(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return m;
+};
+
 /* ============================================================
    TAB 1: OVERVIEW
    ============================================================ */
 const TabOverview = () => {
+  const isMobile = useIsMobile();
   const totalField = FIN.Kingston.receipts + FIN.Montgomery.receipts + FIN.Farrell.receipts;
 
   // Radar chart — 6 dimensions, normalized 0-100
@@ -526,10 +538,10 @@ const TabOverview = () => {
       {/* Radar */}
       <Card style={{ padding: 28, marginBottom: 24 }}>
         <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Kingston leads on every dimension; Farrell registers only on in-district concentration — a function of raising almost entirely within 31xxx ZIPs."/>
-        <ResponsiveContainer width="100%" height={400}>
-          <RadarChart data={radarData} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 290 : 400}>
+          <RadarChart data={radarData} margin={isMobile ? { top: 6, right: 52, bottom: 6, left: 52 } : { top: 20, right: 40, bottom: 20, left: 40 }}>
             <PolarGrid stroke={P.line}/>
-            <PolarAngleAxis dataKey="metric" tick={{ fontFamily: 'DM Sans', fontSize: 12, fill: P.ink, fontWeight: 600 }}/>
+            <PolarAngleAxis dataKey="metric" tick={{ fontFamily: 'DM Sans', fontSize: isMobile ? 9 : 12, fill: P.ink, fontWeight: 600 }}/>
             <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
             <Radar name="Kingston"   dataKey="Kingston"   stroke={P.kingston}   fill={P.kingston}   fillOpacity={0.35} strokeWidth={2}/>
             <Radar name="Montgomery" dataKey="Montgomery" stroke={P.montgomery} fill={P.montgomery} fillOpacity={0.25} strokeWidth={2}/>
@@ -799,6 +811,7 @@ const TabMoney = () => {
    TAB 3: DONORS
    ============================================================ */
 const TabDonors = () => {
+  const isMobile = useIsMobile();
   // Quality table
   const rows = [
     { label: 'Unique donors',        K: Q.Kingston.donors,       M: Q.Montgomery.donors,       F: Q.Farrell.donors,       good: 'more',   fmt: (n) => fmtN(n) },
@@ -827,7 +840,8 @@ const TabDonors = () => {
             </p>
           </div>
         </div>
-        <ResponsiveContainer className="dk-cliff-chart" width="100%" height={340}>
+        <div className="dk-cliff-wrap">
+        <ResponsiveContainer width="100%" height={isMobile ? 240 : 340}>
           <BarChart data={AMOUNT_DIST} margin={{ top: 20, right: 20, left: 0, bottom: 10 }}>
             <CartesianGrid strokeDasharray="2 4" stroke={P.line} vertical={false}/>
             <XAxis dataKey="short" tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted, fontWeight: 600 }} axisLine={{ stroke: P.line }} tickLine={false}/>
@@ -840,6 +854,7 @@ const TabDonors = () => {
             <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 8 }}/>
           </BarChart>
         </ResponsiveContainer>
+        </div>
         <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           <div style={{ padding: '12px 14px', background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
             <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Kingston at the cap</div>
@@ -2829,7 +2844,8 @@ export default function Dashboard() {
           .dk-root .dk-field-stats > div > div:last-child { font-size: 15px !important; }
           .dk-root .dk-farrell-legend { grid-template-columns: repeat(3, 1fr) !important; }
           .dk-root .dk-field-receipts { text-align: left !important; }
-          .dk-root .dk-cliff-chart { height: 240px !important; }
+          .dk-root .dk-cliff-wrap { margin-left: -28px !important; margin-right: -28px !important; }
+          .dk-root .dk-kpi-grid > :last-child { grid-column: 1 / -1 !important; }
           .dk-root .dk-scroll-hint { display: block !important; }
           /* Findings insight: compact the number into a top strip, content full-width */
           .dk-root .dk-insight-grid { grid-template-columns: 1fr !important; }
