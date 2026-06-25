@@ -397,15 +397,15 @@ const Insight = ({ n, title, tone = 'default', children, stat }) => {
   const accent = accents[tone];
   return (
     <Card style={{ padding: 0, overflow: 'hidden' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: 0 }}>
-        <div style={{
+      <div className="dk-insight-grid" style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: 0 }}>
+        <div className="dk-insight-accent" style={{
           background: accent, color: '#FBF8F2',
           padding: '24px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
           minHeight: 200,
         }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: '0.2em', fontWeight: 700, opacity: 0.8 }}>INSIGHT</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 56, fontWeight: 300, lineHeight: 1, marginTop: 8, fontStyle: 'italic' }}>{n}</div>
+            <div className="dk-insight-num" style={{ fontFamily: 'Fraunces, serif', fontSize: 56, fontWeight: 300, lineHeight: 1, marginTop: 8, fontStyle: 'italic' }}>{n}</div>
           </div>
           {stat && (
             <div>
@@ -474,11 +474,11 @@ const TabOverview = () => {
       </div>
 
       {/* KPI row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 28 }}>
+      <div className="dk-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 28 }}>
         <Card><Stat label="Total Raised"  value={fmtK(FIN.Kingston.receipts)} sub={`${Math.round(FIN.Kingston.receipts/totalField*100)}% of field's money`}/></Card>
         <Card><Stat label="Cash on Hand"  value={fmtK(FIN.Kingston.cash)}     sub="9× the rest of field combined" accent={P.success}/></Card>
         <Card><Stat label="Unique Donors" value={fmtN(Q.Kingston.donors)}     sub={`vs. ${Q.Montgomery.donors + Q.Farrell.donors} for the rest of the field`}/></Card>
-        <Card><Stat label="$3.5K Max-Outs" value="281"                         sub="30% of itemized contributions" accent={P.kingstonAccent}/></Card>
+        <Card><Stat label="$3.5K Max-Outs" value="281"                         sub="32% of itemized contributions" accent={P.kingstonAccent}/></Card>
         <Card tone="warning"><Stat label="Unused Donor Room" value="$1.04M"    sub="legal giving room among existing donors" accent={P.warning}/></Card>
       </div>
 
@@ -500,7 +500,7 @@ const TabOverview = () => {
               </div>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: 38, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmtK(d.receipts)}</div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>total receipts</div>
-              <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid ${isK ? 'rgba(255,255,255,0.15)' : P.line}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13, fontFamily: 'DM Sans' }}>
+              <div className="dk-rank-stats" style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid ${isK ? 'rgba(255,255,255,0.15)' : P.line}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13, fontFamily: 'DM Sans' }}>
                 <div>
                   <div style={{ opacity: 0.55, fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Cash</div>
                   <div style={{ fontWeight: 700, marginTop: 2 }}>{fmtK(d.cash)}</div>
@@ -635,7 +635,7 @@ const TabMoney = () => {
             <Tag tone="default" style={{ background: 'rgba(255,255,255,0.2)', color: '#FBF8F2' }}>KEY FINDING</Tag>
           </div>
           <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, margin: '12px 0 0', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-            Pat Farrell's $646K is mostly his own money — $146K from donors, plus a $500,000 personal loan.
+            Pat Farrell's $657K is mostly his own money — $157K from donors, plus a $500,000 personal loan.
           </h2>
         </div>
         <div style={{ padding: 28, display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 36, alignItems: 'center' }}>
@@ -650,7 +650,7 @@ const TabMoney = () => {
             </ResponsiveContainer>
             <div style={{ textAlign: 'center', marginTop: -180, fontFamily: 'Fraunces, serif', fontSize: 38, fontWeight: 600, color: P.danger, pointerEvents: 'none' }}>76%</div>
             <div style={{ textAlign: 'center', marginTop: 0, fontSize: 11, color: P.muted, pointerEvents: 'none' }}>self-funded</div>
-            <div style={{ marginTop: 160, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 11 }}>
+            <div className="dk-farrell-legend" style={{ marginTop: 160, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 11 }}>
               {farrellPie.map(p => (
                 <div key={p.name} style={{ textAlign: 'center' }}>
                   <div style={{ height: 4, background: p.color, borderRadius: 2, marginBottom: 4 }}/>
@@ -673,7 +673,7 @@ const TabMoney = () => {
                 </p>
               </div>
               <p style={{ margin: '16px 0 0', fontSize: 14, color: P.muted, fontStyle: 'italic' }}>
-                It is the clearest single signal in Farrell's filing: a campaign financed largely by the candidate rather than by donors — 22 years in office, $146K from voters, $500K from himself.
+                It is the clearest single signal in Farrell's filing: a campaign financed largely by the candidate rather than by donors — 22 years in office, $157K from voters, $500K from himself.
               </p>
             </div>
           </div>
@@ -823,11 +823,11 @@ const TabDonors = () => {
               281 contributions to Kingston hit exactly $3,500.
             </h3>
             <p style={{ fontSize: 14, color: P.muted, margin: '6px 0 0', maxWidth: 760 }}>
-              That's the federal max-per-election limit. It's the single biggest signal in the distribution — and it's why the chart spikes so dramatically at one specific bucket. 34% of Kingston's itemized contributions hit the cap exactly. Montgomery: 23. Farrell: 8.
+              That's the federal max-per-election limit. It's the single biggest signal in the distribution — and it's why the chart spikes so dramatically at one specific bucket. 32% of Kingston's itemized contributions hit the cap exactly. Montgomery: 24. Farrell: 9.
             </p>
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={340}>
+        <ResponsiveContainer className="dk-cliff-chart" width="100%" height={340}>
           <BarChart data={AMOUNT_DIST} margin={{ top: 20, right: 20, left: 0, bottom: 10 }}>
             <CartesianGrid strokeDasharray="2 4" stroke={P.line} vertical={false}/>
             <XAxis dataKey="short" tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted, fontWeight: 600 }} axisLine={{ stroke: P.line }} tickLine={false}/>
@@ -847,11 +847,11 @@ const TabDonors = () => {
           </div>
           <div style={{ padding: '12px 14px', background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.montgomery}` }}>
             <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Montgomery at the cap</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.montgomery, marginTop: 2 }}>23 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $80,500</span></div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.montgomery, marginTop: 2 }}>24 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $84,000</span></div>
           </div>
           <div style={{ padding: '12px 14px', background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.farrell}` }}>
             <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Farrell at the cap</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.farrell, marginTop: 2 }}>8 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $28,000</span></div>
+            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 24, fontWeight: 600, color: P.farrell, marginTop: 2 }}>9 <span style={{ fontSize: 13, color: P.muted, fontWeight: 500 }}>· $31,500</span></div>
           </div>
         </div>
         <WhyMatters tone="warning">
@@ -863,6 +863,7 @@ const TabDonors = () => {
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Donor base quality scorecard</h3>
         <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because a third of his money comes from Atlanta and out of state.</p>
+        <div className="dk-scroll-hint" style={{ display: 'none', fontSize: 11, color: P.kingston, fontWeight: 700, marginBottom: 8, letterSpacing: '0.03em' }}>← swipe to compare all three candidates →</div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
             <thead>
@@ -1429,7 +1430,7 @@ const TabOpponents = () => (
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Jim Kingston</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>34 · Son of Rep. Jack Kingston (GA-1, 1993–2015) · Savannah native · Trump-endorsed</div>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div className="dk-field-receipts" style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500 }}>{fmtK(FIN.Kingston.receipts)}</div>
             <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>$949K cash on hand</strong></div>
           </div>
@@ -1470,7 +1471,7 @@ const TabOpponents = () => (
           </ol>
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+      <div className="dk-field-stats" style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
         {[
           { l: 'Donors',     v: fmtN(Q.Kingston.donors) },
           { l: 'Cash',       v: fmtK(FIN.Kingston.cash),  c: P.success },
@@ -1495,7 +1496,7 @@ const TabOpponents = () => (
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Pat Farrell</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>64 · Chatham County Commissioner (2004–2026) · Skidaway Island resident · Georgia Southern grad, mechanical engineering</div>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div className="dk-field-receipts" style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500 }}>{fmtK(FIN.Farrell.receipts)}</div>
             <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>76% self-funded</strong></div>
           </div>
@@ -1516,7 +1517,7 @@ const TabOpponents = () => (
         <div>
           <Tag tone="danger">Weaknesses</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>77% self-funded.</strong> Only $146K from individual donors</li>
+            <li><strong>76% self-funded.</strong> Only $157K from individual donors</li>
             <li>Raised just <strong>$250 from PACs</strong> — zero institutional backing</li>
             <li>Only 137 donors · 15% repeat rate · narrow base</li>
             <li>Only 5 out-of-state donors in the entire filing</li>
@@ -1529,7 +1530,7 @@ const TabOpponents = () => (
         <div>
           <Tag tone="warning">Vulnerabilities</Tag>
           <ol style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Candidate-financed.</strong> 77% of receipts are a personal loan; $146K came from donors.</li>
+            <li><strong>Candidate-financed.</strong> 76% of receipts are a personal loan; $157K came from donors.</li>
             <li><strong>Establishment résumé.</strong> 22 years on the county commission cuts against the anti-establishment mood of a Trump-era primary.</li>
             <li><strong>No institutional support.</strong> $250 in PAC money — effectively zero.</li>
             <li><strong>Qualifying fallout.</strong> Lost his commission seat automatically upon qualifying — a costly news cycle in March.</li>
@@ -1537,7 +1538,7 @@ const TabOpponents = () => (
           </ol>
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+      <div className="dk-field-stats" style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
         {[
           { l: 'Donors',       v: '137' },
           { l: 'Cash',         v: fmtK(FIN.Farrell.cash) },
@@ -1562,7 +1563,7 @@ const TabOpponents = () => (
             <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '4px 0 0', letterSpacing: '-0.01em' }}>Brian Montgomery</h3>
             <div style={{ fontSize: 14, marginTop: 4, opacity: 0.9 }}>Lt. Col. USA (Ret.) · West Point · Ranger · 82nd Airborne, 3rd ID (Fort Stewart) · 2× Iraq · Savannah ~10 yrs</div>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div className="dk-field-receipts" style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500 }}>{fmtK(FIN.Montgomery.receipts)}</div>
             <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>{fmtK(FIN.Montgomery.cash)} cash</strong></div>
           </div>
@@ -1594,7 +1595,7 @@ const TabOpponents = () => (
         <div>
           <Tag tone="warning">Vulnerabilities</Tag>
           <ol style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>Biography hasn't converted.</strong> The field's strongest résumé has produced the field's smallest fundraising total ($252K).</li>
+            <li><strong>Biography hasn't converted.</strong> The field's strongest résumé has produced the field's smallest fundraising total ($268K).</li>
             <li><strong>Cash crunch.</strong> $45K on hand and a ~2-month runway point to going dark on paid media before May 19.</li>
             <li><strong>Endorsement undercut.</strong> Trump's endorsement of Kingston undercuts the MAGA lane his profile is built for.</li>
             <li><strong>Thin institutional support.</strong> $8,500 in PAC money — no veterans' group or trade backing on the books.</li>
@@ -1602,7 +1603,7 @@ const TabOpponents = () => (
           </ol>
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+      <div className="dk-field-stats" style={{ borderTop: `1px solid ${P.line}`, padding: '16px 24px', background: P.bg, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
         {[
           { l: 'Donors', v: '150' },
           { l: 'Cash', v: fmtK(FIN.Montgomery.cash), c: P.danger },
@@ -2820,6 +2821,20 @@ export default function Dashboard() {
           .dk-root [style*="grid-template-columns:70px 1fr 120px"] {
             grid-template-columns: 1fr !important;
           }
+
+          /* Per-grid mobile overrides — after the generic collapse so they win */
+          .dk-root .dk-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .dk-root .dk-rank-stats { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
+          .dk-root .dk-field-stats { grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; }
+          .dk-root .dk-field-stats > div > div:last-child { font-size: 15px !important; }
+          .dk-root .dk-farrell-legend { grid-template-columns: repeat(3, 1fr) !important; }
+          .dk-root .dk-field-receipts { text-align: left !important; }
+          .dk-root .dk-cliff-chart { height: 240px !important; }
+          .dk-root .dk-scroll-hint { display: block !important; }
+          /* Findings insight: compact the number into a top strip, content full-width */
+          .dk-root .dk-insight-grid { grid-template-columns: 1fr !important; }
+          .dk-root .dk-insight-accent { flex-direction: row !important; align-items: center !important; min-height: 0 !important; padding: 12px 18px !important; }
+          .dk-root .dk-insight-num { font-size: 30px !important; margin-top: 0 !important; }
 
           /* Charts and images never exceed their container */
           .dk-root svg, .dk-root img { max-width: 100%; }
