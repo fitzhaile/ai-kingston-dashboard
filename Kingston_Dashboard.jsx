@@ -41,9 +41,9 @@ const C = {
 
 // === FEC FINANCIAL SUMMARY (THROUGH Q1 2026) ===
 const FIN = {
-  Kingston:   { receipts: 1818425, indiv: 1638975, itemized: 1622210, unitemized: 16765, pac: 179450, selfLoans: 0, selfContrib: 0, spent: 527039, cash: 1291387, debt: 0, monthsActive: 10 },
-  Montgomery: { receipts: 252045,  indiv: 227031,  itemized: 216349,  unitemized: 10681, pac: 8500,   selfLoans: 0, selfContrib: 16515, spent: 206600, cash: 45445,   debt: 0, monthsActive: 9 },
-  Farrell:    { receipts: 646235,  indiv: 145985,  itemized: 139401,  unitemized: 6584,  pac: 250,    selfLoans: 500000, selfContrib: 0, spent: 236163, cash: 410073, debt: 500000, monthsActive: 11 },
+  Kingston:   { receipts: 1862606, indiv: 1681156, itemized: 1659885, unitemized: 21270, pac: 181450, selfLoans: 0, selfContrib: 0, spent: 913390, cash: 949215, debt: 0, monthsActive: 11 },
+  Montgomery: { receipts: 267832,  indiv: 238518,  itemized: 225957,  unitemized: 12561, pac: 8500,   selfLoans: 0, selfContrib: 20815, spent: 222692, cash: 45140,   debt: 0, monthsActive: 10 },
+  Farrell:    { receipts: 656764,  indiv: 156514,  itemized: 149276,  unitemized: 7238,  pac: 250,    selfLoans: 500000, selfContrib: 0, spent: 593932, cash: 62832, debt: 500000, monthsActive: 12 },
 };
 
 // === CUMULATIVE & MONTHLY (primary, from Schedule A) ===
@@ -58,6 +58,7 @@ const CUMULATIVE = [
   { month: 'Jan', Kingston: 948700,  Montgomery: 126299, Farrell: 116900 },
   { month: 'Feb', Kingston: 969850,  Montgomery: 153899, Farrell: 120660 },
   { month: 'Mar', Kingston: 1060710, Montgomery: 176027, Farrell: 128751 },
+  { month: 'Apr', Kingston: 1088444, Montgomery: 185284, Farrell: 138626 },
 ];
 const MONTHLY = [
   { month: 'Jun', Kingston: 523550, Montgomery: 0,     Farrell: 25050 },
@@ -70,18 +71,19 @@ const MONTHLY = [
   { month: 'Jan', Kingston: 9150,   Montgomery: 364,   Farrell: 23400 },
   { month: 'Feb', Kingston: 21150,  Montgomery: 27600, Farrell: 3760  },
   { month: 'Mar', Kingston: 90860,  Montgomery: 22128, Farrell: 8091  },
+  { month: 'Apr', Kingston: 27734,  Montgomery: 9257,  Farrell: 9875  },
 ];
 
 // === PROPERLY-BUCKETED DONATION DISTRIBUTION ===
 // (earlier version was wrong — pd.cut used right-inclusive intervals)
 const AMOUNT_DIST = [
-  { bucket: '< $100',         short: '<$100',     Kingston: 5,   Montgomery: 2,  Farrell: 0  },
-  { bucket: '$100 – 249',     short: '$100',      Kingston: 9,   Montgomery: 20, Farrell: 0  },
-  { bucket: '$250 – 499',     short: '$250',      Kingston: 54,  Montgomery: 50, Farrell: 48 },
-  { bucket: '$500 – 999',     short: '$500',      Kingston: 126, Montgomery: 41, Farrell: 49 },
-  { bucket: '$1K – 2.4K',     short: '$1K',       Kingston: 290, Montgomery: 45, Farrell: 40 },
-  { bucket: '$2.5K – 3.4K',   short: '$2.5K',     Kingston: 42,  Montgomery: 12, Farrell: 6  },
-  { bucket: '$3,500 exactly', short: '$3.5K max', Kingston: 280, Montgomery: 23, Farrell: 8  },
+  { bucket: '< $100',         short: '<$100',     Kingston: 16,  Montgomery: 3,  Farrell: 0  },
+  { bucket: '$100 – 249',     short: '$100',      Kingston: 21,  Montgomery: 24, Farrell: 1  },
+  { bucket: '$250 – 499',     short: '$250',      Kingston: 57,  Montgomery: 51, Farrell: 49 },
+  { bucket: '$500 – 999',     short: '$500',      Kingston: 138, Montgomery: 43, Farrell: 50 },
+  { bucket: '$1K – 2.4K',     short: '$1K',       Kingston: 305, Montgomery: 48, Farrell: 45 },
+  { bucket: '$2.5K – 3.4K',   short: '$2.5K',     Kingston: 45,  Montgomery: 12, Farrell: 6  },
+  { bucket: '$3,500 exactly', short: '$3.5K max', Kingston: 281, Montgomery: 24, Farrell: 9  },
   { bucket: '$3.5K – 6.9K',   short: '$3.5–7K',   Kingston: 10,  Montgomery: 1,  Farrell: 0  },
   { bucket: '$7,000 exactly', short: '$7K (2×)',  Kingston: 9,   Montgomery: 0,  Farrell: 0  },
   { bucket: '> $7,000',       short: '>$7K',      Kingston: 10,  Montgomery: 1,  Farrell: 0  },
@@ -90,18 +92,18 @@ const AMOUNT_DIST = [
 // === OCCUPATIONS (unique donors with net > 0 — counts people, not checks) ===
 const OCCUPATIONS = {
   Kingston: [
-    { occ: 'Attorney',    n: 56 }, { occ: 'Owner', n: 44 }, { occ: 'Retired', n: 40 },
-    { occ: 'Homemaker',   n: 32 }, { occ: 'President', n: 24 }, { occ: 'CEO', n: 23 },
-    { occ: 'Physician',   n: 21 }, { occ: 'Consultant', n: 21 }, { occ: 'Real Estate', n: 14 },
+    { occ: 'Attorney',    n: 58 }, { occ: 'Retired', n: 45 }, { occ: 'Owner', n: 43 },
+    { occ: 'Homemaker',   n: 37 }, { occ: 'President', n: 24 }, { occ: 'CEO', n: 24 },
+    { occ: 'Physician',   n: 22 }, { occ: 'Consultant', n: 21 }, { occ: 'Real Estate', n: 14 },
     { occ: 'Partner',     n: 11 },
   ],
   Montgomery: [
-    { occ: 'Retired', n: 40 }, { occ: 'Business Owner', n: 11 }, { occ: 'Attorney', n: 7 },
+    { occ: 'Retired', n: 42 }, { occ: 'Business Owner', n: 12 }, { occ: 'Attorney', n: 7 },
     { occ: 'Consultant', n: 4 }, { occ: 'CEO', n: 3 }, { occ: 'Manager', n: 3 },
     { occ: 'Registered Agent', n: 3 }, { occ: 'Officer', n: 2 }, { occ: 'Physician', n: 2 }, { occ: 'Real Estate', n: 2 },
   ],
   Farrell: [
-    { occ: 'Retired', n: 32 }, { occ: 'Attorney', n: 9 }, { occ: 'Owner', n: 9 },
+    { occ: 'Retired', n: 35 }, { occ: 'Owner', n: 10 }, { occ: 'Attorney', n: 9 },
     { occ: 'Consultant', n: 4 }, { occ: 'Clerk', n: 3 }, { occ: 'Vice President', n: 3 },
     { occ: 'CEO', n: 3 }, { occ: 'President', n: 3 }, { occ: 'Longshoreman', n: 3 }, { occ: 'Dockworker', n: 3 },
   ],
@@ -113,37 +115,37 @@ const OCCUPATIONS = {
 // numbers always match the computed ones. 31416 has no published ACS estimate;
 // it carries null and is excluded from all income-based math and charts.
 const TOP_ZIPS = [
-  { zip: '31411', nbhd: 'Skidaway Island',   city: 'Savannah',      hhi: 122723, Kingston: 180800, Montgomery: 54077, Farrell: 12800 },
-  { zip: '31406', nbhd: 'Southside',         city: 'Savannah',      hhi: 66084,  Kingston: 189550, Montgomery: 2551,  Farrell: 28410 },
-  { zip: '31410', nbhd: 'Wilmington Island', city: 'Savannah',      hhi: 97225,  Kingston: 105250, Montgomery: 1551,  Farrell: 22010 },
-  { zip: '31401', nbhd: 'Downtown Historic', city: 'Savannah',      hhi: 50182,  Kingston: 88000,  Montgomery: 520,   Farrell: 13500 },
-  { zip: '31522', nbhd: 'St. Simons Island', city: 'St. Simons',    hhi: 106413, Kingston: 26300,  Montgomery: 12268, Farrell: 750   },
-  { zip: '31324', nbhd: 'Richmond Hill',     city: 'Richmond Hill', hhi: 110767, Kingston: 66310,  Montgomery: 12960, Farrell: 1000  },
-  { zip: '31405', nbhd: 'Habersham',         city: 'Savannah',      hhi: 62123,  Kingston: 56000,  Montgomery: 250,   Farrell: 8650  },
-  { zip: '31416', nbhd: 'Isle of Hope/Oatland', city: 'Savannah',   hhi: null,   Kingston: 12250,  Montgomery: 0,     Farrell: 8550  },
+  { zip: '31411', nbhd: 'Skidaway Island',   city: 'Savannah',      hhi: 122723, Kingston: 182750, Montgomery: 54077, Farrell: 12800 },
+  { zip: '31406', nbhd: 'Southside',         city: 'Savannah',      hhi: 66084,  Kingston: 193600, Montgomery: 2551,  Farrell: 29930 },
+  { zip: '31410', nbhd: 'Wilmington Island', city: 'Savannah',      hhi: 97225,  Kingston: 111325, Montgomery: 3151,  Farrell: 22010 },
+  { zip: '31401', nbhd: 'Downtown Historic', city: 'Savannah',      hhi: 50182,  Kingston: 88250,  Montgomery: 520,   Farrell: 13500 },
+  { zip: '31522', nbhd: 'St. Simons Island', city: 'St. Simons',    hhi: 106413, Kingston: 26300,  Montgomery: 14268, Farrell: 750   },
+  { zip: '31324', nbhd: 'Richmond Hill',     city: 'Richmond Hill', hhi: 110767, Kingston: 66310,  Montgomery: 12960, Farrell: 2104  },
+  { zip: '31405', nbhd: 'Habersham',         city: 'Savannah',      hhi: 62123,  Kingston: 57500,  Montgomery: 450,   Farrell: 8650  },
+  { zip: '31416', nbhd: 'Isle of Hope/Oatland', city: 'Savannah',   hhi: null,   Kingston: 12250,  Montgomery: 0,     Farrell: 10050 },
   { zip: '31322', nbhd: 'Pooler',            city: 'Pooler',        hhi: 91293,  Kingston: 34750,  Montgomery: 4510,  Farrell: 3750  },
-  { zip: '31419', nbhd: 'Westside',          city: 'Savannah',      hhi: 70734,  Kingston: 24000,  Montgomery: 848,   Farrell: 7520  },
-  { zip: '31404', nbhd: 'Eastside',          city: 'Savannah',      hhi: 49805,  Kingston: 54500,  Montgomery: 0,     Farrell: 1250  },
+  { zip: '31419', nbhd: 'Westside',          city: 'Savannah',      hhi: 70734,  Kingston: 25775,  Montgomery: 898,   Farrell: 7520  },
+  { zip: '31404', nbhd: 'Eastside',          city: 'Savannah',      hhi: 49805,  Kingston: 57500,  Montgomery: 0,     Farrell: 4750  },
   { zip: '30327', nbhd: 'Buckhead',          city: 'Atlanta',       hhi: 182317, Kingston: 53950,  Montgomery: 0,     Farrell: 0     },
-  { zip: '30305', nbhd: 'Buckhead',          city: 'Atlanta',       hhi: 107836, Kingston: 27000,  Montgomery: 0,     Farrell: 0     },
+  { zip: '30305', nbhd: 'Buckhead',          city: 'Atlanta',       hhi: 107836, Kingston: 28500,  Montgomery: 0,     Farrell: 0     },
   { zip: '31407', nbhd: 'Port Wentworth',    city: 'Savannah',      hhi: 83954,  Kingston: 21000,  Montgomery: 0,     Farrell: 1000  },
   { zip: '30269', nbhd: 'Peachtree City',    city: 'Peachtree City', hhi: 111093, Kingston: 10500, Montgomery: 0,     Farrell: 1600  },
   { zip: '31331', nbhd: 'Darien/Sapelo',     city: 'Darien',        hhi: 60669,  Kingston: 1000,   Montgomery: 8528,  Farrell: 0     },
-  { zip: '31545', nbhd: 'Jesup',             city: 'Jesup',         hhi: 44260,  Kingston: 2000,   Montgomery: 7184,  Farrell: 0     },
+  { zip: '31545', nbhd: 'Jesup',             city: 'Jesup',         hhi: 44260,  Kingston: 2000,   Montgomery: 8184,  Farrell: 0     },
 ];
 
 const INCOME_TIER = [
-  { tier: 'High ($125K+)',        Kingston: 4.6,  Montgomery: 0.7,  Farrell: 0.4  },
-  { tier: 'Upper-Mid ($75–124K)', Kingston: 40.8, Montgomery: 45.0, Farrell: 37.6 },
-  { tier: 'Middle ($50–74K)',     Kingston: 34.6, Montgomery: 21.4, Farrell: 55.0 },
-  { tier: 'Low (<$50K)',          Kingston: 8.0,  Montgomery: 3.8,  Farrell: 4.0  },
-  { tier: 'Out-of-state',         Kingston: 12.0, Montgomery: 29.1, Farrell: 3.0  },
+  { tier: 'High ($125K+)',        Kingston: 4.5,  Montgomery: 0.6,  Farrell: 0.4  },
+  { tier: 'Upper-Mid ($75–124K)', Kingston: 40.7, Montgomery: 46.6, Farrell: 36.6 },
+  { tier: 'Middle ($50–74K)',     Kingston: 34.7, Montgomery: 20.8, Farrell: 53.5 },
+  { tier: 'Low (<$50K)',          Kingston: 8.1,  Montgomery: 4.1,  Farrell: 6.6  },
+  { tier: 'Out-of-state',         Kingston: 12.0, Montgomery: 27.9, Farrell: 2.8  },
 ];
 
 const GEO = {
-  Kingston:   { inDist: 707410, atlanta: 235100, outState: 118200 },
-  Montgomery: { inDist: 119248, atlanta: 8783,   outState: 47998  },
-  Farrell:    { inDist: 116341, atlanta: 8860,   outState: 3550   },
+  Kingston:   { inDist: 727535, atlanta: 238859, outState: 122050 },
+  Montgomery: { inDist: 124504, atlanta: 12783,  outState: 47998  },
+  Farrell:    { inDist: 125966, atlanta: 9110,   outState: 3550   },
 };
 
 // === WEIGHTED-AVG DONOR ZIP INCOME + ACS COVERAGE ===
@@ -152,16 +154,16 @@ const GEO = {
 // estimate (the rest land in ZIPs with no estimate, e.g. 31416). Used by both
 // the Geography tab and the Data Quality tab; verified by derive_dashboard_data.py --check.
 const ZIP_INCOME = [
-  { name: 'Kingston',   wAvg: 89563,  cov: 96.6 },
-  { name: 'Montgomery', wAvg: 100811, cov: 92.5 },
-  { name: 'Farrell',    wAvg: 79195,  cov: 90.4 },
+  { name: 'Kingston',   wAvg: 89384,  cov: 96.0 },
+  { name: 'Montgomery', wAvg: 100616, cov: 92.8 },
+  { name: 'Farrell',    wAvg: 78493,  cov: 88.5 },
 ];
 
 // === QUALITY METRICS ===
 const Q = {
-  Kingston:   { donors: 583, repeatRate: 29.7, top20Pct: 12.9, avgGift: 2129, inDistPct: 66.7, maxed: 190, pac: 179450, selfPct: 0 },
-  Montgomery: { donors: 143, repeatRate: 20.3, top20Pct: 50.1, avgGift: 1142, inDistPct: 67.7, maxed: 24,  pac: 8500,   selfPct: 6.6 },
-  Farrell:    { donors: 130, repeatRate: 13.8, top20Pct: 47.7, avgGift: 873,  inDistPct: 90.4, maxed: 11,  pac: 250,    selfPct: 77.4 },
+  Kingston:   { donors: 609, repeatRate: 31.4, top20Pct: 12.6, avgGift: 2036, inDistPct: 66.8, maxed: 192, pac: 181450, selfPct: 0 },
+  Montgomery: { donors: 150, repeatRate: 21.3, top20Pct: 48.0, avgGift: 1121, inDistPct: 67.2, maxed: 26,  pac: 8500,   selfPct: 7.8 },
+  Farrell:    { donors: 137, repeatRate: 14.6, top20Pct: 46.1, avgGift: 885,  inDistPct: 90.9, maxed: 12,  pac: 250,    selfPct: 76.1 },
 };
 
 // === TRIPLE-MAX CLUB (gave Kingston $7,000+, primary+general+runoff) ===
@@ -184,17 +186,18 @@ const DOUBLE_MAX = [
   { name: 'John Skeadas III',       city: 'Savannah',       occ: 'Investment Manager (First Capital City)', amount: 7000  },
 ];
 
-// Every employer cluster with 3+ donors (the OrthoAtlanta and Bernard Williams
-// clusters arrived in the March data refresh).
+// Every employer cluster with 3+ donors (OrthoAtlanta and Bernard Williams
+// arrived in the March refresh; HunterMaclean reached 3 donors in April).
 const BUNDLERS = [
   { firm: 'Pintail Site Preparation',    n: 4,  total: 27000 },
   { firm: 'Critz Inc.',                  n: 4,  total: 26500 },
-  { firm: "Mingledorff's Inc.",          n: 3,  total: 22000 },
+  { firm: "Mingledorff's Inc.",          n: 4,  total: 22250 },
   { firm: 'Sterling Seacrest Pritchard', n: 3,  total: 13000 },
   { firm: 'OrthoAtlanta',                n: 12, total: 10500 },
   { firm: 'Oliver Maner LLP',            n: 5,  total: 10500 },
   { firm: 'Weiner Shearouse Weitz Greenberg & Shawe', n: 5, total: 9500 },
   { firm: 'Tiber Creek Group',           n: 9,  total: 8750  },
+  { firm: 'HunterMaclean',               n: 3,  total: 6500  },
   { firm: 'Osteen Law Group',            n: 3,  total: 3500  },
   { firm: 'Bernard Williams & Company',  n: 3,  total: 1350  },
 ];
@@ -231,14 +234,11 @@ const TIMELINE = [
 ];
 
 // === RUNWAY BURN-DOWN DATA (projected forward from Apr 20, 2026) ===
+// Actual cash on hand at the two FEC report dates — the Q1 close and the
+// pre-primary report. The real April drawdown, not a projection (FEC Form 3).
 const RUNWAY = [
-  { weeksOut: -1, day: 'Apr 13',   Kingston: 1291387, Montgomery: 45445,  Farrell: 410073 },
-  { weeksOut: 0,  day: 'Apr 20',   Kingston: 1280344, Montgomery: 39638,  Farrell: 405044 },
-  { weeksOut: 1,  day: 'Apr 27',   Kingston: 1269301, Montgomery: 33831,  Farrell: 400015 },
-  { weeksOut: 2,  day: 'May 4',    Kingston: 1258258, Montgomery: 28024,  Farrell: 394986 },
-  { weeksOut: 3,  day: 'May 11',   Kingston: 1247215, Montgomery: 22217,  Farrell: 389957 },
-  { weeksOut: 4,  day: 'May 18',   Kingston: 1236172, Montgomery: 16410,  Farrell: 384928 },
-  { weeksOut: 5,  day: 'Primary',  Kingston: 1235000, Montgomery: 15000,  Farrell: 384000 },
+  { day: 'Mar 31', Kingston: 1291387, Montgomery: 45445, Farrell: 410073 },
+  { day: 'Apr 29', Kingston: 949215,  Montgomery: 45140, Farrell: 62832  },
 ];
 
 /* ============================================================
@@ -462,7 +462,7 @@ const TabOverview = () => {
               A frontrunner built on big checks and a legacy network.
             </h1>
             <p style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.55, marginTop: 8, marginBottom: 0, opacity: 0.9 }}>
-              Kingston has out-raised Farrell and Montgomery combined roughly 2-to-1, with about 3× the field's cash on hand — enough to contest a first-round majority on May 19 and avoid the June 16 runoff.
+              Kingston has out-raised Farrell and Montgomery combined roughly 2-to-1, with about 9× the field's cash on hand by late April — enough to contest a first-round majority on May 19 and avoid the June 16 runoff.
             </p>
           </div>
           <div className="dk-hero-date" style={{ textAlign: 'center', minWidth: 110 }}>
@@ -476,7 +476,7 @@ const TabOverview = () => {
       {/* KPI row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 28 }}>
         <Card><Stat label="Total Raised"  value={fmtK(FIN.Kingston.receipts)} sub={`${Math.round(FIN.Kingston.receipts/totalField*100)}% of field's money`}/></Card>
-        <Card><Stat label="Cash on Hand"  value={fmtK(FIN.Kingston.cash)}     sub="3× the rest of field combined" accent={P.success}/></Card>
+        <Card><Stat label="Cash on Hand"  value={fmtK(FIN.Kingston.cash)}     sub="9× the rest of field combined" accent={P.success}/></Card>
         <Card><Stat label="Unique Donors" value={fmtN(Q.Kingston.donors)}     sub={`vs. ${Q.Montgomery.donors + Q.Farrell.donors} for the rest of the field`}/></Card>
         <Card><Stat label="$3.5K Max-Outs" value="280"                         sub="34% of itemized contributions" accent={P.kingstonAccent}/></Card>
         <Card tone="warning"><Stat label="Unused Donor Room" value="$980K"     sub="legal giving room among existing donors" accent={P.warning}/></Card>
@@ -648,7 +648,7 @@ const TabMoney = () => {
                 <Tooltip content={<TTip/>}/>
               </PieChart>
             </ResponsiveContainer>
-            <div style={{ textAlign: 'center', marginTop: -180, fontFamily: 'Fraunces, serif', fontSize: 38, fontWeight: 600, color: P.danger, pointerEvents: 'none' }}>77%</div>
+            <div style={{ textAlign: 'center', marginTop: -180, fontFamily: 'Fraunces, serif', fontSize: 38, fontWeight: 600, color: P.danger, pointerEvents: 'none' }}>76%</div>
             <div style={{ textAlign: 'center', marginTop: 0, fontSize: 11, color: P.muted, pointerEvents: 'none' }}>self-funded</div>
             <div style={{ marginTop: 160, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 11 }}>
               {farrellPie.map(p => (
@@ -748,16 +748,14 @@ const TabMoney = () => {
 
       {/* Runway burn-down */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Cash burn-down to primary day</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Projecting current burn rate forward. Montgomery's line falls to roughly $16K by primary day — before the typical final-month spending spike, which would exhaust it sooner. He likely cannot fund paid media in the closing stretch unless he raises a surprising amount in April.</p>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Cash drawn down into the final stretch</h3>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Actual cash on hand at the two FEC report dates. Between March 31 and April 29, Kingston spent $386K (holding $949K) and Farrell spent $358K (draining to $63K), while Montgomery spent only the ~$16K he raised and stayed flat at $45K. The two candidates with money to spend both emptied a war chest into the close — but only Kingston could do it without denting his lead.</p>
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={RUNWAY} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="2 4" stroke={P.line} vertical={false}/>
             <XAxis dataKey="day" tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} axisLine={{ stroke: P.line }} tickLine={false}/>
             <YAxis tickFormatter={fmtK} tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} axisLine={false} tickLine={false}/>
             <Tooltip content={<TTip/>}/>
-            <ReferenceLine x="Apr 20" stroke={P.kingstonAccent} strokeDasharray="3 3" label={{ value: 'Today', fill: P.kingstonAccent, fontSize: 11, fontWeight: 700 }}/>
-            <ReferenceLine x="Primary" stroke={P.danger} label={{ value: 'Primary', fill: P.danger, fontSize: 11, fontWeight: 700 }}/>
             <Line type="monotone" dataKey="Kingston"   stroke={P.kingston}   strokeWidth={3} dot={{ r: 4 }}/>
             <Line type="monotone" dataKey="Farrell"    stroke={P.farrell}    strokeWidth={2} dot={{ r: 3 }}/>
             <Line type="monotone" dataKey="Montgomery" stroke={P.montgomery} strokeWidth={2} dot={{ r: 3 }}/>
@@ -765,7 +763,7 @@ const TabMoney = () => {
           </LineChart>
         </ResponsiveContainer>
         <WhyMatters tone="warning">
-          The last two weeks before a primary are when campaigns buy the most TV and mail. Montgomery's projected balance is under $30K by early May with the costliest weeks still ahead — paid media in the final stretch is likely out of reach. Kingston's reserve near $1.2M leaves room to outspend the field through primary day.
+          The pre-primary report covers through April 29 — all but the final three weeks before the May 19 vote. Going into that stretch Kingston still held ~$949K, against Farrell's $63K and Montgomery's $45K. Cash on hand is what buys closing TV and mail, and only Kingston had the reserves to keep spending through primary day; the challengers had effectively spent out.
         </WhyMatters>
       </Card>
 
@@ -1111,7 +1109,7 @@ const TabGeography = () => {
             Kingston's money flows from Georgia's wealthiest neighborhoods
           </h3>
           <p style={{ fontSize: 13, lineHeight: 1.55, margin: '6px 0 0', opacity: 0.9, maxWidth: 760 }}>
-            $628,260 came from Georgia ZIPs with median household income of $90K or more — <strong>roughly 14× what Farrell raised from the same neighborhoods, 6.6× what Montgomery raised.</strong> Kingston's weighted donor ZIP income is $90K, 20% above Georgia's median.
+            $639,819 came from Georgia ZIPs with median household income of $90K or more — <strong>roughly 14× what Farrell raised from the same neighborhoods, 6.2× what Montgomery raised.</strong> Kingston's weighted donor ZIP income is $89K, 20% above Georgia's median.
           </p>
         </div>
 
@@ -1277,9 +1275,9 @@ const TabGeography = () => {
               {[
                 // Sum over ALL 41 Georgia ZIPs with ACS median HHI ≥ $90K — the
                 // stated criterion — not just the eight shown above.
-                { name: 'Kingston',   total: 628260, color: P.kingston   },
-                { name: 'Montgomery', total: 95479,  color: P.montgomery },
-                { name: 'Farrell',    total: 44510,  color: P.farrell    },
+                { name: 'Kingston',   total: 639819, color: P.kingston   },
+                { name: 'Montgomery', total: 102579, color: P.montgomery },
+                { name: 'Farrell',    total: 45614,  color: P.farrell    },
               ].map(d => {
                 const barPct = (d.total / 628260) * 100;
                 return (
@@ -1433,7 +1431,7 @@ const TabOpponents = () => (
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500 }}>{fmtK(FIN.Kingston.receipts)}</div>
-            <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>$1.29M cash on hand</strong></div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>$949K cash on hand</strong></div>
           </div>
         </div>
       </div>
@@ -1442,8 +1440,8 @@ const TabOpponents = () => (
           <Tag tone="success">Strengths</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
             <li><strong>Trump endorsement</strong> (Apr 14) — neither challenger has one</li>
-            <li>$1.82M raised — 7× Montgomery, 3× Farrell; $1.29M cash on hand ≈ 3× the rest of the field combined</li>
-            <li>583 unique donors — 4.5× Farrell's count; donor velocity ~60/month sustained</li>
+            <li>$1.86M raised — 7× Montgomery, 3× Farrell; $949K cash on hand ≈ 9× the rest of the field combined</li>
+            <li>609 unique donors — 4.4× Farrell's count; donor velocity ~55/month sustained</li>
             <li>76 ultra-loyalists (≥$7K); 10 bundler firms organizing stacked giving across employee rosters</li>
             <li>Legacy network: Jack Kingston's 30-year Savannah donor and business base showing up intact</li>
             <li>Atlanta moat — $109K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5K</li>
@@ -1499,7 +1497,7 @@ const TabOpponents = () => (
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500 }}>{fmtK(FIN.Farrell.receipts)}</div>
-            <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>77% self-funded</strong></div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>total receipts · <strong>76% self-funded</strong></div>
           </div>
         </div>
       </div>
@@ -1585,7 +1583,7 @@ const TabOpponents = () => (
         <div>
           <Tag tone="danger">Weaknesses</Tag>
           <ul style={{ fontFamily: 'DM Sans', fontSize: 13, lineHeight: 1.65, color: P.ink, paddingLeft: 18, marginTop: 12 }}>
-            <li><strong>$45K cash on hand — ~2 months runway.</strong> Likely goes dark on paid media before May 19</li>
+            <li><strong>$45K cash on hand at April 29.</strong> He spent only what he raised, never building a closing war chest</li>
             <li>Only 143 donors · top 20 = 50% of money (fragile concentration)</li>
             <li>Recent Savannah resident ("nearly a decade") vs. lifers Kingston/Farrell</li>
             <li>Trump endorsed Kingston, not him — strips his MAGA messaging of its main asset</li>
@@ -1685,7 +1683,7 @@ const TabInsights = () => {
       <div style={{ display: 'grid', gap: 14 }}>
 
         <Insight n="01" tone="hot" title="The 76-person Ultra-Loyalist Club"
-          stat={{ value: '$739K', label: 'from 76 donors' }}>
+          stat={{ value: '$747K', label: 'from 77 donors' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             76 donors gave Kingston $7,000 or more (primary + general, plus runoff where applicable). That's <strong>13% of the donor base producing 46% of the money.</strong> The top tier — Critz, Demere, Hollis, Dorsey — each hit the full $10,500 triple-max, and several of their spouses maxed out too, so the strongest households total ~$21,000. The $10,500 individual triple-max cap holds across the board.
           </p>
@@ -1699,10 +1697,10 @@ const TabInsights = () => {
           </div>
         </Insight>
 
-        <Insight n="02" tone="hot" title="The partial-triple cohort — $59K of uncollected runoff capacity"
+        <Insight n="02" tone="hot" title="The partial-triple cohort — $62K of uncollected runoff capacity"
           stat={{ value: '21', label: 'donors one check short of max' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Of the 76 ultra-loyalists who've given $7,000+, <strong>55 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 21 stopped between $7,000 and $10,000 — short of the runoff deposit. That's <strong>$59,000 in legal runoff capacity from a specific, identifiable cohort of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
+            Of the 77 ultra-loyalists who've given $7,000+, <strong>55 have hit the full $10,500 triple-max</strong> (primary + general + runoff). The other 22 stopped between $7,000 and $10,000 — short of the runoff deposit. That's <strong>$61,500 in legal runoff capacity from a specific, identifiable cohort of donors who have already demonstrated triple-max intent</strong> by giving far past most people's ceiling.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 12 }}>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingston}` }}>
@@ -1712,7 +1710,7 @@ const TabInsights = () => {
             </div>
             <div style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.danger}` }}>
               <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Partial-triple</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.danger, marginTop: 2 }}>21 donors · $162K</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: P.danger, marginTop: 2 }}>22 donors · $170K</div>
               <div style={{ fontSize: 11, color: P.muted, marginTop: 2 }}>Primary + general only · $59K of unwritten runoff checks</div>
             </div>
           </div>
@@ -1722,9 +1720,9 @@ const TabInsights = () => {
         </Insight>
 
         <Insight n="03" tone="warm" title="The Atlanta Moat — $109K where opponents barely register"
-          stat={{ value: '$109K', label: 'Atlanta network' }}>
+          stat={{ value: '$111K', label: 'Atlanta network' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$109,450 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs — about 5% of Kingston's haul. This is donor territory the field has almost entirely ceded to him.
+            Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$110,950 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs — about 5% of Kingston's haul. This is donor territory the field has almost entirely ceded to him.
           </p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={atlantaZips} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
@@ -1819,7 +1817,7 @@ const TabInsights = () => {
         <Insight n="08" tone="default" title="Montgomery's cash can't cover the final stretch"
           stat={{ value: '~2.0 mo', label: 'Montgomery runway' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Montgomery has $45,445 cash on hand and burns roughly $23K/month. A straight-line projection doesn't hit zero until mid-June — a month <em>after</em> the primary — but straight-line is the generous case: campaign spending typically runs 2–3× baseline in the final month, and at that pace his cash is gone between May 10 and primary day. Either way, $45K cannot fund a meaningful paid-media push in the closing weeks unless April fundraising surprises.
+            Through the April 29 pre-primary report, Montgomery had $45,140 cash on hand — essentially flat on the month, because he spent almost exactly the ~$16K he raised. He never built the reserve a closing paid-media push needs: $45K, with three weeks to go, could not fund meaningful TV or mail against a frontrunner sitting on $949K. Solvent, but invisible in the air war.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 12 }}>
             {['Kingston','Farrell','Montgomery'].map(name => {
@@ -1841,7 +1839,7 @@ const TabInsights = () => {
         </Insight>
 
         <Insight n="09" tone="default" title="10 employer clusters account for $133K in stacked giving"
-          stat={{ value: '$133K', label: 'from 10 firms' }}>
+          stat={{ value: '$139K', label: 'from 11 firms' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
             When 3+ employees of one firm donate within days of each other, it is <strong>consistent with someone inside organizing the giving</strong> — a likely bundler — though shared employer and timing alone don't prove coordination. Here are the ten employer clusters, including OrthoAtlanta, whose 12 physicians all gave within the last nine days of March.
           </p>
@@ -1899,7 +1897,7 @@ const TabInsights = () => {
         <Insight n="12" tone="gold" title="40 households doubled up — a rare depth signal"
           stat={{ value: '40', label: 'households w/ 2+ max-givers' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            The FEC's $3,500 cap is per individual, not per household — so when two people who <em>share a surname and ZIP</em> both max out, that reads as two independent decisions, not one donor writing a bigger check. <strong>40 Kingston households — clusters that share a surname and ZIP — have 2+ members who each netted $3,500 or more</strong>, together accounting for <strong>$621,000 net</strong> — well over one in every three Kingston dollars. Households are inferred from shared surname + ZIP, so a few may be unrelated namesakes; even so, it is an uncommon depth of repeat max-giving.
+            The FEC's $3,500 cap is per individual, not per household — so when two people who <em>share a surname and ZIP</em> both max out, that reads as two independent decisions, not one donor writing a bigger check. <strong>40 Kingston households — clusters that share a surname and ZIP — have 2+ members who each netted $3,500 or more</strong>, together accounting for <strong>$624,475 net</strong> — well over one in every three Kingston dollars. Households are inferred from shared surname + ZIP, so a few may be unrelated namesakes; even so, it is an uncommon depth of repeat max-giving.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 8, marginBottom: 12 }}>
             {[
@@ -2091,27 +2089,27 @@ const TabModels = () => {
             </div>
             <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>INPUTS (FEC Schedule A)</div>
             <div style={{ fontSize: 13, lineHeight: 1.8, color: P.ink }}>
-              583 unique donors, 886 itemized contributions through 3/31/2026.<br/>
-              280 contributions at exactly $3,500 (primary cap); 190 donors net-maxed.<br/>
-              136 of those have not given $3,500 to general.<br/>
-              393 donors below primary cap, avg remaining capacity $2,493.
+              609 unique donors, 944 itemized contributions through 4/29/2026.<br/>
+              281 contributions at exactly $3,500 (primary cap); 192 donors net-maxed.<br/>
+              138 of those have not given $3,500 to general.<br/>
+              417 donors below primary cap, avg remaining capacity $2,501.
             </div>
           </div>
           <div>
             <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>RESULT</div>
             <div style={{ padding: 16, background: `linear-gradient(135deg, ${P.kingston} 0%, ${P.kingstonLight} 100%)`, color: '#FBF8F2', borderRadius: 10, marginBottom: 10 }}>
               <div style={{ fontSize: 11, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Primary room</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, marginTop: 2, lineHeight: 1 }}>$979,790</div>
-              <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>from 393 non-maxed primary donors</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, marginTop: 2, lineHeight: 1 }}>$1,043,056</div>
+              <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>from 417 non-maxed primary donors</div>
             </div>
             <div style={{ padding: 16, background: `linear-gradient(135deg, ${P.kingstonAccent} 0%, #E0B96A 100%)`, color: P.ink, borderRadius: 10, marginBottom: 10 }}>
               <div style={{ fontSize: 11, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>General room (redesignation)</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, marginTop: 2, lineHeight: 1 }}>$464,500</div>
-              <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>from 136 primary max-outs not yet max-given general, net of partial general gifts</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 34, fontWeight: 600, marginTop: 2, lineHeight: 1 }}>$470,500</div>
+              <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>from 138 primary max-outs not yet max-given general, net of partial general gifts</div>
             </div>
             <div style={{ padding: '12px 16px', borderLeft: `4px solid ${P.success}`, background: P.bg, borderRadius: 8 }}>
               <div style={{ fontSize: 11, color: P.muted, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Total addressable without new donors</div>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600, color: P.success, marginTop: 2 }}>$1,444,290</div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600, color: P.success, marginTop: 2 }}>$1,513,556</div>
             </div>
           </div>
         </div>

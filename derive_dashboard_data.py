@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Derive every Schedule-A-based dashboard constant from FEC itemized individual
-contributions, through 3/31/2026.
+contributions, through 4/29/2026 (the last pre-primary FEC report).
 
 Methodology (derived itemized totals land within 0.2% of FEC Form 3 for
 Kingston, 1.8% for Montgomery, and 5.5% for Farrell — the API export nets out
@@ -19,13 +19,13 @@ Run:  python3 derive_dashboard_data.py            (print every derived constant)
       python3 derive_dashboard_data.py --check    (also diff the constants against
             Kingston_Dashboard.jsx and exit 1 on any mismatch — guards the
             CLAUDE.md "No fabricated data" rule)
-Input: congresscontributions_through_march2026.csv  (FEC Schedule A, cycle 2026,
-       contribution_receipt_date <= 2026-03-31, pulled from api.open.fec.gov)
+Input: congresscontributions_through_april2026.csv  (FEC Schedule A, cycle 2026,
+       contribution_receipt_date <= 2026-04-29, pulled from api.open.fec.gov)
 """
 import csv
 from collections import defaultdict, Counter
 
-SRC = "congresscontributions_through_march2026.csv"
+SRC = "congresscontributions_through_april2026.csv"
 CN = {'K': 'FRIENDS OF JIM KINGSTON', 'M': 'FRIENDS OF BRIAN MONTGOMERY', 'F': 'PAT FARRELL FOR CONGRESS'}
 rows = [r for r in csv.DictReader(open(SRC)) if r['entity_type'] == 'IND']
 
@@ -73,10 +73,10 @@ def tier(h):
 
 MONTHS = [('2025-06','Jun'),('2025-07','Jul'),('2025-08','Aug'),('2025-09','Sep'),
           ('2025-10','Oct'),('2025-11','Nov'),('2025-12','Dec'),('2026-01','Jan'),
-          ('2026-02','Feb'),('2026-03','Mar')]
+          ('2026-02','Feb'),('2026-03','Mar'),('2026-04','Apr')]
 
 print("="*72)
-print("DASHBOARD CONSTANTS — DERIVED THROUGH 3/31/2026 (IND, dedup-by-transaction_id)")
+print("DASHBOARD CONSTANTS — DERIVED THROUGH 4/29/2026 (IND, dedup-by-transaction_id)")
 print("="*72)
 
 # --- itemized totals (checksum vs FEC) ---
