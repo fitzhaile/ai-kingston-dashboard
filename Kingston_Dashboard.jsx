@@ -19,8 +19,8 @@ const P = {
   kingstonAccent: '#D4A94A',
   montgomery: '#8B4513',
   montgomeryLight: '#B8743F',
-  farrell: '#6B4C7A',
-  farrellLight: '#9379A3',
+  farrell: '#8E44AD',
+  farrellLight: '#A569BD',
   bg: '#FBF8F2',
   paper: '#FFFFFF',
   ink: '#1F1F1F',
@@ -454,6 +454,15 @@ const TabOverview = () => {
     { metric: 'In-District\nShare', Kingston: Q.Kingston.inDistPct, Montgomery: Q.Montgomery.inDistPct, Farrell: Q.Farrell.inDistPct },
     { metric: 'Grassroots\nIndex',  Kingston: 100 - Q.Kingston.selfPct, Montgomery: 100 - Q.Montgomery.selfPct, Farrell: 100 - Q.Farrell.selfPct },
   ];
+  // Custom 2-line radar tick so the dimension labels fit (Recharts ignores the \n)
+  const radarTick = ({ x, y, textAnchor, payload }) => {
+    const lines = String(payload.value).split('\n');
+    return (
+      <text x={x} y={y} textAnchor={textAnchor} fontFamily="DM Sans" fontSize={isMobile ? 10 : 12} fontWeight={600} fill={P.ink}>
+        {lines.map((l, i) => <tspan key={i} x={x} dy={i === 0 ? `${0.32 - (lines.length - 1) * 0.55}em` : '1.1em'}>{l}</tspan>)}
+      </text>
+    );
+  };
 
   return (
     <div>
@@ -538,17 +547,26 @@ const TabOverview = () => {
       {/* Radar */}
       <Card style={{ padding: 28, marginBottom: 24 }}>
         <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Kingston leads on every dimension; Farrell registers only on in-district concentration — a function of raising almost entirely within 31xxx ZIPs."/>
-        <ResponsiveContainer width="100%" height={isMobile ? 290 : 400}>
-          <RadarChart data={radarData} margin={isMobile ? { top: 6, right: 52, bottom: 6, left: 52 } : { top: 20, right: 40, bottom: 20, left: 40 }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 280 : 400}>
+          <RadarChart data={radarData} margin={isMobile ? { top: 14, right: 46, bottom: 14, left: 46 } : { top: 20, right: 40, bottom: 20, left: 40 }}>
             <PolarGrid stroke={P.line}/>
-            <PolarAngleAxis dataKey="metric" tick={{ fontFamily: 'DM Sans', fontSize: isMobile ? 9 : 12, fill: P.ink, fontWeight: 600 }}/>
+            <PolarAngleAxis dataKey="metric" tick={radarTick}/>
             <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
             <Radar name="Kingston"   dataKey="Kingston"   stroke={P.kingston}   fill={P.kingston}   fillOpacity={0.35} strokeWidth={2}/>
             <Radar name="Montgomery" dataKey="Montgomery" stroke={P.montgomery} fill={P.montgomery} fillOpacity={0.25} strokeWidth={2}/>
             <Radar name="Farrell"    dataKey="Farrell"    stroke={P.farrell}    fill={P.farrell}    fillOpacity={0.20} strokeWidth={2}/>
-            <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 12 }}/>
+            {!isMobile && <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 12 }}/>}
           </RadarChart>
         </ResponsiveContainer>
+        {isMobile && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 18, paddingTop: 6, fontFamily: 'DM Sans', fontSize: 12 }}>
+            {['Kingston', 'Montgomery', 'Farrell'].map(n => (
+              <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 12, height: 12, borderRadius: 2, background: C[n].color }}/>{n}
+              </span>
+            ))}
+          </div>
+        )}
         <WhyMatters>
           A broader shape signals a campaign with more ways to raise — individual donors, institutional money, reach beyond a narrow base. Kingston's shape nearly fills the chart; both challengers hug the center on almost every axis. That imbalance is what a broad fundraising coalition looks like in data form.
         </WhyMatters>
@@ -1098,6 +1116,7 @@ const GeoMaps = () => {
 };
 
 const TabGeography = () => {
+  const isMobile = useIsMobile();
   const zipForChart = TOP_ZIPS.slice(0, 15).map(z => ({
     ...z,
     label: `${z.zip} · ${z.nbhd}`,
@@ -1351,7 +1370,7 @@ const TabGeography = () => {
           <BarChart data={zipForChart} layout="vertical" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="2 4" stroke={P.line} horizontal={false}/>
             <XAxis type="number" tickFormatter={fmtK} tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.muted }} axisLine={false} tickLine={false}/>
-            <YAxis type="category" dataKey="label" width={200} tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.ink }} axisLine={false} tickLine={false}/>
+            <YAxis type="category" dataKey="label" width={isMobile ? 48 : 200} tickFormatter={(v) => isMobile ? String(v).split('·')[0].trim() : v} tick={{ fontFamily: 'DM Sans', fontSize: 11, fill: P.ink }} axisLine={false} tickLine={false}/>
             <Tooltip content={<TTip/>}/>
             <Bar dataKey="Kingston"   stackId="a" fill={P.kingston}/>
             <Bar dataKey="Montgomery" stackId="a" fill={P.montgomery}/>
@@ -2840,6 +2859,7 @@ export default function Dashboard() {
           /* Per-grid mobile overrides — after the generic collapse so they win */
           .dk-root .dk-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .dk-root .dk-rank-stats { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
+          .dk-root .dk-rank-stats > div > div:last-child { font-size: 15px !important; }
           .dk-root .dk-field-stats { grid-template-columns: repeat(5, 1fr) !important; gap: 5px !important; }
           .dk-root .dk-field-stats > div > div:last-child { font-size: 15px !important; }
           .dk-root .dk-farrell-legend { grid-template-columns: repeat(3, 1fr) !important; }
