@@ -557,26 +557,23 @@ const TabOverview = () => {
       {/* Radar */}
       <Card style={{ padding: 28, marginBottom: 24 }}>
         <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Kingston leads on every dimension; Farrell registers only on in-district concentration — a function of raising almost entirely within 31xxx ZIPs."/>
-        <ResponsiveContainer width="100%" height={isMobile ? 290 : 470}>
-          <RadarChart data={radarData} margin={isMobile ? { top: 24, right: 46, bottom: 24, left: 46 } : { top: 36, right: 40, bottom: 36, left: 40 }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 320 : 520}>
+          <RadarChart data={radarData} outerRadius="84%" margin={isMobile ? { top: 22, right: 46, bottom: 24, left: 46 } : { top: 30, right: 40, bottom: 38, left: 40 }}>
             <PolarGrid stroke={P.line}/>
             <PolarAngleAxis dataKey="metric" tick={radarTick}/>
-            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
+            <PolarRadiusAxis angle={60} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
             <Radar name="Kingston"   dataKey="Kingston"   stroke={P.kingston}   fill={P.kingston}   fillOpacity={0.35} strokeWidth={2}/>
             <Radar name="Montgomery" dataKey="Montgomery" stroke={P.montgomery} fill={P.montgomery} fillOpacity={0.25} strokeWidth={2}/>
             <Radar name="Farrell"    dataKey="Farrell"    stroke={P.farrell}    fill={P.farrell}    fillOpacity={0.20} strokeWidth={2}/>
-            {!isMobile && <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 12 }}/>}
           </RadarChart>
         </ResponsiveContainer>
-        {isMobile && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 18, paddingTop: 6, fontFamily: 'DM Sans', fontSize: 12 }}>
-            {['Kingston', 'Montgomery', 'Farrell'].map(n => (
-              <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ width: 12, height: 12, borderRadius: 2, background: C[n].color }}/>{n}
-              </span>
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 22, paddingTop: 14, paddingBottom: 14, fontFamily: 'DM Sans', fontSize: 12.5 }}>
+          {['Kingston', 'Montgomery', 'Farrell'].map(n => (
+            <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 2, background: C[n].color }}/>{n}
+            </span>
+          ))}
+        </div>
         <WhyMatters>
           A broader shape signals a campaign with more ways to raise — individual donors, institutional money, reach beyond a narrow base. Kingston's shape nearly fills the chart; both challengers hug the center on almost every axis. That imbalance is what a broad fundraising coalition looks like in data form.
         </WhyMatters>
@@ -2165,7 +2162,7 @@ const TabModels = () => {
             </div>
             <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>INPUTS (FEC Schedule A)</div>
             <div style={{ fontSize: 13, lineHeight: 1.8, color: P.ink }}>
-              609 unique donors, 944 itemized contributions through 4/29/2026.<br/>
+              609 unique donors, 944 itemized line items through 4/29/2026.<br/>
               281 contributions at exactly $3,500 (primary cap); 192 donors net-maxed.<br/>
               138 of those have not given $3,500 to general.<br/>
               417 donors below primary cap, avg remaining capacity $2,501.

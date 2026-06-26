@@ -483,7 +483,7 @@ if '--check' in sys.argv:
 
     # -- Key prose figures (expected strings are built from derived values) --
     at35 = sum(1 for r in Kd if amt(r) == 3500)
-    chk_text('Model 2 donors/rows line', f"{len(donors_pos)} unique donors, {len(Kd)} itemized contributions")
+    chk_text('Model 2 donors/rows line', f"{len(donors_pos)} unique donors, {len(Kd)} itemized line items")
     chk_text('Model 2 at-cap/maxed line', f"{at35} contributions at exactly $3,500 (primary cap); {len(pmaxed)} donors net-maxed")
     chk_text('Model 2 general-room donors', f"{len(gnot)} of those have not given $3,500 to general")
     chk_text('Model 2 below-cap line', f"{len(m2_below)} donors below primary cap, avg remaining capacity ${proom/len(m2_below):,.0f}")
