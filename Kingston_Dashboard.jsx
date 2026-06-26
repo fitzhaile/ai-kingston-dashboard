@@ -454,12 +454,19 @@ const TabOverview = () => {
     { metric: 'In-District\nShare', Kingston: Q.Kingston.inDistPct, Montgomery: Q.Montgomery.inDistPct, Farrell: Q.Farrell.inDistPct },
     { metric: 'Grassroots\nIndex',  Kingston: 100 - Q.Kingston.selfPct, Montgomery: 100 - Q.Montgomery.selfPct, Farrell: 100 - Q.Farrell.selfPct },
   ];
-  // Custom 2-line radar tick so the dimension labels fit (Recharts ignores the \n)
+  // Custom 2-line radar tick (Recharts ignores the \n). The top label (Total Receipts)
+  // renders above its vertex and the bottom one (PAC Support) below it, so neither
+  // collides with the grid/radius numbers; the four side labels stay vertically centered.
   const radarTick = ({ x, y, textAnchor, payload }) => {
     const lines = String(payload.value).split('\n');
+    const n = lines.length, L = 1.1;
+    const head = lines[0];
+    const dy0 = head === 'Total' ? -(n - 1) * L - 0.2   // top vertex → sit above the point
+              : head === 'PAC'   ? 1.0                   // bottom vertex → sit below the point
+              : 0.32 - (n - 1) / 2 * L;                  // sides → vertically centered
     return (
       <text x={x} y={y} textAnchor={textAnchor} fontFamily="DM Sans" fontSize={isMobile ? 10 : 12} fontWeight={600} fill={P.ink}>
-        {lines.map((l, i) => <tspan key={i} x={x} dy={i === 0 ? `${0.32 - (lines.length - 1) * 0.55}em` : '1.1em'}>{l}</tspan>)}
+        {lines.map((l, i) => <tspan key={i} x={x} dy={`${i === 0 ? dy0 : L}em`}>{l}</tspan>)}
       </text>
     );
   };
@@ -547,8 +554,8 @@ const TabOverview = () => {
       {/* Radar */}
       <Card style={{ padding: 28, marginBottom: 24 }}>
         <SectionH eyebrow="Shape of the race" title="Candidate comparison, 6 dimensions" kicker="Each axis is normalized. A bigger shape = a broader campaign. Kingston leads on every dimension; Farrell registers only on in-district concentration — a function of raising almost entirely within 31xxx ZIPs."/>
-        <ResponsiveContainer width="100%" height={isMobile ? 280 : 400}>
-          <RadarChart data={radarData} margin={isMobile ? { top: 14, right: 46, bottom: 14, left: 46 } : { top: 20, right: 40, bottom: 20, left: 40 }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 290 : 470}>
+          <RadarChart data={radarData} margin={isMobile ? { top: 24, right: 46, bottom: 24, left: 46 } : { top: 36, right: 40, bottom: 36, left: 40 }}>
             <PolarGrid stroke={P.line}/>
             <PolarAngleAxis dataKey="metric" tick={radarTick}/>
             <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
