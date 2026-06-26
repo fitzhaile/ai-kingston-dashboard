@@ -248,7 +248,10 @@ const fmt  = (n) => '$' + Math.round(n).toLocaleString();
 const fmtK = (n) => {
   if (n === 0) return '$0';
   if (Math.abs(n) >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
-  if (Math.abs(n) >= 1000) return '$' + Math.round(n/1000) + 'K';
+  if (Math.abs(n) >= 20000) return '$' + Math.round(n/1000) + 'K';
+  // Below $20K, whole-K rounding distorts too much ($8,500 -> "$9K"), so keep one
+  // decimal (and drop a trailing .0, so $7,000 -> "$7K", $8,500 -> "$8.5K").
+  if (Math.abs(n) >= 1000) return '$' + (n/1000).toFixed(1).replace(/\.0$/, '') + 'K';
   return '$' + Math.round(n);
 };
 const fmtN = (n) => Math.round(n).toLocaleString();
@@ -1733,7 +1736,7 @@ const TabInsights = () => {
             {DOUBLE_MAX.slice(0, 10).map(d => (
               <div key={d.name} style={{ padding: '8px 10px', background: P.bg, borderRadius: 6, borderLeft: `3px solid ${P.kingstonAccent}` }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: P.kingston }}>{lastName(d.name)}</div>
-                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 2 }}>{fmtK(d.amount)}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 2 }}>{fmt(d.amount)}</div>
               </div>
             ))}
           </div>
@@ -1788,7 +1791,7 @@ const TabInsights = () => {
                 <div style={{ fontSize: 12, fontWeight: 700, color: P.kingston }}>{d.name}</div>
                 <div style={{ fontSize: 11, color: P.ink, marginTop: 2 }}>{d.role}</div>
                 <div style={{ fontSize: 11, color: P.muted, fontStyle: 'italic' }}>{d.firm} · {d.city}</div>
-                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston, marginTop: 4 }}>{fmtK(d.amount)}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston, marginTop: 4 }}>{fmt(d.amount)}</div>
               </div>
             ))}
           </div>
@@ -1930,7 +1933,7 @@ const TabInsights = () => {
             {overCap.map(d => (
               <div key={d.name} style={{ padding: '8px 10px', background: P.bg, borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: `3px solid ${P.warning}` }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: P.ink }}>{d.name}</div>
-                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.warning }}>{fmtK(d.net)}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.warning }}>{fmt(d.net)}</div>
               </div>
             ))}
           </div>
@@ -1958,7 +1961,7 @@ const TabInsights = () => {
             ].map(h => (
               <div key={h.family} style={{ padding: '8px 10px', background: P.bg, borderRadius: 6, borderLeft: `3px solid ${P.kingstonAccent}` }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: P.kingston }}>{h.family}</div>
-                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 2 }}>{fmtK(h.total)}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 2 }}>{fmt(h.total)}</div>
                 <div style={{ fontSize: 10, color: P.muted, marginTop: 1 }}>{h.n} givers</div>
               </div>
             ))}
@@ -1982,7 +1985,7 @@ const TabInsights = () => {
               <div key={d.name} style={{ padding: '10px 12px', background: P.bg, borderRadius: 6, borderLeft: `3px solid ${P.kingstonAccent}` }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: P.kingston }}>{d.name}</div>
                 <div style={{ fontSize: 10, color: P.muted, marginTop: 2 }}>{d.industry}</div>
-                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 3 }}>{fmtK(d.amount)}</div>
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston, marginTop: 3 }}>{fmt(d.amount)}</div>
               </div>
             ))}
           </div>
