@@ -243,6 +243,7 @@ for t in ['K','M','F']:
 
 # --- gender (Kingston) ---
 print("\n[gender]  Kingston (name-inferred)")
+GENDER_D = {}
 try:
     import importlib.util
     spec = importlib.util.spec_from_file_location("e", "enrich_donors.py")
@@ -257,6 +258,7 @@ try:
         c, d = g[gg]
         below = [(n, v) for n, v in Knet.items() if v > 0 and e.classify_gender(fn[n]) == gg and v < 3500]
         head = sum(3500 - v for _, v in below)
+        GENDER_D[gg] = (len(below), int(round(head)))
         print(f"  {gg}: {c} donors ({c/td*100:.1f}% head, {d/tm*100:.1f}% $) avg=${d/c:,.0f}; {len(below)} below cap, headroom ${head:,.0f}")
 except Exception as ex:
     print("  (gender skipped:", ex, ")")
@@ -509,6 +511,94 @@ if '--check' in sys.argv:
             (abs(it + un - ind) <= 1, abs(ind + pac + sl + sc - rec) <= 1), (True, True))
     print("  NOTE  FIN values come from FEC Form 3 summary filings and cannot be re-derived")
     print("        from the Schedule A CSV — verify them against fec.gov when refreshing data.")
+
+    # ========================================================================
+    # EXTENDED GUARDS — added after several hardcoded/duplicated values drifted
+    # from the constants on a data refresh. Each is re-derived from source here,
+    # so a refresh that updates a constant but forgets a dependent prose figure
+    # or duplicated array now FAILS this check instead of shipping stale.
+    # ========================================================================
+    def fmtk(n):
+        n = int(round(n))
+        if n == 0: return '$0'
+        if abs(n) >= 1000000: return '$%.2fM' % (n / 1000000)
+        if abs(n) >= 20000: return '$%dK' % round(n / 1000)
+        if abs(n) >= 1000:
+            s = '%.1f' % (n / 1000)
+            return '$' + (s[:-2] if s.endswith('.0') else s) + 'K'
+        return '$%d' % n
+
+    JFIN = {}
+    for nm in ('Kingston', 'Montgomery', 'Farrell'):
+        m = re.search(nm + r":\s*\{ receipts: (\d+),\s*indiv: (\d+),\s*itemized: (\d+),\s*unitemized: (\d+),\s*pac: (\d+),\s*selfLoans: (\d+),\s*selfContrib: (\d+),\s*spent: (\d+),\s*cash: (\d+),\s*debt: (\d+)", fb)
+        JFIN[nm] = dict(zip(['receipts','indiv','itemized','unitemized','pac','selfLoans','selfContrib','spent','cash','debt'], (int(x) for x in m.groups())))
+    F3_ITEM = {'Kingston': 1659885, 'Montgomery': 225957, 'Farrell': 149276}
+
+    # -- Geography wealthy-ZIP leaderboard: every ZIP $ must equal the derived per-ZIP sum --
+    lb = re.search(r'WEALTHY ZIPS LEADERBOARD(.*?)\]\.map\(z =>', src, re.S)
+    if lb:
+        rowsLB = re.findall(r"zip: '(\d+)',.*?hhi: \d+,\s*K:\s*(\d+),\s*M:\s*(\d+),\s*F:\s*(\d+)", lb.group(1), re.S)
+        chk('Wealthy leaderboard row count', len(rowsLB), 8)
+        for zp, k, mn, f in rowsLB:
+            # TOP_ZIPS (and therefore the leaderboard that mirrors it) truncate cents
+            # with int(), so compare on the same convention rather than rounding.
+            chk(f'Wealthy leaderboard {zp} K/M/F', (int(k), int(mn), int(f)),
+                (int(zsum['K'][zp]), int(zsum['M'][zp]), int(zsum['F'][zp])))
+        mk = re.search(r'const maxK = (\d+)', src)
+        chk('Wealthy leaderboard maxK', int(mk.group(1)), max(int(zsum['K'][zp]) for zp, *_ in rowsLB))
+        chk_text('Wealthy bar denominator', f"d.total / {WGA_D['K']})")
+        chk_text('Wealthy prose Kingston total', f"{fmtk(WGA_D['K'])}</strong> from these neighborhoods")
+        chk_text('Wealthy prose opponents total', f"combined <strong>{fmtk(WGA_D['M'] + WGA_D['F'])}</strong>")
+
+    # -- Atlanta-moat chart array + totals --
+    az = re.search(r'const atlantaZips = \[(.*?)\];', src, re.S)
+    if az:
+        for zp, king, oth in re.findall(r"zip: '(\d+)',.*?Kingston: (\d+),\s*other: (\d+)", az.group(1), re.S):
+            chk(f'atlantaZips {zp} Kingston/other', (int(king), int(oth)),
+                (int(round(zsum['K'][zp])), int(round(zsum['M'][zp] + zsum['F'][zp]))))
+    chk_text('Atlanta moat Kingston combined', f"{MOAT_K:,} combined")
+    chk_text('Atlanta moat opponents total', f"{MOAT_OPP:,} total")
+    chk_text('Atlanta moat stat value', f"value: '{fmtk(MOAT_K)}'")
+
+    # -- 'outside GA-1' dollars = Atlanta + out-of-state --
+    chk_text('Kingston outside-GA-1 dollars', f"{fmtk(GEO_D['K'][1] + GEO_D['K'][2])} from outside GA-1")
+
+    # -- 31416 head-to-head shares (Kingston's lowest-leading ZIP; Farrell's best) --
+    z16 = zsum['K']['31416'] + zsum['M']['31416'] + zsum['F']['31416']
+    chk('31416 Kingston share %', round(zsum['K']['31416'] / z16 * 100), 55)
+    chk('31416 Farrell share %', round(zsum['F']['31416'] / z16 * 100), 45)
+
+    # -- reconciliation deltas (Schedule A derived itemized vs Form 3 itemized) --
+    for nm, t in (('Kingston', 'K'), ('Montgomery', 'M'), ('Farrell', 'F')):
+        der = sum(amt(r) for r in dedup(comm(t)))
+        d = abs(F3_ITEM[nm] - der) / F3_ITEM[nm] * 100
+        chk_text(f'Reconciliation delta {nm}', f"<strong>{d:.1f}%</strong> ({nm})")
+
+    # -- Model 6 efficiency footnote (cents per $1 raised; Farrell $ per earned dollar) --
+    kc = round(JFIN['Kingston']['spent'] / JFIN['Kingston']['receipts'] * 100)
+    fe = JFIN['Farrell']['spent'] / (JFIN['Farrell']['indiv'] + JFIN['Farrell']['pac'])
+    chk_text('Model 6 Kingston cents', f"Kingston spends {kc}¢ to raise")
+    chk_text('Model 6 Farrell $/dollar', f"Farrell spends ${fe:.2f} per earned")
+
+    # -- Insight 08 final-stretch cash ratios --
+    km = round(JFIN['Kingston']['cash'] / JFIN['Montgomery']['cash'])
+    fm = round(JFIN['Farrell']['cash'] / JFIN['Montgomery']['cash'], 1)
+    chk_text('Insight 08 cash ratios', f"{km}× Montgomery's cash; Farrell has {fm}×")
+
+    # -- Insight 10 opponent unitemized small-dollar shares --
+    um = JFIN['Montgomery']['unitemized'] / JFIN['Montgomery']['indiv'] * 100
+    uf = JFIN['Farrell']['unitemized'] / JFIN['Farrell']['indiv'] * 100
+    chk_text('Insight 10 opponent unitemized', f"Montgomery {um:.1f}%, Farrell {uf:.1f}%")
+    chk_text('Insight 10 Kingston unitemized stat', f"value: '{JFIN['Kingston']['unitemized'] / JFIN['Kingston']['indiv'] * 100:.1f}%'")
+
+    # -- ultra-loyalist concentration (top 13% of donors -> % of itemized money) --
+    chk_text('Ultra-loyalist money share', f"producing {round(sum(v for _, v in ge7) / JFIN['Kingston']['itemized'] * 100)}% of the money")
+
+    # -- gender headroom (name-inferred; only if the gender pass produced values) --
+    if GENDER_D:
+        for gg in ('Male', 'Female'):
+            nb, hd = GENDER_D[gg]
+            chk_text(f'Gender {gg} headroom', f"{nb} below cap · ~{fmtk(hd)} of headroom")
 
     print("-" * 72)
     if failures:

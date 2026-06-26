@@ -1489,7 +1489,7 @@ const TabOpponents = () => (
             <li>609 unique donors — 4.4× Farrell's count; donor velocity ~55/month sustained</li>
             <li>77 ultra-loyalists (≥$7K); 11 bundler firms organizing stacked giving across employee rosters</li>
             <li>Legacy network: Jack Kingston's 30-year Savannah donor and business base showing up intact</li>
-            <li>Atlanta moat — $111K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5K</li>
+            <li>Atlanta moat — $111K from Buckhead/Peachtree City/Sandy Springs ZIPs where opponents raised a combined $5,100</li>
             <li>Zero self-funding, zero debt — entirely outside money, no candidate financing on the books</li>
           </ul>
         </div>
