@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { geoMercator, geoPath } from 'd3-geo';
 import GEO_ZIPS from './geo_zips.json';
+import LEGACY_ZIP_DOLLARS from './legacy_zip_dollars.json';
 
 /* ============================================================
    GA-1 REPUBLICAN PRIMARY — FUNDRAISING ANALYSIS
@@ -2754,6 +2755,59 @@ const NBHD = { '31411': 'Skidaway Island', '31410': 'Wilmington Island', '31324'
 const JACKC = P.kingstonAccent;  // gold = Jack (the father); navy = Jim
 const titleCase = (s) => s.replace(/(?:^|, )([a-z])/g, (m) => m.toUpperCase());
 
+// Side-by-side choropleth: each in-district ZCTA shaded by the candidate's dollars
+// (2026$), normalized to each man's own peak so the geographic *pattern* compares.
+const LegacyMaps = () => {
+  const W = 330, H = 360, pad = 12;
+  const feats = GEO_ZIPS.features;
+  const district = useMemo(() => ({ type: 'Feature', geometry: GEO_ZIPS.district }), []);
+  const proj = useMemo(() => geoMercator().fitExtent([[pad, pad], [W - pad, H - pad]], district), [district]);
+  const path = useMemo(() => geoPath(proj), [proj]);
+  const districtPath = useMemo(() => path(district), [path, district]);
+  const amt = (f, who) => (LEGACY_ZIP_DOLLARS[f.properties.zip] || {})[who] || 0;
+  const maxJack = useMemo(() => Math.max(1, ...feats.map(f => amt(f, 'jack'))), [feats]);
+  const maxJim = useMemo(() => Math.max(1, ...feats.map(f => amt(f, 'jim'))), [feats]);
+  const [hover, setHover] = useState(null);
+  const rowRef = useRef(null);
+  const onMove = (f) => (e) => {
+    const r = rowRef.current.getBoundingClientRect();
+    setHover({ zip: f.properties.zip, city: f.properties.city, hhi: f.properties.hhi,
+      jack: amt(f, 'jack'), jim: amt(f, 'jim'), x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
+  };
+  const off = () => setHover(null);
+  const mapOf = (who, color, max, label) => (
+    <div style={{ flex: 1, minWidth: 220 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{label}</div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', background: P.bg, borderRadius: 10, border: `1px solid ${P.line}` }}>
+        <path d={districtPath} fill="none" stroke={P.kingston} strokeWidth={1.2} strokeOpacity={0.5} />
+        {feats.map(f => {
+          const v = amt(f, who); const op = v > 0 ? 0.14 + 0.86 * Math.sqrt(v / max) : 0.05;
+          return <path key={f.properties.zip} d={path(f)} fill={color} fillOpacity={op} stroke="#fff" strokeWidth={0.4}
+            onMouseMove={onMove(f)} onMouseLeave={off} />;
+        })}
+      </svg>
+    </div>
+  );
+  return (
+    <div ref={rowRef} style={{ position: 'relative', display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 6 }}>
+      {mapOf('jack', JACKC, maxJack, 'Jack · 2004–12')}
+      {mapOf('jim', P.kingston, maxJim, 'Jim · 2026')}
+      {hover && (
+        <div style={{ position: 'absolute', top: Math.max(2, hover.y - 6),
+          left: hover.x < hover.w - 200 ? hover.x + 14 : undefined,
+          right: hover.x < hover.w - 200 ? undefined : hover.w - hover.x + 14,
+          pointerEvents: 'none', zIndex: 10, background: P.paper, border: `1px solid ${P.kingston}`,
+          borderRadius: 8, boxShadow: '0 8px 20px rgba(31,58,95,0.18)', padding: '8px 11px',
+          fontFamily: 'DM Sans', fontSize: 12, whiteSpace: 'nowrap' }}>
+          <div style={{ fontWeight: 700, color: P.kingston }}>{hover.zip}{hover.city ? ' · ' + hover.city : ''}</div>
+          <div style={{ marginTop: 2 }}>Jim <strong style={{ color: P.kingston }}>{fmtK(hover.jim)}</strong> · Jack <strong style={{ color: JACKC }}>{fmtK(hover.jack)}</strong></div>
+          <div style={{ color: P.muted, marginTop: 1 }}>{hover.hhi != null ? '$' + (hover.hhi / 1000).toFixed(0) + 'K median income' : 'income n/a'}</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const TabLegacy = () => {
   const isMobile = useIsMobile();
   const L = LEGACY, jk = L.jack, jm = L.jim;
@@ -2832,7 +2886,13 @@ const TabLegacy = () => {
       {/* GEOGRAPHY */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="Where the money comes from" title="Jack ran on the district; Jim runs on Atlanta"
-          kicker="Share of each candidate's itemized individual dollars by region. Jim draws more than double Jack's share from metro-Atlanta ZIPs, while Jack's reach was more in-district and more national."/>
+          kicker="The in-district money map first, then the full regional split. Jim draws more than double Jack's share from metro-Atlanta ZIPs, while Jack's reach was more in-district and more national."/>
+        <LegacyMaps/>
+        <div style={{ fontSize: 11.5, color: P.muted, margin: '10px 2px 20px', lineHeight: 1.5 }}>
+          Each in-district ZIP is shaded by that candidate's itemized dollars (2026$), normalized to his own peak so the
+          geographic <em>pattern</em> compares. Both Kingstons light up the same wealthy Savannah ZIPs — Skidaway,
+          Wilmington, Richmond Hill. The bars below add the out-of-district money the maps don't show.
+        </div>
         <Bars data={geoData} xKey="cat"/>
         <WhyMatters>
           A long-serving incumbent, Jack could raise broadly — 20% of his money came from outside Georgia (committee chairs attract national money). Jim, an open-seat challenger, leans far harder on the Atlanta donor class ({jm.geo.atlanta}% vs {jk.geo.atlanta}%) even as both keep their base in the district.

@@ -17,7 +17,7 @@ Sources:
 
 Run:  python3 derive_legacy_data.py
 """
-import csv
+import csv, json, sys
 from collections import defaultdict
 
 # CPI-U annual averages (BLS CUUR0000SA0; pull_cpi.py). Base = 2026 (330.079).
@@ -98,6 +98,7 @@ def profile(rows):
         'wealthyGA': sum(zipd[z] for z in wzga), 'wealthyPct': round(sum(zipd[z] for z in wzga) / tot * 100, 1),
         'topWealthy': [(z, int(round(zipd[z])), HHI[z]) for z in sorted(wzga, key=lambda z: -zipd[z])[:8]],
         'topZips': [(z, int(round(zipd[z]))) for z in sorted(zipd, key=lambda z: -zipd[z])[:10]],
+        'zipdAll': {z: int(round(zipd[z])) for z in zipd},
         'occ': [(o, len(d)) for o, d in sorted(occ.items(), key=lambda x: -len(x[1]))[:10]],
         'keys': {keyname(n) for n in dtot if keyname(n)}, 'dtot': dict(dtot),
     }
@@ -105,6 +106,63 @@ def profile(rows):
 J = profile(load_jack()); M = profile(load_jim())
 overlap = {n: v for n, v in M['dtot'].items() if keyname(n) in J['keys']}
 ov_n, ov_d = len(overlap), sum(overlap.values())
+
+# ---- Build the dashboard's LEGACY constants (used for both --check and regeneration) ----
+jbk = defaultdict(float)
+for n, v in J['dtot'].items():
+    k = keyname(n)
+    if k: jbk[k] += v
+def jocc(p): return '[' + ', '.join(f"['{o.title()}',{n}]" for o, n in p['occ']) + ']'
+def jtw(p): return '[' + ', '.join(f"['{z}',{d},{h}]" for z, d, h in p['topWealthy']) + ']'
+def jprof(p):
+    return ("{{ donors: {0}, total: {1}, geo: {{ inDist: {2}, atlanta: {3}, outState: {4} }}, "
+            "tiers: {{ High: {5}, UpperMid: {6}, Middle: {7}, Low: {8}, Out: {9} }}, wAvg: {10}, "
+            "wealthyGA: {11}, wealthyPct: {12}, topWealthy: {13}, occ: {14} }}").format(
+        p['donors'], round(p['total']), p['geoPct']['inDist'], p['geoPct']['atlanta'], p['geoPct']['outState'],
+        p['tiers']['High'], p['tiers']['UpperMid'], p['tiers']['Middle'], p['tiers']['Low'], p['tiers']['Out'],
+        p['wAvg'], round(p['wealthyGA']), p['wealthyPct'], jtw(p), jocc(p))
+ov_header = "n: %d, pct: %.1f, dollars: %d, dollarPct: %.1f" % (
+    ov_n, ov_n / M['donors'] * 100, round(ov_d), ov_d / M['total'] * 100)
+ov_rows = ["['%s', %d, %d]" % (n.replace("'", ''), round(v), round(jbk.get(keyname(n), 0)))
+           for n, v in sorted(overlap.items(), key=lambda x: -x[1])[:14]]
+# per-ZIP dollars (2026$) for the Legacy choropleth maps (shaded onto geo_zips.json ZCTAs)
+expected_zip = {z: {'jack': J['zipdAll'].get(z, 0), 'jim': M['zipdAll'].get(z, 0)}
+                for z in sorted(set(J['zipdAll']) | set(M['zipdAll']))}
+
+# ---- --check: confirm the dashboard still matches this derivation; write nothing ----
+if '--check' in sys.argv:
+    jsx = open('Kingston_Dashboard.jsx').read()
+    fails = []
+    def want(label, substr):
+        if substr in jsx:
+            print(f"  OK    {label}")
+        else:
+            fails.append(label)
+            print(f"  DRIFT {label}\n          derivation expects: {substr[:84]}")
+    want('LEGACY.jack profile', 'jack: ' + jprof(J))
+    want('LEGACY.jim profile', 'jim:  ' + jprof(M))
+    want('LEGACY.overlap headline', ov_header)
+    for r in ov_rows:
+        want('overlap donor ' + r.split("',")[0][2:], r)
+    try:
+        actual_zip = json.load(open('legacy_zip_dollars.json'))
+    except (FileNotFoundError, ValueError):
+        actual_zip = None
+    if actual_zip == expected_zip:
+        print('  OK    legacy_zip_dollars.json (choropleth map data)')
+    else:
+        fails.append('legacy_zip_dollars.json')
+        print('  DRIFT legacy_zip_dollars.json — re-run `python3 derive_legacy_data.py` to regenerate it')
+    if fails:
+        print(f"\nFAIL: {len(fails)} legacy item(s) drifted from the source data.")
+        print("Fix: re-run `python3 derive_legacy_data.py`, then paste the printed LEGACY block into")
+        print("     Kingston_Dashboard.jsx (the map JSON is rewritten automatically).")
+        sys.exit(1)
+    print(f"\nPASS: all {3 + len(ov_rows) + 1} legacy constants + map data match the derivation.")
+    sys.exit(0)
+
+# ---- default mode: regenerate the map data, print the comparison + paste-ready block ----
+json.dump(expected_zip, open('legacy_zip_dollars.json', 'w'), separators=(',', ':'))
 
 def show(label, p):
     print(f"\n{label}: {p['donors']} donors, ${p['total']:,.0f} itemized (2026$)")
@@ -124,26 +182,11 @@ print(f"\nSHARED DONOR CORE: {ov_n} of {M['donors']} Jim donors ({ov_n/M['donors
       f"${ov_d:,.0f} of ${M['total']:,.0f} ({ov_d/M['total']*100:.1f}%). "
       f"Conservative floor (last+first match; Jack pre-2004 & deceased donors not captured).")
 
-# ---- JS constants for the Legacy tab (paste into Kingston_Dashboard.jsx) ----
-jbk = defaultdict(float)
-for n, v in J['dtot'].items():
-    k = keyname(n)
-    if k: jbk[k] += v
-def jocc(p): return '[' + ', '.join(f"['{o.title()}',{n}]" for o, n in p['occ']) + ']'
-def jtw(p): return '[' + ', '.join(f"['{z}',{d},{h}]" for z, d, h in p['topWealthy']) + ']'
-def jprof(p):
-    return ("{{ donors: {0}, total: {1}, geo: {{ inDist: {2}, atlanta: {3}, outState: {4} }}, "
-            "tiers: {{ High: {5}, UpperMid: {6}, Middle: {7}, Low: {8}, Out: {9} }}, wAvg: {10}, "
-            "wealthyGA: {11}, wealthyPct: {12}, topWealthy: {13}, occ: {14} }}").format(
-        p['donors'], round(p['total']), p['geoPct']['inDist'], p['geoPct']['atlanta'], p['geoPct']['outState'],
-        p['tiers']['High'], p['tiers']['UpperMid'], p['tiers']['Middle'], p['tiers']['Low'], p['tiers']['Out'],
-        p['wAvg'], round(p['wealthyGA']), p['wealthyPct'], jtw(p), jocc(p))
 print("\n\n// ====== LEGACY (regenerated by derive_legacy_data.py) ======")
 print("const LEGACY = {")
 print("  jack: " + jprof(J) + ",")
 print("  jim:  " + jprof(M) + ",")
-print("  overlap: { n: %d, pct: %.1f, dollars: %d, dollarPct: %.1f, donors: [" % (
-    ov_n, ov_n / M['donors'] * 100, round(ov_d), ov_d / M['total'] * 100))
-for n, v in sorted(overlap.items(), key=lambda x: -x[1])[:14]:
-    print("    ['%s', %d, %d]," % (n.replace("'", ''), round(v), round(jbk.get(keyname(n), 0))))
+print("  overlap: { " + ov_header + ", donors: [")
+for r in ov_rows:
+    print("    " + r + ",")
 print("  ] },\n};")
