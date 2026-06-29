@@ -1067,7 +1067,7 @@ const GeoMaps = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: 0, color: P.kingston }}>Where the money is — inside GA-1</h3>
-          <p style={{ fontSize: 12, color: P.muted, margin: '4px 0 0', maxWidth: 580 }}>The real 1st Congressional District (current 119th-Congress lines). The choropleth shades each in-district ZIP by <strong style={{ color: candColor }}>{cand}'s</strong> dollars; the bubbles size by dollars and color by neighborhood income. Out-of-district money (Atlanta, out-of-state) sits in the breakdown below.</p>
+          <p style={{ fontSize: 12, color: P.muted, margin: '4px 0 0', maxWidth: 580 }}>The real 1st Congressional District (current 119th-Congress lines). The choropleth shades each in-district ZIP by <strong style={{ color: candColor }}>{cand}'s</strong> dollars; the bubbles size by dollars and color by neighborhood income. Out-of-district money (metro Atlanta, the rest of Georgia, out-of-state) sits in the breakdown below.</p>
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           {['Kingston', 'Montgomery', 'Farrell'].map(c => (
