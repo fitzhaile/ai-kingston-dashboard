@@ -2740,18 +2740,21 @@ const TabData = () => {
 // (CPI-U, BLS). Jim: this cycle through the pre-primary. Income: Census ACS 2019-2023
 // B19013. Both profiled with identical method; overlap is a conservative last+first match.
 const LEGACY = {
-  jack: { donors: 1867, total: 3608305, geo: { inDist: 63.5, atlanta: 10.4, outState: 26.1 }, tiers: { High: 3.5, UpperMid: 32.6, Middle: 23.8, Low: 9.7, Out: 30.3 }, wAvg: 84974, wealthyGA: 1015237, wealthyPct: 28.1, topWealthy: [['31411',368537,122723], ['31522',205291,106413], ['31410',183032,97225], ['31561',58539,144375], ['31324',55357,110767], ['30327',23117,182317], ['30309',21803,111894], ['31328',14828,105669]], occ: [['Retired',204], ['Owner',174], ['Homemaker',158], ['Attorney',148], ['President',140], ['Farmer',87], ['Physician',78], ['Ceo',49], ['Lobbyist',44], ['Consultant',41]] },
-  jim:  { donors: 603, total: 1662419, geo: { inDist: 67.9, atlanta: 20.5, outState: 11.6 }, tiers: { High: 4.5, UpperMid: 40.7, Middle: 34.7, Low: 8.1, Out: 12.0 }, wAvg: 86431, wealthyGA: 638819, wealthyPct: 38.4, topWealthy: [['31411',182250,122723], ['31410',113825,97225], ['31324',66310,110767], ['30327',53950,182317], ['31322',32250,91293], ['30305',28500,107836], ['31522',26300,106413], ['30519',21000,98846]], occ: [['Attorney',59], ['Owner',50], ['Retired',45], ['Homemaker',37], ['President',24], ['Ceo',24], ['Physician',22], ['Consultant',21], ['Real Estate',14], ['Partner',11]] },
+  jack: { donors: 1867, total: 3608305, geo: { inDist: 63.5, atlanta: 10.4, outState: 26.1 }, tiers: { High: 3.5, UpperMid: 32.6, Middle: 23.8, Low: 9.7, Out: 30.3 }, wAvg: 84974, wealthyGA: 1015237, wealthyPct: 28.1, occ: [['Retired',204], ['Owner',174], ['Homemaker',158], ['Attorney',148], ['President',140], ['Farmer',87], ['Physician',78], ['Ceo',49], ['Lobbyist',44], ['Consultant',41]] },
+  jim:  { donors: 603, total: 1662419, geo: { inDist: 67.9, atlanta: 20.5, outState: 11.6 }, tiers: { High: 4.5, UpperMid: 40.7, Middle: 34.7, Low: 8.1, Out: 12.0 }, wAvg: 86431, wealthyGA: 638819, wealthyPct: 38.4, occ: [['Attorney',59], ['Owner',50], ['Retired',45], ['Homemaker',37], ['President',24], ['Ceo',24], ['Physician',22], ['Consultant',21], ['Real Estate',14], ['Partner',11]] },
+  zips: [['31411',10.3,11.0,122723], ['31406',5.8,11.7,66084], ['31410',5.0,6.7,97225], ['31522',5.3,1.6,106413], ['31405',2.6,3.5,62123], ['31401',1.6,5.3,50182], ['31324',1.5,4.0,110767], ['31404',0.7,3.5,49805], ['30327',0.6,3.3,182317], ['31561',1.6,0.6,144375], ['31768',1.8,0.1,44895], ['31313',1.3,0.7,59443], ['31419',0.9,1.6,70734], ['31776',1.5,0.0,0]],
   overlap: { n: 78, pct: 12.9, dollars: 247100, dollarPct: 14.9, donors: [
-    ['JACKSON, ELIZABETH S.', 10500, 719], ['CRITZ, DALE C. JR.', 10500, 18003], ['MCCACHERN, SAMUEL', 10500, 1945],
-    ['TARBUTTON, BEN J. III', 10500, 3589], ['WATERS, DON L.', 10500, 9923], ['CRIDER, WILLIAM A. III', 10500, 19648],
-    ['GLENDYE, ROSS', 10500, 180], ['DANIEL, CINDY', 10500, 8097], ['DANIEL, MARVIN', 10500, 2257],
-    ['SMITH, BYRON L.', 10500, 845], ['LEWIS, J. CURTIS IV', 10000, 4201], ['BARROW, CHAD', 10000, 1438],
-    ['WASDEN, WILEY', 7000, 845], ['COMPTON, CHARLES', 7000, 9561],
+    ['JACKSON, ELIZABETH S.', 10500, 719], ['CRITZ, DALE C. JR.', 10500, 4501], ['MCCACHERN, SAMUEL', 10500, 648],
+    ['TARBUTTON, BEN J. III', 10500, 3589], ['WATERS, DON L.', 10500, 2481], ['CRIDER, WILLIAM A. III', 10500, 6549],
+    ['GLENDYE, ROSS', 10500, 180], ['DANIEL, CINDY', 10500, 4049], ['DANIEL, MARVIN', 10500, 1129],
+    ['SMITH, BYRON L.', 10500, 845], ['LEWIS, J. CURTIS IV', 10000, 2101], ['BARROW, CHAD', 10000, 1438],
+    ['WASDEN, WILEY', 7000, 845], ['COMPTON, CHARLES', 7000, 1912],
   ] },
 };
 const NBHD = { '31411': 'Skidaway Island', '31410': 'Wilmington Island', '31324': 'Richmond Hill', '31322': 'Pooler',
-  '31522': 'St. Simons', '31561': 'Sea Island', '31328': 'Tybee Island', '30327': 'Buckhead', '30305': 'Buckhead',
+  '31522': 'St. Simons', '31561': 'Sea Island', '31328': 'Tybee Island', '31406': 'Southside Savannah',
+  '31401': 'Downtown Savannah', '31405': 'Habersham', '31404': 'Eastside Savannah', '31419': 'Westside Savannah',
+  '31768': 'Moultrie', '31313': 'Hinesville', '30327': 'Buckhead', '30305': 'Buckhead',
   '30309': 'Midtown Atlanta', '30519': 'Buford', '30622': 'Bogart', '30022': 'Alpharetta' };
 const JACKC = P.kingstonAccent;  // gold = Jack (the father); navy = Jim
 const titleCase = (s) => s.replace(/(?:^|, )([a-z])/g, (m) => m.toUpperCase());
@@ -2826,12 +2829,9 @@ const TabLegacy = () => {
     { tier: 'Low', Jack: jk.tiers.Low, Jim: jm.tiers.Low },
     { tier: 'Out-of-state', Jack: jk.tiers.Out, Jim: jm.tiers.Out },
   ];
-  // wealthy ZIPs as SHARE of each man's haul (cycle-independent: avoids comparing
-  // Jack's five full cycles to Jim's single pre-primary window).
-  const wz = {};
-  jk.topWealthy.forEach(([z, d, h]) => { wz[z] = { z, h, jack: d / jk.total * 100, jim: 0 }; });
-  jm.topWealthy.forEach(([z, d, h]) => { wz[z] = { ...(wz[z] || { z, h, jack: 0 }), jim: d / jm.total * 100, h }; });
-  const wzRows = Object.values(wz).sort((a, b) => (b.jack + b.jim) - (a.jack + a.jim));
+  // top Georgia ZIPs as a SHARE of each man's haul — precomputed in the derive via the
+  // Geography tab's exact method, so Jim's figures match that tab and cycles compare fairly.
+  const wzRows = L.zips.map(([z, jackPct, jimPct, h]) => ({ z, h, jack: jackPct, jim: jimPct }));
   // occupations as SHARE of each donor base (not raw counts — Jack built his over five cycles)
   const occPct = (occ, donors) => occ.map(([o, n]) => [o, n / donors * 100]);
   const jackOcc = occPct(jk.occ, jk.donors), jimOcc = occPct(jm.occ, jm.donors);
@@ -2880,12 +2880,12 @@ const TabLegacy = () => {
               <div style={{ fontSize: 12, fontWeight: 700, color: P.kingston }}>{titleCase(name.toLowerCase())}</div>
               <div style={{ display: 'flex', gap: 14, marginTop: 6, fontSize: 12 }}>
                 <span>to Jim <strong style={{ color: P.kingston }}>{fmt(jimAmt)}</strong></span>
-                <span>to Jack <strong style={{ color: JACKC }}>{fmt(jackAmt)}</strong></span>
+                <span>to Jack <strong style={{ color: JACKC }}>{fmt(jackAmt)}</strong>/cy</span>
               </div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: P.muted, marginTop: 10 }}>Jack amounts in 2026 dollars, summed across 2004–2012.</div>
+        <div style={{ fontSize: 11, color: P.muted, marginTop: 10 }}>Jim is this cycle; Jack is his per-cycle average (his total ÷ the cycles he gave in), 2026 dollars — so the two compare directly.</div>
       </Card>
 
       {/* GEOGRAPHY */}
@@ -2946,8 +2946,8 @@ const TabLegacy = () => {
 
       {/* WEALTHY SAVANNAH CORE */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <SectionH eyebrow="The wealthy Savannah core" title="The same rich ZIPs, a generation apart"
-          kicker="Each wealthy Georgia ZIP (ACS median HHI ≥ $90K) as a share of that Kingston's total haul, so the comparison is fair across cycles. Skidaway, Wilmington, Richmond Hill and St. Simons anchor both — the inherited money map."/>
+        <SectionH eyebrow="The money map" title="The same ZIPs fund both, a generation apart"
+          kicker="Each Kingston's top Georgia ZIPs as a share of his total itemized haul (so five cycles and one pre-primary window compare fairly), with each ZIP's median income shown. Savannah's Southside and Skidaway anchor both; Atlanta's Buckhead shows up for each."/>
         <div style={{ display: 'grid', gap: 8 }}>
           {wzRows.map(({ z, h, jack, jim }) => {
             const mx = Math.max(...wzRows.map(r => Math.max(r.jack, r.jim)));
@@ -2956,7 +2956,7 @@ const TabLegacy = () => {
                 <div>
                   <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>{z}</span>
                   <span style={{ fontSize: 11, color: P.ink, marginLeft: 6 }}>{NBHD[z] || ''}</span>
-                  <div style={{ fontSize: 10, color: P.kingstonAccent, fontWeight: 700, fontFamily: 'ui-monospace, monospace' }}>${Math.round(h / 1000)}K HHI</div>
+                  <div style={{ fontSize: 10, color: P.kingstonAccent, fontWeight: 700, fontFamily: 'ui-monospace, monospace' }}>{h ? '$' + Math.round(h / 1000) + 'K HHI' : 'income n/a'}</div>
                 </div>
                 <div style={{ display: 'grid', gap: 3 }}>
                   {[['Jim', jim, P.kingston], ['Jack', jack, JACKC]].map(([w, v, c]) => (

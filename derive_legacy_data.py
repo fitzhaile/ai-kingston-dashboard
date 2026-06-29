@@ -112,22 +112,60 @@ jbk = defaultdict(float)
 for n, v in J['dtot'].items():
     k = keyname(n)
     if k: jbk[k] += v
+
+# Per-ZIP dollars via the Geography tab's exact method (transaction-sum, dedup by
+# transaction_id, refunds included) so Jim's per-ZIP figures match geo_zips.json.
+def jim_raw():
+    for r in csv.DictReader(open('congresscontributions_through_april2026.csv')):
+        if r['committee_name'] != 'FRIENDS OF JIM KINGSTON' or r['entity_type'] != 'IND': continue
+        try: a = float(r['contribution_receipt_amount'] or 0)
+        except: continue
+        yield (r['transaction_id'], r['contributor_zip'][:5], a, 1.0)
+def jack_raw():
+    for r in csv.DictReader(open('jack_kingston_contributions_2004_2012.csv')):
+        try: a = float(r['amount'])
+        except: continue
+        yield (r.get('transaction_id', ''), r['zip'][:5], a, factor(r['year'], int(r['cycle'])))
+def zipsum(raw):
+    seen = set(); zd = defaultdict(float)
+    for txn, z, a, f in raw:
+        if txn and txn in seen: continue
+        if txn: seen.add(txn)
+        if z: zd[z] += a * f
+    return zd
+MD = zipsum(jim_raw()); JD = zipsum(jack_raw())
+jim_tot = sum(MD.values()) or 1.0; jack_tot = sum(JD.values()) or 1.0
+def is_ga(z): return z[:2] in ('30', '31') or z[:3] in ('398', '399')
+top_ga = sorted((z for z in (set(JD) | set(MD)) if is_ga(z)),
+                key=lambda z: -(JD.get(z, 0) + MD.get(z, 0)))[:14]
+
+# Jack's per-cycle average for each shared-core donor (total / cycles they gave in)
+jack_cycles = defaultdict(set)
+for r in csv.DictReader(open('jack_kingston_contributions_2004_2012.csv')):
+    k = keyname(r['name'])
+    if k: jack_cycles[k].add(r['cycle'])
+def jack_per_cycle(name):
+    k = keyname(name)
+    return jbk.get(k, 0) / max(1, len(jack_cycles.get(k, {0})))
+
 def jocc(p): return '[' + ', '.join(f"['{o.title()}',{n}]" for o, n in p['occ']) + ']'
-def jtw(p): return '[' + ', '.join(f"['{z}',{d},{h}]" for z, d, h in p['topWealthy']) + ']'
+def jzips(): return '[' + ', '.join(
+    "['%s',%.1f,%.1f,%d]" % (z, JD.get(z, 0) / jack_tot * 100, MD.get(z, 0) / jim_tot * 100, HHI.get(z, 0))
+    for z in top_ga) + ']'
 def jprof(p):
     return ("{{ donors: {0}, total: {1}, geo: {{ inDist: {2}, atlanta: {3}, outState: {4} }}, "
             "tiers: {{ High: {5}, UpperMid: {6}, Middle: {7}, Low: {8}, Out: {9} }}, wAvg: {10}, "
-            "wealthyGA: {11}, wealthyPct: {12}, topWealthy: {13}, occ: {14} }}").format(
+            "wealthyGA: {11}, wealthyPct: {12}, occ: {13} }}").format(
         p['donors'], round(p['total']), p['geoPct']['inDist'], p['geoPct']['atlanta'], p['geoPct']['outState'],
         p['tiers']['High'], p['tiers']['UpperMid'], p['tiers']['Middle'], p['tiers']['Low'], p['tiers']['Out'],
-        p['wAvg'], round(p['wealthyGA']), p['wealthyPct'], jtw(p), jocc(p))
+        p['wAvg'], round(p['wealthyGA']), p['wealthyPct'], jocc(p))
 ov_header = "n: %d, pct: %.1f, dollars: %d, dollarPct: %.1f" % (
     ov_n, ov_n / M['donors'] * 100, round(ov_d), ov_d / M['total'] * 100)
-ov_rows = ["['%s', %d, %d]" % (n.replace("'", ''), round(v), round(jbk.get(keyname(n), 0)))
+ov_rows = ["['%s', %d, %d]" % (n.replace("'", ''), round(v), round(jack_per_cycle(n)))
            for n, v in sorted(overlap.items(), key=lambda x: -x[1])[:14]]
-# per-ZIP dollars (2026$) for the Legacy choropleth maps (shaded onto geo_zips.json ZCTAs)
-expected_zip = {z: {'jack': J['zipdAll'].get(z, 0), 'jim': M['zipdAll'].get(z, 0)}
-                for z in sorted(set(J['zipdAll']) | set(M['zipdAll']))}
+# per-ZIP dollars (2026$, transaction-sum — matches geo_zips.json) for the choropleth maps
+expected_zip = {z: {'jack': int(round(JD.get(z, 0))), 'jim': int(round(MD.get(z, 0)))}
+                for z in sorted(set(JD) | set(MD))}
 
 # ---- --check: confirm the dashboard still matches this derivation; write nothing ----
 if '--check' in sys.argv:
@@ -141,6 +179,7 @@ if '--check' in sys.argv:
             print(f"  DRIFT {label}\n          derivation expects: {substr[:84]}")
     want('LEGACY.jack profile', 'jack: ' + jprof(J))
     want('LEGACY.jim profile', 'jim:  ' + jprof(M))
+    want('LEGACY.zips (top GA ZIPs)', 'zips: ' + jzips())
     want('LEGACY.overlap headline', ov_header)
     for r in ov_rows:
         want('overlap donor ' + r.split("',")[0][2:], r)
@@ -158,11 +197,20 @@ if '--check' in sys.argv:
         print("Fix: re-run `python3 derive_legacy_data.py`, then paste the printed LEGACY block into")
         print("     Kingston_Dashboard.jsx (the map JSON is rewritten automatically).")
         sys.exit(1)
-    print(f"\nPASS: all {3 + len(ov_rows) + 1} legacy constants + map data match the derivation.")
+    print(f"\nPASS: all {4 + len(ov_rows) + 1} legacy constants + map data match the derivation.")
     sys.exit(0)
 
 # ---- default mode: regenerate the map data, print the comparison + paste-ready block ----
 json.dump(expected_zip, open('legacy_zip_dollars.json', 'w'), separators=(',', ':'))
+
+# verify Jim's per-ZIP now matches the Geography tab (geo_zips.json) — the alignment goal
+try:
+    _g = json.load(open('geo_zips.json'))
+    _gk = {f['properties']['zip']: round(f['properties'].get('K', 0) or 0) for f in _g['features']}
+    _mm = [z for z, v in _gk.items() if v > 0 and abs(v - round(MD.get(z, 0))) > 1]
+    print(f"Jim per-ZIP vs geo_zips: {sum(1 for v in _gk.values() if v>0)} in-district ZIPs, {len(_mm)} mismatched {_mm[:5]}")
+except Exception as _e:
+    print("geo_zips alignment check skipped:", _e)
 
 def show(label, p):
     print(f"\n{label}: {p['donors']} donors, ${p['total']:,.0f} itemized (2026$)")
@@ -170,7 +218,6 @@ def show(label, p):
     print(f"  income tiers %: " + " ".join(f"{k} {p['tiers'][k]}" for k in ('High', 'UpperMid', 'Middle', 'Low', 'Out')))
     print(f"  weighted-avg donor ZIP income: ${p['wAvg']:,} (coverage {p['wAvgCov']}%)")
     print(f"  wealthy GA ZIPs: ${p['wealthyGA']:,.0f} ({p['wealthyPct']}% of haul)")
-    print(f"  top wealthy GA ZIPs: " + ", ".join(f"{z} ${d:,}(HHI${h//1000}k)" for z, d, h in p['topWealthy']))
     print(f"  top occupations: " + ", ".join(f"{o.title()} {n}" for o, n in p['occ']))
 
 print("=" * 72)
@@ -186,6 +233,7 @@ print("\n\n// ====== LEGACY (regenerated by derive_legacy_data.py) ======")
 print("const LEGACY = {")
 print("  jack: " + jprof(J) + ",")
 print("  jim:  " + jprof(M) + ",")
+print("  zips: " + jzips() + ",")
 print("  overlap: { " + ov_header + ", donors: [")
 for r in ov_rows:
     print("    " + r + ",")
