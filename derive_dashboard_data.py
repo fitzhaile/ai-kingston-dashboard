@@ -277,15 +277,24 @@ for (ln, z), mem in sorted(multi.items(), key=lambda x: -sum(v for _, v in x[1])
     print(f"    {ln:14} {z}  n={len(mem)} ${sum(v for _, v in mem):,.0f}")
 
 # --- GEO (P2026, dedup) ---
-print("\n[GEO]  primary $ by region (out-of-state / Atlanta GA-30 / in-district GA-rest)")
+print("\n[GEO]  primary $ by region (in-district coastal / metro Atlanta / rest of GA / out-of-state)")
+# 4-way geography, identical rule to the Legacy tab (derive_legacy_data.region):
+# in-district = Savannah/coastal home base (ZIP-3 313/314/315, the district map set);
+# metro Atlanta = MSA core 300-303 + Buford (Gwinnett); rest of GA = other GA; non-GA = out.
+def geo_region(r):
+    if r['contributor_state'] != 'GA': return 'out'
+    z = r['contributor_zip'][:5]
+    if z[:3] in ('313', '314', '315'): return 'ind'
+    if z[:3] in ('300', '301', '302', '303') or z in ('30515', '30518', '30519'): return 'atl'
+    return 'rest'
 GEO_D = {}
 for t in ['K','M','F']:
     d = [r for r in dedup(comm(t)) if r['election_type'] == 'P2026']
-    out = sum(amt(r) for r in d if r['contributor_state'] != 'GA')
-    atl = sum(amt(r) for r in d if r['contributor_state'] == 'GA' and r['contributor_zip'][:2] == '30')
-    ind = sum(amt(r) for r in d if r['contributor_state'] == 'GA' and r['contributor_zip'][:2] != '30')
-    GEO_D[t] = (int(round(ind)), int(round(atl)), int(round(out)), round(ind / (ind + atl + out) * 100, 1))
-    print(f"  {t}: inDist={ind:,.0f}  atlanta={atl:,.0f}  outState={out:,.0f}  inDistPct={ind/(ind+atl+out)*100:.1f}%")
+    g = defaultdict(float)
+    for r in d: g[geo_region(r)] += amt(r)
+    ind, atl, rest, out = g['ind'], g['atl'], g['rest'], g['out']; tot = ind + atl + rest + out
+    GEO_D[t] = (int(round(ind)), int(round(atl)), int(round(rest)), int(round(out)), round(ind / tot * 100, 1))
+    print(f"  {t}: inDist={ind:,.0f}  metroAtl={atl:,.0f}  restGA={rest:,.0f}  outState={out:,.0f}  inDistPct={ind/tot*100:.1f}%")
 
 # --- TOP_ZIPS (dedup, all elections) ---
 print("\n[TOP_ZIPS]  $ per candidate for the 17 dashboard ZIPs")
@@ -420,9 +429,9 @@ if '--check' in sys.argv:
         chk(f'Q {nm} (donors/repeat/top20/avgGift/maxed)',
             (int(mq.group(1)), float(mq.group(2)), float(mq.group(3)), int(mq.group(4)), int(mq.group(6))),
             (Q_D[t]['donors'], Q_D[t]['repeat'], Q_D[t]['top20'], Q_D[t]['avg'], Q_D[t]['maxed']))
-        chk(f'Q {nm} inDistPct', float(mq.group(5)), GEO_D[t][3])
-        mg = re.search(nm + r":\s*\{ inDist: (\d+),\s*atlanta: (\d+),\s*outState: (\d+)", gb)
-        chk(f'GEO {nm}', tuple(int(x) for x in mg.groups()), GEO_D[t][:3])
+        chk(f'Q {nm} inDistPct', float(mq.group(5)), GEO_D[t][4])
+        mg = re.search(nm + r":\s*\{ inDist: (\d+),\s*metroAtl: (\d+),\s*restGA: (\d+),\s*outState: (\d+)", gb)
+        chk(f'GEO {nm}', tuple(int(x) for x in mg.groups()), GEO_D[t][:4])
 
     # -- INCOME_TIER --
     b = re.search(r'const INCOME_TIER = \[(.*?)\];', src, re.S).group(1)
@@ -560,8 +569,8 @@ if '--check' in sys.argv:
     chk_text('Atlanta moat opponents total', f"{MOAT_OPP:,} total")
     chk_text('Atlanta moat stat value', f"value: '{fmtk(MOAT_K)}'")
 
-    # -- 'outside GA-1' dollars = Atlanta + out-of-state --
-    chk_text('Kingston outside-GA-1 dollars', f"{fmtk(GEO_D['K'][1] + GEO_D['K'][2])} from outside GA-1")
+    # -- 'outside the coastal home base' dollars = metro Atlanta + rest of Georgia + out-of-state --
+    chk_text('Kingston outside-home-base dollars', f"{fmtk(GEO_D['K'][1] + GEO_D['K'][2] + GEO_D['K'][3])} from outside the coastal home base")
 
     # -- 31416 head-to-head shares (Kingston's lowest-leading ZIP; Farrell's best) --
     z16 = zsum['K']['31416'] + zsum['M']['31416'] + zsum['F']['31416']

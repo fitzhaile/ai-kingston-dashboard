@@ -144,9 +144,9 @@ const INCOME_TIER = [
 ];
 
 const GEO = {
-  Kingston:   { inDist: 727535, atlanta: 238859, outState: 122050 },
-  Montgomery: { inDist: 124504, atlanta: 12783,  outState: 47998  },
-  Farrell:    { inDist: 125966, atlanta: 9110,   outState: 3550   },
+  Kingston:   { inDist: 654535, metroAtl: 188384, restGA: 123475, outState: 122050 },
+  Montgomery: { inDist: 118418, metroAtl: 12405,  restGA: 6465,  outState: 47998  },
+  Farrell:    { inDist: 125966, metroAtl: 3350,   restGA: 5760,  outState: 3550   },
 };
 
 // === WEIGHTED-AVG DONOR ZIP INCOME + ACS COVERAGE ===
@@ -162,8 +162,8 @@ const ZIP_INCOME = [
 
 // === QUALITY METRICS ===
 const Q = {
-  Kingston:   { donors: 609, repeatRate: 31.4, top20Pct: 12.6, avgGift: 2036, inDistPct: 66.8, maxed: 192, pac: 181450, selfPct: 0 },
-  Montgomery: { donors: 150, repeatRate: 21.3, top20Pct: 48.0, avgGift: 1121, inDistPct: 67.2, maxed: 26,  pac: 8500,   selfPct: 7.8 },
+  Kingston:   { donors: 609, repeatRate: 31.4, top20Pct: 12.6, avgGift: 2036, inDistPct: 60.1, maxed: 192, pac: 181450, selfPct: 0 },
+  Montgomery: { donors: 150, repeatRate: 21.3, top20Pct: 48.0, avgGift: 1121, inDistPct: 63.9, maxed: 26,  pac: 8500,   selfPct: 7.8 },
   Farrell:    { donors: 137, repeatRate: 14.6, top20Pct: 46.1, avgGift: 885,  inDistPct: 90.9, maxed: 12,  pac: 250,    selfPct: 76.1 },
 };
 
@@ -903,7 +903,7 @@ const TabDonors = () => {
       {/* Quality scorecard */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Donor base quality scorecard</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because a third of his money comes from Atlanta and out of state.</p>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because about 40% of his money comes from metro Atlanta, the rest of Georgia, and out-of-state.</p>
         <div className="dk-scroll-hint" style={{ display: 'none', fontSize: 11, color: P.kingston, fontWeight: 700, marginBottom: 8, letterSpacing: '0.03em' }}>← swipe to compare all three candidates →</div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
@@ -941,7 +941,7 @@ const TabDonors = () => {
           </table>
         </div>
         <WhyMatters>
-          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston leads on five of seven; the two without a winner (average gift, in-district %) reflect the shape of his coalition — the field's largest average gift, and the lowest in-district share because a third of his money comes from Atlanta and out of state.
+          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston leads on five of seven; the two without a winner (average gift, in-district %) reflect the shape of his coalition — the field's largest average gift, and the lowest in-district share because about 40% of his money comes from metro Atlanta, the rest of Georgia, and out-of-state.
         </WhyMatters>
       </Card>
 
@@ -1133,7 +1133,8 @@ const TabGeography = () => {
   const geoBars = ['Kingston','Montgomery','Farrell'].map(name => ({
     name,
     'In-district (GA-1)': GEO[name].inDist,
-    'In-state (Atlanta etc.)': GEO[name].atlanta,
+    'Metro Atlanta': GEO[name].metroAtl,
+    'Rest of Georgia': GEO[name].restGA,
     'Out-of-state': GEO[name].outState,
   }));
 
@@ -1352,9 +1353,9 @@ const TabGeography = () => {
       </Card>
 
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>In-district, in-state, out-of-state</h3>
+        <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>In-district, metro Atlanta, rest of Georgia, out-of-state</h3>
         <p style={{ fontSize: 13, color: P.muted, margin: '0 0 14px', maxWidth: 740 }}>
-          Farrell: 90% in-district, only <strong>5 out-of-state donors total.</strong> He has no national network. Kingston: $361K from outside GA-1, much of it Atlanta and DC. Montgomery's out-of-state bloc ($48K) is his military brotherhood.
+          Farrell: 91% in-district, only <strong>5 out-of-state donors total.</strong> He has no national network. Kingston draws $434K from outside the coastal home base — $188K of it true metro Atlanta, the rest split between the rest of Georgia and out-of-state. Montgomery's out-of-state bloc ($48K) is his military brotherhood.
         </p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={geoBars} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
@@ -1362,9 +1363,10 @@ const TabGeography = () => {
             <XAxis type="number" tickFormatter={fmtK} tick={{ fontFamily: 'DM Sans', fontSize: 12, fill: P.muted }} axisLine={false} tickLine={false}/>
             <YAxis type="category" dataKey="name" width={100} tick={{ fontFamily: 'DM Sans', fontSize: 14, fill: P.ink, fontWeight: 600 }} axisLine={false} tickLine={false}/>
             <Tooltip content={<TTip/>}/>
-            <Bar dataKey="In-district (GA-1)"     stackId="a" fill={P.kingston}       radius={[6,0,0,6]}/>
-            <Bar dataKey="In-state (Atlanta etc.)" stackId="a" fill={P.kingstonLight}/>
-            <Bar dataKey="Out-of-state"             stackId="a" fill={P.kingstonAccent} radius={[0,6,6,0]}/>
+            <Bar dataKey="In-district (GA-1)"  stackId="a" fill={P.kingston}       radius={[6,0,0,6]}/>
+            <Bar dataKey="Metro Atlanta"       stackId="a" fill={P.kingstonAccent}/>
+            <Bar dataKey="Rest of Georgia"     stackId="a" fill={P.kingstonLight}/>
+            <Bar dataKey="Out-of-state"        stackId="a" fill={P.muted}          radius={[0,6,6,0]}/>
             <Legend wrapperStyle={{ fontFamily: 'DM Sans', fontSize: 12, paddingTop: 12 }}/>
           </BarChart>
         </ResponsiveContainer>
@@ -2536,8 +2538,8 @@ const DQ_ESTIMATES = [
   },
   {
     tag: 'Approximation', tone: 'warning',
-    title: '“In-district” is approximated by ZIP prefix',
-    body: 'In-district is computed as Georgia ZIPs outside metro Atlanta (ZIP prefix ≠ 30) — a proxy, not the legal GA-1 boundary. It therefore counts other non-Atlanta Georgia ZIPs that are not actually in GA-1, so treat the in-district share as an upper bound.',
+    title: 'Geography: four regions, by ZIP prefix',
+    body: 'Donor geography is bucketed by ZIP into four regions — the same rule on the Geography and Legacy tabs: in-district = the Savannah/coastal home base (ZIP-3 313/314/315, the ZIPs the district map shades); metro Atlanta = the Atlanta MSA core (300–303, plus Buford); rest of Georgia = every other Georgia ZIP (Statesboro, Athens, Augusta, Macon, Valdosta, Moultrie…); out-of-state = non-Georgia. These are prefix approximations, not the exact GA-1 boundary (which differs between Jack Kingston’s era and today), so read in-district as the coastal core, not the legal district. This replaced an earlier “any Georgia 30xxx ZIP = Atlanta” rule that overstated metro Atlanta by ~5 points — it had swept in Athens, Augusta, and Statesboro.',
   },
   {
     tag: 'Self-reported', tone: 'warning',
