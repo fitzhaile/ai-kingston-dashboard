@@ -3,7 +3,7 @@
 Derive the Jack-vs-Jim Kingston comparison constants for the "Legacy" tab.
 
 Both donor bases are profiled with the SAME method (all itemized individual
-contributions): geography (in-district / Atlanta-metro / out-of-state), income
+contributions): geography (in-district / metro-Atlanta / rest-of-Georgia / out-of-state), income
 tiers, weighted-average donor-ZIP income, wealthy-GA-ZIP haul, occupations — plus
 the shared-donor overlap. Jack's dollars are inflation-adjusted to 2026 dollars.
 
@@ -35,6 +35,24 @@ for r in csv.DictReader(open('zip_hhi_acs2023.csv')):
 def tier(h):
     if h is None: return 'Unknown'
     return 'High' if h >= 125000 else 'UpperMid' if h >= 75000 else 'Middle' if h >= 50000 else 'Low'
+
+# 4-way geography. In-district = the Savannah/coastal home base (ZIP-3 313/314/315 — the
+# coastal core the district map (geo_zips.json) uses); metro Atlanta = MSA core 300-303 plus
+# Buford (Gwinnett Co., a 305 ZIP); everything else in Georgia = "rest of Georgia" (Statesboro,
+# Athens, Augusta, Macon, Valdosta, Moultrie...); non-GA = out-of-state. This replaces the old
+# "any 30xxx = Atlanta" rule, which mislabeled ~5 points of non-Atlanta Georgia as Atlanta.
+ATL5 = {'30515', '30518', '30519'}  # Buford / Gwinnett Co. — Atlanta MSA, but in the 305 range
+def region(st, z):
+    if st != 'GA': return 'outState'
+    if z[:3] in ('313', '314', '315'): return 'inDist'
+    if z[:3] in ('300', '301', '302', '303') or z in ATL5: return 'metroAtl'
+    return 'restGA'
+def region_zip(z):  # ZIP-only variant for the per-ZIP map/list (Georgia ZIPs only)
+    if z[:3] in ('313', '314', '315'): return 'inDist'
+    if z[:3] in ('300', '301', '302', '303') or z in ATL5: return 'metroAtl'
+    if z[:2] in ('30', '31') or z[:3] in ('398', '399'): return 'restGA'
+    return None
+GEO_KEYS = ('inDist', 'metroAtl', 'restGA', 'outState')
 
 SUFFIX = {'JR', 'SR', 'II', 'III', 'IV', 'V'}
 def keyname(name):
@@ -77,8 +95,7 @@ def profile(rows):
         if net <= 0: continue
         st, z, o = dmeta[name]
         tot += net; dtot[name] = net
-        region = 'outState' if st != 'GA' else ('atlanta' if z[:2] == '30' else 'inDist')
-        geo[region] += net
+        geo[region(st, z)] += net
         if z: zipd[z] += net
         if st == 'GA' and z: ga.add(z)
         if o not in OCC_SKIP: occ[o].add(name)
@@ -91,8 +108,8 @@ def profile(rows):
     wzga = [z for z in zipd if z in ga and HHI.get(z, 0) >= 90000]
     return {
         'total': tot, 'donors': len({keyname(n) for n in dtot if keyname(n)}),
-        'geo': {k: geo[k] for k in ('inDist', 'atlanta', 'outState')},
-        'geoPct': {k: round(geo[k] / tot * 100, 1) for k in ('inDist', 'atlanta', 'outState')},
+        'geo': {k: geo[k] for k in GEO_KEYS},
+        'geoPct': {k: round(geo[k] / tot * 100, 1) for k in GEO_KEYS},
         'tiers': {k: round(tierd[k] / classif * 100, 1) for k in ('High', 'UpperMid', 'Middle', 'Low', 'Out')},
         'wAvg': int(round(wsum / wbase)), 'wAvgCov': round(wbase / tot * 100, 1),
         'wealthyGA': sum(zipd[z] for z in wzga), 'wealthyPct': round(sum(zipd[z] for z in wzga) / tot * 100, 1),
@@ -135,9 +152,14 @@ def zipsum(raw):
     return zd
 MD = zipsum(jim_raw()); JD = zipsum(jack_raw())
 jim_tot = sum(MD.values()) or 1.0; jack_tot = sum(JD.values()) or 1.0
-def is_ga(z): return z[:2] in ('30', '31') or z[:3] in ('398', '399')
-top_ga = sorted((z for z in (set(JD) | set(MD)) if is_ga(z)),
-                key=lambda z: -(JD.get(z, 0) + MD.get(z, 0)))[:14]
+# top ZIPs per Georgia region (same split as the geography bars) so each region's biggest
+# ZIPs show under its own subtotal — and Atlanta isn't crowded out by concentrated Savannah.
+def region_top(reg, n):  # sort by the larger of the two shares (ties break by ZIP, for determinism)
+    zs = [z for z in (set(JD) | set(MD)) if region_zip(z) == reg]
+    return sorted(zs, key=lambda z: (-max(JD.get(z, 0) / jack_tot, MD.get(z, 0) / jim_tot), z))[:n], sum(1 for z in zs if MD.get(z, 0) > 0)
+indist_z, _ = region_top('inDist', 6)
+metro_z, metro_n = region_top('metroAtl', 6)
+rest_z, _ = region_top('restGA', 5)
 
 # Jack's per-cycle average for each shared-core donor (total / cycles they gave in)
 jack_cycles = defaultdict(set)
@@ -149,14 +171,14 @@ def jack_per_cycle(name):
     return jbk.get(k, 0) / max(1, len(jack_cycles.get(k, {0})))
 
 def jocc(p): return '[' + ', '.join(f"['{o.title()}',{n}]" for o, n in p['occ']) + ']'
-def jzips(): return '[' + ', '.join(
-    "['%s',%.1f,%.1f,%d]" % (z, JD.get(z, 0) / jack_tot * 100, MD.get(z, 0) / jim_tot * 100, HHI.get(z, 0))
-    for z in top_ga) + ']'
+def zrow(z): return "['%s',%.1f,%.1f,%d]" % (z, JD.get(z, 0) / jack_tot * 100, MD.get(z, 0) / jim_tot * 100, HHI.get(z, 0))
+def jzips(): return '{ inDist: [%s], metroAtl: [%s], restGA: [%s], atlN: %d }' % (
+    ', '.join(zrow(z) for z in indist_z), ', '.join(zrow(z) for z in metro_z), ', '.join(zrow(z) for z in rest_z), metro_n)
 def jprof(p):
-    return ("{{ donors: {0}, total: {1}, geo: {{ inDist: {2}, atlanta: {3}, outState: {4} }}, "
-            "tiers: {{ High: {5}, UpperMid: {6}, Middle: {7}, Low: {8}, Out: {9} }}, wAvg: {10}, "
-            "wealthyGA: {11}, wealthyPct: {12}, occ: {13} }}").format(
-        p['donors'], round(p['total']), p['geoPct']['inDist'], p['geoPct']['atlanta'], p['geoPct']['outState'],
+    return ("{{ donors: {0}, total: {1}, geo: {{ inDist: {2}, metroAtl: {3}, restGA: {4}, outState: {5} }}, "
+            "tiers: {{ High: {6}, UpperMid: {7}, Middle: {8}, Low: {9}, Out: {10} }}, wAvg: {11}, "
+            "wealthyGA: {12}, wealthyPct: {13}, occ: {14} }}").format(
+        p['donors'], round(p['total']), p['geoPct']['inDist'], p['geoPct']['metroAtl'], p['geoPct']['restGA'], p['geoPct']['outState'],
         p['tiers']['High'], p['tiers']['UpperMid'], p['tiers']['Middle'], p['tiers']['Low'], p['tiers']['Out'],
         p['wAvg'], round(p['wealthyGA']), p['wealthyPct'], jocc(p))
 ov_header = "n: %d, pct: %.1f, dollars: %d, dollarPct: %.1f" % (
@@ -214,7 +236,7 @@ except Exception as _e:
 
 def show(label, p):
     print(f"\n{label}: {p['donors']} donors, ${p['total']:,.0f} itemized (2026$)")
-    print(f"  geography: inDist {p['geoPct']['inDist']}%  atlanta {p['geoPct']['atlanta']}%  outState {p['geoPct']['outState']}%")
+    print(f"  geography: inDist {p['geoPct']['inDist']}%  metroAtl {p['geoPct']['metroAtl']}%  restGA {p['geoPct']['restGA']}%  outState {p['geoPct']['outState']}%")
     print(f"  income tiers %: " + " ".join(f"{k} {p['tiers'][k]}" for k in ('High', 'UpperMid', 'Middle', 'Low', 'Out')))
     print(f"  weighted-avg donor ZIP income: ${p['wAvg']:,} (coverage {p['wAvgCov']}%)")
     print(f"  wealthy GA ZIPs: ${p['wealthyGA']:,.0f} ({p['wealthyPct']}% of haul)")

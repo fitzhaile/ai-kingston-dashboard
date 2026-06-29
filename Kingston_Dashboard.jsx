@@ -2758,9 +2758,9 @@ const TabData = () => {
 // (CPI-U, BLS). Jim: this cycle through the pre-primary. Income: Census ACS 2019-2023
 // B19013. Both profiled with identical method; overlap is a conservative last+first match.
 const LEGACY = {
-  jack: { donors: 1867, total: 3608305, geo: { inDist: 63.5, atlanta: 10.4, outState: 26.1 }, tiers: { High: 3.5, UpperMid: 32.6, Middle: 23.8, Low: 9.7, Out: 30.3 }, wAvg: 84974, wealthyGA: 1015237, wealthyPct: 28.1, occ: [['Retired',204], ['Owner',174], ['Homemaker',158], ['Attorney',148], ['President',140], ['Farmer',87], ['Physician',78], ['Ceo',49], ['Lobbyist',44], ['Consultant',41]] },
-  jim:  { donors: 603, total: 1662419, geo: { inDist: 67.9, atlanta: 20.5, outState: 11.6 }, tiers: { High: 4.5, UpperMid: 40.7, Middle: 34.7, Low: 8.1, Out: 12.0 }, wAvg: 86431, wealthyGA: 638819, wealthyPct: 38.4, occ: [['Attorney',59], ['Owner',50], ['Retired',45], ['Homemaker',37], ['President',24], ['Ceo',24], ['Physician',22], ['Consultant',21], ['Real Estate',14], ['Partner',11]] },
-  zips: [['31411',10.3,11.0,122723], ['31406',5.8,11.7,66084], ['31410',5.0,6.7,97225], ['31522',5.3,1.6,106413], ['31405',2.6,3.5,62123], ['31401',1.6,5.3,50182], ['31324',1.5,4.0,110767], ['31404',0.7,3.5,49805], ['30327',0.6,3.3,182317], ['31561',1.6,0.6,144375], ['31768',1.8,0.1,44895], ['31313',1.3,0.7,59443], ['31419',0.9,1.6,70734], ['31776',1.5,0.0,0]],
+  jack: { donors: 1867, total: 3608305, geo: { inDist: 51.7, metroAtl: 6.5, restGA: 15.7, outState: 26.1 }, tiers: { High: 3.5, UpperMid: 32.6, Middle: 23.8, Low: 9.7, Out: 30.3 }, wAvg: 84974, wealthyGA: 1015237, wealthyPct: 28.1, occ: [['Retired',204], ['Owner',174], ['Homemaker',158], ['Attorney',148], ['President',140], ['Farmer',87], ['Physician',78], ['Ceo',49], ['Lobbyist',44], ['Consultant',41]] },
+  jim:  { donors: 603, total: 1662419, geo: { inDist: 60.6, metroAtl: 15.1, restGA: 12.7, outState: 11.6 }, tiers: { High: 4.5, UpperMid: 40.7, Middle: 34.7, Low: 8.1, Out: 12.0 }, wAvg: 86431, wealthyGA: 638819, wealthyPct: 38.4, occ: [['Attorney',59], ['Owner',50], ['Retired',45], ['Homemaker',37], ['President',24], ['Ceo',24], ['Physician',22], ['Consultant',21], ['Real Estate',14], ['Partner',11]] },
+  zips: { inDist: [['31406',5.8,11.7,66084], ['31411',10.3,11.0,122723], ['31410',5.0,6.7,97225], ['31522',5.3,1.6,106413], ['31401',1.6,5.3,50182], ['31324',1.5,4.0,110767]], metroAtl: [['30327',0.6,3.3,182317], ['30305',0.2,1.7,107836], ['30253',0.0,1.3,81601], ['30519',0.0,1.3,98846], ['30152',0.8,0.0,0], ['30339',0.1,0.7,101049]], restGA: [['31768',1.8,0.1,44895], ['31776',1.5,0.0,0], ['30415',0.0,1.3,61295], ['31792',0.0,1.3,49045], ['31082',0.4,1.1,51932]], atlN: 51 },
   overlap: { n: 78, pct: 12.9, dollars: 247100, dollarPct: 14.9, donors: [
     ['JACKSON, ELIZABETH S.', 10500, 719], ['CRITZ, DALE C. JR.', 10500, 4501], ['MCCACHERN, SAMUEL', 10500, 648],
     ['TARBUTTON, BEN J. III', 10500, 3589], ['WATERS, DON L.', 10500, 2481], ['CRIDER, WILLIAM A. III', 10500, 6549],
@@ -2773,7 +2773,9 @@ const NBHD = { '31411': 'Skidaway Island', '31410': 'Wilmington Island', '31324'
   '31522': 'St. Simons', '31561': 'Sea Island', '31328': 'Tybee Island', '31406': 'Southside Savannah',
   '31401': 'Downtown Savannah', '31405': 'Habersham', '31404': 'Eastside Savannah', '31419': 'Westside Savannah',
   '31768': 'Moultrie', '31313': 'Hinesville', '30327': 'Buckhead', '30305': 'Buckhead',
-  '30309': 'Midtown Atlanta', '30519': 'Buford', '30622': 'Bogart', '30022': 'Alpharetta' };
+  '30309': 'Midtown Atlanta', '30519': 'Buford', '30253': 'McDonough', '30152': 'Kennesaw', '30339': 'Vinings',
+  '31776': 'Moultrie', '30415': 'Brooklet', '31792': 'Thomasville', '31082': 'Sandersville',
+  '30622': 'Bogart', '30022': 'Alpharetta' };
 const JACKC = P.kingstonAccent;  // gold = Jack (the father); navy = Jim
 const titleCase = (s) => s.replace(/(?:^|, )([a-z])/g, (m) => m.toUpperCase());
 
@@ -2837,7 +2839,8 @@ const TabLegacy = () => {
   const paceX = (jm.total / perCycle).toFixed(1);
   const geoData = [
     { cat: 'In-district', Jack: jk.geo.inDist, Jim: jm.geo.inDist },
-    { cat: 'Atlanta metro', Jack: jk.geo.atlanta, Jim: jm.geo.atlanta },
+    { cat: 'Metro Atlanta', Jack: jk.geo.metroAtl, Jim: jm.geo.metroAtl },
+    { cat: 'Rest of GA', Jack: jk.geo.restGA, Jim: jm.geo.restGA },
     { cat: 'Out-of-state', Jack: jk.geo.outState, Jim: jm.geo.outState },
   ];
   const tierData = [
@@ -2847,9 +2850,14 @@ const TabLegacy = () => {
     { tier: 'Low', Jack: jk.tiers.Low, Jim: jm.tiers.Low },
     { tier: 'Out-of-state', Jack: jk.tiers.Out, Jim: jm.tiers.Out },
   ];
-  // top Georgia ZIPs as a SHARE of each man's haul — precomputed in the derive via the
-  // Geography tab's exact method, so Jim's figures match that tab and cycles compare fairly.
-  const wzRows = L.zips.map(([z, jackPct, jimPct, h]) => ({ z, h, jack: jackPct, jim: jimPct }));
+  // ZIP list regrouped by region (matches the geography bars) so each region's biggest ZIPs
+  // sit under its own subtotal — and metro Atlanta, spread thin, isn't crowded out by Savannah.
+  const zipRegions = [
+    { key: 'inDist', label: 'In-district — Savannah & the coast', jim: jm.geo.inDist, jack: jk.geo.inDist, note: 'where both Kingstons concentrate their giving' },
+    { key: 'metroAtl', label: 'Metro Atlanta', jim: jm.geo.metroAtl, jack: jk.geo.metroAtl, note: `Jim's ${jm.geo.metroAtl}% is spread across ${L.zips.atlN} ZIPs — only the largest show here` },
+    { key: 'restGA', label: 'Rest of Georgia', jim: jm.geo.restGA, jack: jk.geo.restGA, note: 'Statesboro, Athens, Augusta, Macon, Moultrie, Thomasville…' },
+  ];
+  const zipMax = Math.max(...['inDist', 'metroAtl', 'restGA'].flatMap(k => L.zips[k].map(([z, jck, jmm]) => Math.max(jck, jmm))));
   // occupations as SHARE of each donor base (not raw counts — Jack built his over five cycles)
   const occPct = (occ, donors) => occ.map(([o, n]) => [o, n / donors * 100]);
   const jackOcc = occPct(jk.occ, jk.donors), jimOcc = occPct(jm.occ, jm.donors);
@@ -2909,17 +2917,17 @@ const TabLegacy = () => {
       {/* GEOGRAPHY */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="Where the money comes from" title="Jim leans on Atlanta; Jack reached out-of-state"
-          kicker="The in-district money map first, then the full regional split. Jim draws more than double Jack's share from metro-Atlanta ZIPs; Jack, a long-serving incumbent, drew over a quarter of his money from outside Georgia. Both still keep most of their base in the district."/>
+          kicker="The coastal home-base map first, then the full four-way split. Jim draws more than double Jack's share from true metro-Atlanta ZIPs; Jack, a long-serving incumbent, reached further — a quarter of his money from outside Georgia, and more from the rest of the state. Both still anchor most of their giving in the Savannah district."/>
         <LegacyMaps/>
         <div style={{ fontSize: 11.5, color: P.muted, margin: '10px 2px 20px', lineHeight: 1.5 }}>
-          Each in-district ZIP is shaded by that candidate's itemized dollars (2026$), normalized to his own peak so the
-          geographic <em>pattern</em> compares — not the magnitude (Jim's one pre-primary window vs Jack's five cycles).
-          Both Kingstons light up the same wealthy Savannah ZIPs — Skidaway, Wilmington, Richmond Hill. The bars below add
-          the out-of-district money the maps don't show, as each man's <em>share</em> of his haul, so cycles compare fairly.
+          Each coastal home-base ZIP is shaded by that candidate's itemized dollars (2026$), normalized to his own peak so
+          the geographic <em>pattern</em> compares — not the magnitude (Jim's one pre-primary window vs Jack's five cycles).
+          Both Kingstons light up the same wealthy Savannah ZIPs — Skidaway, Wilmington, Richmond Hill. The bars below break
+          out the rest — metro Atlanta, the rest of Georgia, and out-of-state — as each man's <em>share</em> of his haul.
         </div>
         <Bars data={geoData} xKey="cat"/>
         <WhyMatters>
-          A long-serving incumbent, Jack raised broadly — {jk.geo.outState}% of his money came from outside Georgia, more than double Jim's {jm.geo.outState}% (seniority and committee posts attract national money). Jim, an open-seat challenger, leans harder on the Atlanta donor class ({jm.geo.atlanta}% vs {jk.geo.atlanta}%), even as both keep their base in the district.
+          A long-serving incumbent, Jack cast the widest net — {jk.geo.outState}% of his money came from outside Georgia (more than double Jim's {jm.geo.outState}%) and another {jk.geo.restGA}% from the rest of the state beyond metro Atlanta — Moultrie, Warner Robins, Valdosta — the reach of a member with statewide standing. Jim, an open-seat challenger, is more homegrown ({jm.geo.inDist}% from the coastal district) but leans on the metro-Atlanta donor class {(jm.geo.metroAtl / jk.geo.metroAtl).toFixed(1)}× as hard as his father did ({jm.geo.metroAtl}% vs {jk.geo.metroAtl}%).
         </WhyMatters>
       </Card>
 
@@ -2964,32 +2972,43 @@ const TabLegacy = () => {
         </div>
       </Card>
 
-      {/* WEALTHY SAVANNAH CORE */}
+      {/* MONEY MAP — regrouped by region */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <SectionH eyebrow="The money map" title="The same ZIPs fund both, a generation apart"
-          kicker="Each Kingston's top Georgia ZIPs as a share of his total itemized haul (so five cycles and one pre-primary window compare fairly), with each ZIP's median income shown. Savannah's Southside and Skidaway anchor both; Atlanta's Buckhead shows up for each."/>
-        <div style={{ display: 'grid', gap: 8 }}>
-          {wzRows.map(({ z, h, jack, jim }) => {
-            const mx = Math.max(...wzRows.map(r => Math.max(r.jack, r.jim)));
-            return (
-              <div key={z} style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 14, alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${P.line}` }}>
-                <div>
-                  <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>{z}</span>
-                  <span style={{ fontSize: 11, color: P.ink, marginLeft: 6 }}>{NBHD[z] || ''}</span>
-                  <div style={{ fontSize: 10, color: P.kingstonAccent, fontWeight: 700, fontFamily: 'ui-monospace, monospace' }}>{h ? '$' + Math.round(h / 1000) + 'K HHI' : 'income n/a'}</div>
-                </div>
-                <div style={{ display: 'grid', gap: 3 }}>
-                  {[['Jim', jim, P.kingston], ['Jack', jack, JACKC]].map(([w, v, c]) => (
-                    <div key={w} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11 }}>
-                      <span style={{ width: 26, color: P.muted }}>{w}</span>
-                      <div style={{ flex: 1, height: 13, background: P.bg, borderRadius: 3 }}><div style={{ width: `${v / mx * 100}%`, height: '100%', background: c, borderRadius: 3 }}/></div>
-                      <span style={{ width: 52, textAlign: 'right', fontWeight: 600 }}>{v.toFixed(1)}%</span>
-                    </div>
-                  ))}
-                </div>
+        <SectionH eyebrow="The money map" title="The same ZIPs fund both — grouped by region"
+          kicker="Each Georgia region as a share of each man's haul (matching the bars above), with its biggest ZIPs beneath and their median income. Metro Atlanta's money is real but thin-spread, so its weight lives in the subtotal, not any one ZIP."/>
+        <div style={{ display: 'grid', gap: 6 }}>
+          {zipRegions.map(region => (
+            <div key={region.key} style={{ marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '9px 0 3px', borderBottom: `2px solid ${P.kingston}` }}>
+                <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>{region.label}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700 }}><span style={{ color: P.kingston }}>Jim {region.jim}%</span> <span style={{ color: P.muted }}>·</span> <span style={{ color: JACKC }}>Jack {region.jack}%</span></span>
               </div>
-            );
-          })}
+              <div style={{ fontSize: 10.5, color: P.muted, margin: '3px 0 7px' }}>{region.note}</div>
+              {L.zips[region.key].map(([z, jack, jim, h]) => (
+                <div key={z} style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 14, alignItems: 'center', padding: '5px 0', borderBottom: `1px solid ${P.line}` }}>
+                  <div>
+                    <span style={{ fontFamily: 'Fraunces, serif', fontSize: 14, fontWeight: 600, color: P.kingston }}>{z}</span>
+                    <span style={{ fontSize: 11, color: P.ink, marginLeft: 6 }}>{NBHD[z] || ''}</span>
+                    <div style={{ fontSize: 10, color: P.kingstonAccent, fontWeight: 700, fontFamily: 'ui-monospace, monospace' }}>{h ? '$' + Math.round(h / 1000) + 'K HHI' : 'income n/a'}</div>
+                  </div>
+                  <div style={{ display: 'grid', gap: 3 }}>
+                    {[['Jim', jim, P.kingston], ['Jack', jack, JACKC]].map(([w, v, c]) => (
+                      <div key={w} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11 }}>
+                        <span style={{ width: 26, color: P.muted }}>{w}</span>
+                        <div style={{ flex: 1, height: 13, background: P.bg, borderRadius: 3 }}><div style={{ width: `${v / zipMax * 100}%`, height: '100%', background: c, borderRadius: 3 }}/></div>
+                        <span style={{ width: 52, textAlign: 'right', fontWeight: 600 }}>{v.toFixed(1)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '9px 0 3px', borderBottom: `2px solid ${P.kingston}` }}>
+            <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Out-of-state</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700 }}><span style={{ color: P.kingston }}>Jim {jm.geo.outState}%</span> <span style={{ color: P.muted }}>·</span> <span style={{ color: JACKC }}>Jack {jk.geo.outState}%</span></span>
+          </div>
+          <div style={{ fontSize: 10.5, color: P.muted, margin: '3px 0 0' }}>National giving — no single ZIP dominates. Jack's {jk.geo.outState}% reflects a long-serving incumbent's national network.</div>
         </div>
       </Card>
 
