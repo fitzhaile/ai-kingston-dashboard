@@ -2499,6 +2499,16 @@ const DQ_SOURCES = [
     feeds: 'Contribution caps ($3,500 per individual per election), legal runoff/general capacity, and the Farrell loan-recovery analysis.',
     vintage: '52 U.S.C. §30116; 11 C.F.R. §116.11; FEC v. Ted Cruz for Senate, 596 U.S. 289 (2022).',
   },
+  {
+    name: 'FEC Schedule A — Jack Kingston (2004–2012)',
+    feeds: "The Legacy tab only — the father-vs-son comparison: shared-donor overlap, geography, income tiers, occupations, per-ZIP dollars, and the choropleth maps.",
+    vintage: 'Committee C00261958 (Jack Kingston for Congress), his last five House re-election cycles, pulled from the OpenFEC API via keyset pagination and reconciled to within ~1% of his Form 3 itemized totals each cycle.',
+  },
+  {
+    name: 'U.S. Bureau of Labor Statistics — CPI-U',
+    feeds: "The Legacy tab's inflation adjustment, which restates Jack's 2004–2012 dollars in 2026 dollars (a 2012 dollar ≈ $1.44 today) so the comparison with Jim is not distorted by inflation.",
+    vintage: 'CPI-U, U.S. city average, all items (series CUUR0000SA0), annual averages; indexed to a 2026 base.',
+  },
 ];
 
 // Estimates & approximations — methods that infer rather than measure. Each is
@@ -2563,6 +2573,14 @@ const DQ_LIMITS = [
     title: 'Biographies and dates are from public reporting',
     body: 'Candidate biographies on The Field tab (ages, careers, military and education records) and dated events on the timeline (announcements, the Trump endorsement, the primary result) come from public reporting and official records, not from the FEC/ACS dataset, and are not independently re-verified here. The financial figures do not depend on them.',
   },
+  {
+    title: 'Father-vs-son comparison spans different eras',
+    body: "The Legacy tab sets Jim's single pre-primary window against Jack's five full 2004–2012 cycles, and the per-election cap was lower in Jack's era (~$2,000–2,500 vs $3,500 today). To keep it fair the tab compares shares of each man's haul and per-cycle figures, and inflates Jack's dollars to 2026 — but the raw dollar magnitudes are not directly comparable, and the pace multiple is directional, not a like-for-like total. Income coverage is thinner for Jack, too: about 60% of his donors sit in a ZIP with a published ACS median, vs ~85% of Jim's.",
+  },
+  {
+    title: 'Shared-donor overlap is a conservative floor',
+    body: "The share of Jim's donors who also gave Jack is a last-name + first-name match against Jack's 2004–2012 e-filed donors. It can't catch nicknames, name changes, Jack's pre-2004 donors (which predate complete e-filing), or donors since deceased — so the true carryover is higher than the figure shown.",
+  },
 ];
 
 const DQTag = ({ children, tone }) => {
@@ -2611,7 +2629,7 @@ const TabData = () => {
       {/* SOURCES */}
       <Card style={{ padding: 22, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, margin: '0 0 4px', color: P.kingston }}>Where the numbers come from</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Five sources, each feeding a specific part of the dashboard. Nothing is sourced from memory or estimation.</p>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Seven sources, each feeding a specific part of the dashboard. Nothing is sourced from memory or estimation.</p>
         <div style={{ display: 'grid', gap: 10 }}>
           {DQ_SOURCES.map(s => (
             <div key={s.name} style={{ padding: '14px 16px', background: P.bg, borderRadius: 10, borderLeft: `4px solid ${P.kingston}` }}>
@@ -2873,7 +2891,7 @@ const TabLegacy = () => {
       {/* SHARED CORE */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="The inherited core" title="The same families fund both Kingstons"
-          kicker={`${L.overlap.n} of Jim's ${jm.donors} donors (${L.overlap.pct}%) gave directly to his father's 2004–2012 campaigns — ${fmtK(L.overlap.dollars)} of Jim's money (${L.overlap.dollarPct}%), concentrated among his biggest givers. This is a conservative floor: the name match can't catch nicknames, Jack's pre-2004 donors, or donors since deceased, so the real carryover is higher.`}/>
+          kicker={`${L.overlap.n} of Jim's ${jm.donors} donors (${L.overlap.pct}%) gave directly to his father's 2004–2012 campaigns — ${fmtK(L.overlap.dollars)} of Jim's money (${L.overlap.dollarPct}%). The dollars lean to his biggest givers (the 14 below are over half of it), but the ${L.overlap.n} span his whole base. And this is a conservative floor: the name match can't catch nicknames, Jack's pre-2004 donors, or donors since deceased, so the real carryover is higher.`}/>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
           {L.overlap.donors.map(([name, jimAmt, jackAmt]) => (
             <div key={name} style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingstonAccent}` }}>
@@ -2890,13 +2908,14 @@ const TabLegacy = () => {
 
       {/* GEOGRAPHY */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <SectionH eyebrow="Where the money comes from" title="Jack ran on the district; Jim runs on Atlanta"
-          kicker="The in-district money map first, then the full regional split. Jim draws more than double Jack's share from metro-Atlanta ZIPs, while Jack's reach was more in-district and more national."/>
+        <SectionH eyebrow="Where the money comes from" title="Jim leans on Atlanta; Jack reached out-of-state"
+          kicker="The in-district money map first, then the full regional split. Jim draws more than double Jack's share from metro-Atlanta ZIPs; Jack, a long-serving incumbent, drew over a quarter of his money from outside Georgia. Both still keep most of their base in the district."/>
         <LegacyMaps/>
         <div style={{ fontSize: 11.5, color: P.muted, margin: '10px 2px 20px', lineHeight: 1.5 }}>
           Each in-district ZIP is shaded by that candidate's itemized dollars (2026$), normalized to his own peak so the
-          geographic <em>pattern</em> compares. Both Kingstons light up the same wealthy Savannah ZIPs — Skidaway,
-          Wilmington, Richmond Hill. The bars below add the out-of-district money the maps don't show.
+          geographic <em>pattern</em> compares — not the magnitude (Jim's one pre-primary window vs Jack's five cycles).
+          Both Kingstons light up the same wealthy Savannah ZIPs — Skidaway, Wilmington, Richmond Hill. The bars below add
+          the out-of-district money the maps don't show, as each man's <em>share</em> of his haul, so cycles compare fairly.
         </div>
         <Bars data={geoData} xKey="cat"/>
         <WhyMatters>
@@ -2923,6 +2942,7 @@ const TabLegacy = () => {
             </div>
           </div>
         </div>
+        <div style={{ fontSize: 11, color: P.muted, marginTop: 12 }}>Income covers donors whose ZIP has a published ACS median — about 85% of Jim's dollars but only ~60% of Jack's (more of his donors sit in out-of-state or rural ZIPs without an estimate), so weight the wealthy-ZIP share over the average.</div>
       </Card>
 
       {/* OCCUPATIONS */}
