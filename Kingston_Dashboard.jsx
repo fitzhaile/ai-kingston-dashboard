@@ -2740,18 +2740,19 @@ const TabData = () => {
 // (CPI-U, BLS). Jim: this cycle through the pre-primary. Income: Census ACS 2019-2023
 // B19013. Both profiled with identical method; overlap is a conservative last+first match.
 const LEGACY = {
-  jack: { donors: 450, total: 3313165, geo: { inDist: 70.4, atlanta: 9.3, outState: 20.3 }, tiers: { High: 2.3, UpperMid: 24.0, Middle: 38.4, Low: 12.6, Out: 22.7 }, wAvg: 73872, wealthyGA: 693882, wealthyPct: 20.9, topWealthy: [['31411',195038,122723], ['31410',137756,97225], ['31324',98920,110767], ['31322',63758,91293], ['31522',61086,106413], ['30622',23423,127530], ['30327',22750,182317], ['30022',22706,153022]], occ: [['Retired',48], ['Owner',33], ['Attorney',33], ['President',26], ['Homemaker',23], ['Physician',11], ['Farmer',11], ['Ceo',8], ['Vice President',5], ['Executive',5]] },
+  jack: { donors: 1867, total: 3608305, geo: { inDist: 63.5, atlanta: 10.4, outState: 26.1 }, tiers: { High: 3.5, UpperMid: 32.6, Middle: 23.8, Low: 9.7, Out: 30.3 }, wAvg: 84974, wealthyGA: 1015237, wealthyPct: 28.1, topWealthy: [['31411',368537,122723], ['31522',205291,106413], ['31410',183032,97225], ['31561',58539,144375], ['31324',55357,110767], ['30327',23117,182317], ['30309',21803,111894], ['31328',14828,105669]], occ: [['Retired',204], ['Owner',174], ['Homemaker',158], ['Attorney',148], ['President',140], ['Farmer',87], ['Physician',78], ['Ceo',49], ['Lobbyist',44], ['Consultant',41]] },
   jim:  { donors: 603, total: 1662419, geo: { inDist: 67.9, atlanta: 20.5, outState: 11.6 }, tiers: { High: 4.5, UpperMid: 40.7, Middle: 34.7, Low: 8.1, Out: 12.0 }, wAvg: 86431, wealthyGA: 638819, wealthyPct: 38.4, topWealthy: [['31411',182250,122723], ['31410',113825,97225], ['31324',66310,110767], ['30327',53950,182317], ['31322',32250,91293], ['30305',28500,107836], ['31522',26300,106413], ['30519',21000,98846]], occ: [['Attorney',59], ['Owner',50], ['Retired',45], ['Homemaker',37], ['President',24], ['Ceo',24], ['Physician',22], ['Consultant',21], ['Real Estate',14], ['Partner',11]] },
-  overlap: { n: 26, pct: 4.3, dollars: 92850, dollarPct: 5.6, donors: [
-    ['CRITZ, DALE C. JR.', 10500, 3684], ['WATERS, DON L.', 10500, 19568], ['CRIDER, WILLIAM A. III', 10500, 20970],
-    ['DANIEL, CINDY', 10500, 47865], ['DANIEL, MARVIN', 10500, 5032], ['LEWIS, J. CURTIS IV', 10000, 14736],
-    ['CRITZ, DALE III', 5000, 3684], ['DALY, JAMES', 3500, 10485], ['HAMILTON, PAUL', 3500, 4724],
-    ['JONES, PATRICK', 3500, 10064], ['MONSEES, HENRY', 2500, 16451], ['JACKSON, JAMES LELAND', 2000, 1840],
-    ['PIRKLE, ROBERT', 1000, 14736], ['OSTEEN, J. NOEL', 1000, 12265],
+  overlap: { n: 78, pct: 12.9, dollars: 247100, dollarPct: 14.9, donors: [
+    ['JACKSON, ELIZABETH S.', 10500, 719], ['CRITZ, DALE C. JR.', 10500, 18003], ['MCCACHERN, SAMUEL', 10500, 1945],
+    ['TARBUTTON, BEN J. III', 10500, 3589], ['WATERS, DON L.', 10500, 9923], ['CRIDER, WILLIAM A. III', 10500, 19648],
+    ['GLENDYE, ROSS', 10500, 180], ['DANIEL, CINDY', 10500, 8097], ['DANIEL, MARVIN', 10500, 2257],
+    ['SMITH, BYRON L.', 10500, 845], ['LEWIS, J. CURTIS IV', 10000, 4201], ['BARROW, CHAD', 10000, 1438],
+    ['WASDEN, WILEY', 7000, 845], ['COMPTON, CHARLES', 7000, 9561],
   ] },
 };
 const NBHD = { '31411': 'Skidaway Island', '31410': 'Wilmington Island', '31324': 'Richmond Hill', '31322': 'Pooler',
-  '31522': 'St. Simons', '30327': 'Buckhead', '30305': 'Buckhead', '30519': 'Buford', '30622': 'Bogart', '30022': 'Alpharetta' };
+  '31522': 'St. Simons', '31561': 'Sea Island', '31328': 'Tybee Island', '30327': 'Buckhead', '30305': 'Buckhead',
+  '30309': 'Midtown Atlanta', '30519': 'Buford', '30622': 'Bogart', '30022': 'Alpharetta' };
 const JACKC = P.kingstonAccent;  // gold = Jack (the father); navy = Jim
 const titleCase = (s) => s.replace(/(?:^|, )([a-z])/g, (m) => m.toUpperCase());
 
@@ -2825,12 +2826,16 @@ const TabLegacy = () => {
     { tier: 'Low', Jack: jk.tiers.Low, Jim: jm.tiers.Low },
     { tier: 'Out-of-state', Jack: jk.tiers.Out, Jim: jm.tiers.Out },
   ];
-  // merge the wealthy-ZIP top lists into one shared view
+  // wealthy ZIPs as SHARE of each man's haul (cycle-independent: avoids comparing
+  // Jack's five full cycles to Jim's single pre-primary window).
   const wz = {};
-  jk.topWealthy.forEach(([z, d, h]) => { wz[z] = { z, h, jack: d, jim: 0 }; });
-  jm.topWealthy.forEach(([z, d, h]) => { wz[z] = { ...(wz[z] || { z, h, jack: 0 }), jim: d, h }; });
+  jk.topWealthy.forEach(([z, d, h]) => { wz[z] = { z, h, jack: d / jk.total * 100, jim: 0 }; });
+  jm.topWealthy.forEach(([z, d, h]) => { wz[z] = { ...(wz[z] || { z, h, jack: 0 }), jim: d / jm.total * 100, h }; });
   const wzRows = Object.values(wz).sort((a, b) => (b.jack + b.jim) - (a.jack + a.jim));
-  const occMax = Math.max(...jk.occ.map(o => o[1]), ...jm.occ.map(o => o[1]));
+  // occupations as SHARE of each donor base (not raw counts — Jack built his over five cycles)
+  const occPct = (occ, donors) => occ.map(([o, n]) => [o, n / donors * 100]);
+  const jackOcc = occPct(jk.occ, jk.donors), jimOcc = occPct(jm.occ, jm.donors);
+  const occMax = Math.max(...jackOcc.map(o => o[1]), ...jimOcc.map(o => o[1]));
   const Bars = ({ data, xKey, fmt }) => (
     <ResponsiveContainer width="100%" height={250}>
       <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 4 }} barGap={3}>
@@ -2855,20 +2860,20 @@ const TabLegacy = () => {
         </h2>
         <p style={{ fontSize: 15, lineHeight: 1.6, maxWidth: 760, opacity: 0.92, margin: 0 }}>
           Jack Kingston represented GA-1 for 22 years. Comparing his itemized donors (2004–2012, his last five House
-          re-elections) with Jim's this cycle — all in <strong>2026 dollars</strong> — shows a campaign that runs on the
-          same wealthy Savannah core, but raises far more, from wealthier and more metro-Atlanta donors.
+          re-elections) with Jim's this cycle — all in <strong>2026 dollars</strong> — shows a campaign built on the same
+          Savannah donor families: nearly one in eight of Jim's donors gave to his father, and he leans harder on metro-Atlanta.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginTop: 18 }}>
-          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{paceX}×</div><div style={{ fontSize: 12, opacity: 0.85 }}>Jim's haul vs Jack's per-cycle average</div></div>
-          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{L.overlap.n}</div><div style={{ fontSize: 12, opacity: 0.85 }}>of Jim's {jm.donors} donors also gave Jack</div></div>
-          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{jm.wealthyPct}% vs {jk.wealthyPct}%</div><div style={{ fontSize: 12, opacity: 0.85 }}>haul from wealthy GA ZIPs (Jim vs Jack)</div></div>
+          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{L.overlap.n}</div><div style={{ fontSize: 12, opacity: 0.85 }}>of Jim's {jm.donors} donors ({L.overlap.pct}%) also gave to Jack</div></div>
+          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{L.overlap.dollarPct}%</div><div style={{ fontSize: 12, opacity: 0.85 }}>of Jim's money ({fmtK(L.overlap.dollars)}) is from his father's donors</div></div>
+          <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{paceX}×</div><div style={{ fontSize: 12, opacity: 0.85 }}>Jim's pre-primary haul vs Jack's full-cycle average</div></div>
         </div>
       </div>
 
       {/* SHARED CORE */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="The inherited core" title="The same families fund both Kingstons"
-          kicker={`${L.overlap.n} of Jim's ${jm.donors} donors (${L.overlap.pct}%) gave directly to his father's 2004–2012 campaigns — ${fmtK(L.overlap.dollars)} of Jim's money (${L.overlap.dollarPct}%). They cluster at the very top: most maxed out to both. A conservative floor (it can't catch name changes, Jack's pre-2004 donors, or donors since deceased).`}/>
+          kicker={`${L.overlap.n} of Jim's ${jm.donors} donors (${L.overlap.pct}%) gave directly to his father's 2004–2012 campaigns — ${fmtK(L.overlap.dollars)} of Jim's money (${L.overlap.dollarPct}%), concentrated among his biggest givers. This is a conservative floor: the name match can't catch nicknames, Jack's pre-2004 donors, or donors since deceased, so the real carryover is higher.`}/>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
           {L.overlap.donors.map(([name, jimAmt, jackAmt]) => (
             <div key={name} style={{ padding: 12, background: P.bg, borderRadius: 8, borderLeft: `3px solid ${P.kingstonAccent}` }}>
@@ -2895,14 +2900,14 @@ const TabLegacy = () => {
         </div>
         <Bars data={geoData} xKey="cat"/>
         <WhyMatters>
-          A long-serving incumbent, Jack could raise broadly — 20% of his money came from outside Georgia (committee chairs attract national money). Jim, an open-seat challenger, leans far harder on the Atlanta donor class ({jm.geo.atlanta}% vs {jk.geo.atlanta}%) even as both keep their base in the district.
+          A long-serving incumbent, Jack raised broadly — {jk.geo.outState}% of his money came from outside Georgia, more than double Jim's {jm.geo.outState}% (seniority and committee posts attract national money). Jim, an open-seat challenger, leans harder on the Atlanta donor class ({jm.geo.atlanta}% vs {jk.geo.atlanta}%), even as both keep their base in the district.
         </WhyMatters>
       </Card>
 
       {/* WEALTH */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <SectionH eyebrow="The wealth shift" title="Jim's donors live in wealthier neighborhoods"
-          kicker="Share of classifiable dollars by the ACS median income of the donor's ZIP. Jim's base skews markedly more upper-middle and high income than his father's."/>
+        <SectionH eyebrow="Where the wealth is" title="Similar incomes — but Jim leans harder on the wealthy ZIPs"
+          kicker="Share of classifiable dollars by the ACS median income of the donor's ZIP. The two bases sit at nearly the same average donor-ZIP income, but Jim draws a markedly larger share from the wealthiest Georgia ZIPs and skews more upper-middle."/>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.4fr 1fr', gap: 18 }}>
           <Bars data={tierData} xKey="tier"/>
           <div style={{ display: 'grid', gridTemplateRows: 'repeat(2, 1fr)', gap: 12 }}>
@@ -2923,15 +2928,15 @@ const TabLegacy = () => {
       {/* OCCUPATIONS */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="Who gives" title="From farmers to attorneys"
-          kicker="Top donor occupations by number of unique donors. Jack's rolls carry a rural-Georgia signature (farmers); Jim's are heavier on urban professionals — attorneys, consultants, real estate."/>
+          kicker="Top donor occupations as a share of each man's donor base (so Jack's five cycles vs Jim's one window don't distort the count). Jack's rolls carry a rural-Georgia signature — farmers; Jim's tilt to urban professionals — attorneys, consultants, real estate."/>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-          {[['Jack (2004–12)', jk.occ, JACKC], ['Jim (2026)', jm.occ, P.kingston]].map(([who, occ, color]) => (
+          {[['Jack (2004–12)', jackOcc, JACKC], ['Jim (2026)', jimOcc, P.kingston]].map(([who, occ, color]) => (
             <div key={who}>
               <div style={{ fontSize: 12, fontWeight: 700, color, marginBottom: 8 }}>{who}</div>
-              {occ.map(([o, n]) => (
+              {occ.map(([o, pct]) => (
                 <div key={o} style={{ marginBottom: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}><span>{o}</span><span style={{ color: P.muted }}>{n}</span></div>
-                  <div style={{ height: 6, background: P.line, borderRadius: 3, marginTop: 2 }}><div style={{ width: `${n / occMax * 100}%`, height: '100%', background: color, borderRadius: 3 }}/></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}><span>{o}</span><span style={{ color: P.muted }}>{pct.toFixed(1)}%</span></div>
+                  <div style={{ height: 6, background: P.line, borderRadius: 3, marginTop: 2 }}><div style={{ width: `${pct / occMax * 100}%`, height: '100%', background: color, borderRadius: 3 }}/></div>
                 </div>
               ))}
             </div>
@@ -2942,7 +2947,7 @@ const TabLegacy = () => {
       {/* WEALTHY SAVANNAH CORE */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <SectionH eyebrow="The wealthy Savannah core" title="The same rich ZIPs, a generation apart"
-          kicker="Top wealthy Georgia ZIPs (ACS median HHI ≥ $90K) for each Kingston, in 2026 dollars. Skidaway, Wilmington, Richmond Hill, Pooler and St. Simons anchor both — the inherited money map."/>
+          kicker="Each wealthy Georgia ZIP (ACS median HHI ≥ $90K) as a share of that Kingston's total haul, so the comparison is fair across cycles. Skidaway, Wilmington, Richmond Hill and St. Simons anchor both — the inherited money map."/>
         <div style={{ display: 'grid', gap: 8 }}>
           {wzRows.map(({ z, h, jack, jim }) => {
             const mx = Math.max(...wzRows.map(r => Math.max(r.jack, r.jim)));
@@ -2958,7 +2963,7 @@ const TabLegacy = () => {
                     <div key={w} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11 }}>
                       <span style={{ width: 26, color: P.muted }}>{w}</span>
                       <div style={{ flex: 1, height: 13, background: P.bg, borderRadius: 3 }}><div style={{ width: `${v / mx * 100}%`, height: '100%', background: c, borderRadius: 3 }}/></div>
-                      <span style={{ width: 56, textAlign: 'right', fontWeight: 600 }}>{fmtK(v)}</span>
+                      <span style={{ width: 52, textAlign: 'right', fontWeight: 600 }}>{v.toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
@@ -2973,8 +2978,9 @@ const TabLegacy = () => {
         <div style={{ fontSize: 11, color: P.kingston, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, marginBottom: 6 }}>How to read this</div>
         <ul style={{ fontSize: 12.5, lineHeight: 1.6, color: P.ink, paddingLeft: 18, margin: 0 }}>
           <li><strong>Inflation:</strong> Jack's dollars are converted to 2026 dollars using CPI-U (U.S. BLS); a 2012 dollar ≈ $1.44 today.</li>
-          <li><strong>Limits differ:</strong> the per-election cap was ~$2,000–2,500 in Jack's era vs $3,500 now, so part of Jim's higher pace is structural — read the <em>profile</em> comparisons (shares, geography, occupations) as the cleaner signal.</li>
-          <li><strong>Scope:</strong> Jack = his 2004–2012 House cycles (FEC's structured Schedule A; his 1990s races and 2014 Senate run predate e-filing). Income from Census ACS 2019–2023; the donor overlap is a conservative last-name + first-name match.</li>
+          <li><strong>Pace is not like-for-like:</strong> Jim's total is one pre-primary window; Jack's is full two-year cycles, and the per-election cap was lower in his era (~$2,000–2,500 vs $3,500). Treat the {paceX}× as directional — the <em>profile</em> comparisons (shares, geography, occupations) are the cleaner signal.</li>
+          <li><strong>Income coverage:</strong> income figures cover the ~60% of Jack's donors (and ~85% of Jim's) whose ZIP has a published ACS median; out-of-state and rural ZIPs without an estimate are excluded.</li>
+          <li><strong>Scope:</strong> Jack = his 2004–2012 House cycles, reconciled to within ~1% of his FEC-reported itemized totals; his 1990s races and 2014 Senate run predate complete e-filing. The donor overlap is a conservative last-name + first-name match.</li>
         </ul>
       </Card>
     </div>
