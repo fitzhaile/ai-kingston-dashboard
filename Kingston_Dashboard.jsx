@@ -1798,10 +1798,10 @@ const TabInsights = () => {
           </p>
         </Insight>
 
-        <Insight n="03" tone="warm" title="The Atlanta Moat — $111K where opponents barely register"
-          stat={{ value: '$111K', label: 'Atlanta network' }}>
+        <Insight n="03" tone="warm" title="Some metro-Atlanta reach — $111K from five wealthy ZIPs"
+          stat={{ value: '$111K', label: '≈5% of his haul' }}>
           <p style={{ fontSize: 14, lineHeight: 1.65, margin: '0 0 12px', color: P.ink }}>
-            Five Atlanta-area ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$110,950 combined</strong>. Opponents took <strong>$5,100 total</strong> from the same ZIPs — about 5% of Kingston's haul. This is donor territory the field has almost entirely ceded to him.
+            Five wealthy metro-Atlanta ZIPs (Buckhead, Peachtree City, Sandy Springs, Midtown) gave Kingston <strong>$110,950 combined</strong> — about 5% of his haul, part of the metro-Atlanta money he's added beyond the coastal base. Opponents drew just <strong>$5,100 total</strong> from the same ZIPs, but at 5% it's a modest slice of his coalition, not a stronghold.
           </p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={atlantaZips} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
@@ -3256,7 +3256,7 @@ export default function Dashboard() {
             ))}
           </div>
           <div role="button" aria-label="Scroll tabs right" onClick={() => scrollNav(1)} style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0, width: 58,
+            position: 'absolute', top: 0, right: 0, bottom: 0, width: 72,
             pointerEvents: navOverflow.right ? 'auto' : 'none', cursor: 'pointer',
             background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 52%)`,
             opacity: navOverflow.right ? 1 : 0,
@@ -3265,10 +3265,10 @@ export default function Dashboard() {
             paddingRight: 7, paddingBottom: 2,
           }}>
             <span className="dk-nav-more" style={{
-              width: 27, height: 27, borderRadius: '50%', background: P.paper,
+              width: 24, height: 24, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 16, fontWeight: 700, lineHeight: 1,
             }}>›</span>
           </div>
           <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
@@ -3281,10 +3281,10 @@ export default function Dashboard() {
             paddingLeft: 7, paddingBottom: 2,
           }}>
             <span style={{
-              width: 27, height: 27, borderRadius: '50%', background: P.paper,
+              width: 24, height: 24, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 16, fontWeight: 700, lineHeight: 1,
             }}>‹</span>
           </div>
         </div>
