@@ -3146,11 +3146,6 @@ export default function Dashboard() {
         .dk-root ul { list-style: disc outside; }
         .dk-root ol { list-style: decimal outside; }
         .dk-root li { margin-bottom: 4px; }
-        /* Nudge the "more tabs" chevron so it's clear the nav strip scrolls sideways */
-        @keyframes dkNavNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
-        @media (prefers-reduced-motion: no-preference) {
-          .dk-root .dk-nav-more { animation: dkNavNudge 1.5s ease-in-out infinite; }
-        }
         @media (max-width: 768px) {
           /* Tighten outer container padding */
           .dk-root [style*="padding: 28px 32px"] { padding: 20px 14px !important; }
@@ -3265,10 +3260,10 @@ export default function Dashboard() {
             paddingRight: 7, paddingBottom: 2,
           }}>
             <span className="dk-nav-more" style={{
-              width: 24, height: 24, borderRadius: '50%', background: P.paper,
+              width: 22, height: 22, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 16, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 15, fontWeight: 700, lineHeight: 1,
             }}>›</span>
           </div>
           <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
@@ -3281,10 +3276,10 @@ export default function Dashboard() {
             paddingLeft: 7, paddingBottom: 2,
           }}>
             <span style={{
-              width: 24, height: 24, borderRadius: '50%', background: P.paper,
+              width: 22, height: 22, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 16, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 15, fontWeight: 700, lineHeight: 1,
             }}>‹</span>
           </div>
         </div>
