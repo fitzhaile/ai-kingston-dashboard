@@ -937,7 +937,7 @@ const TabDonors = () => {
       {/* Quality scorecard */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>Donor base quality scorecard</h3>
-        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because about 40% of his money comes from metro Atlanta, the rest of Georgia, and out-of-state.</p>
+        <p style={{ fontSize: 13, color: P.muted, margin: '0 0 16px' }}>Checkmark = best on that metric. Kingston leads on five of seven. The two without a winner (average gift, in-district %) are context metrics — his average gift is the field's largest, and his in-district share is the lowest because about 40% of his money is spread across metro Atlanta, the rest of Georgia, and out-of-state.</p>
         <div className="dk-scroll-hint" style={{ display: 'none', fontSize: 11, color: P.kingston, fontWeight: 700, marginBottom: 8, letterSpacing: '0.03em' }}>← swipe to compare all three candidates →</div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'DM Sans', fontSize: 14 }}>
@@ -975,7 +975,7 @@ const TabDonors = () => {
           </table>
         </div>
         <WhyMatters>
-          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston leads on five of seven; the two without a winner (average gift, in-district %) reflect the shape of his coalition — the field's largest average gift, and the lowest in-district share because about 40% of his money comes from metro Atlanta, the rest of Georgia, and out-of-state.
+          These seven metrics separate a real grassroots coalition from a "big-check" campaign that looks well-funded but has no depth. <strong>Repeat donor rate</strong> measures loyalty and future giving potential. <strong>Top-20 concentration</strong> measures fragility — if Farrell loses one of his top 20 donors, he loses over 2% of his entire war chest. <strong>Primary max-outs</strong> signals donor confidence in winning. Kingston leads on five of seven; the two without a winner (average gift, in-district %) reflect the shape of his coalition — the field's largest average gift, and the lowest in-district share because about 40% of his money is spread across metro Atlanta, the rest of Georgia, and out-of-state.
         </WhyMatters>
       </Card>
 
@@ -1389,7 +1389,7 @@ const TabGeography = () => {
       <Card style={{ padding: 26, marginBottom: 16 }}>
         <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: P.kingston }}>In-district, metro Atlanta, rest of Georgia, out-of-state</h3>
         <p style={{ fontSize: 13, color: P.muted, margin: '0 0 14px', maxWidth: 740 }}>
-          Farrell: 91% in-district, only <strong>5 out-of-state donors total.</strong> He has no national network. Kingston draws $434K from outside the coastal home base — $188K of it true metro Atlanta, the rest split between the rest of Georgia and out-of-state. Montgomery's out-of-state bloc ($48K) is his military brotherhood.
+          Farrell: 91% in-district, only <strong>5 out-of-state donors total.</strong> He has no national network. Kingston is less concentrated — 60% from the coastal home base, the rest spread across metro Atlanta, the rest of Georgia, and out-of-state. Montgomery's out-of-state bloc ($48K) is his military brotherhood.
         </p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={geoBars} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
@@ -2918,12 +2918,12 @@ const TabLegacy = () => {
       <div style={{ background: `linear-gradient(135deg, ${P.kingston} 0%, #2A4D7A 100%)`, color: '#FBF8F2', padding: '26px 30px', borderRadius: 14, marginBottom: 16 }}>
         <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700, opacity: 0.8, color: P.kingstonAccent }}>Like father, like son</div>
         <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, margin: '8px 0 10px', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
-          Jim inherited his father's donor core — then scaled it up and tilted it toward Atlanta
+          Jim inherited his father's donor core — then scaled it up and broadened its reach
         </h2>
         <p style={{ fontSize: 15, lineHeight: 1.6, maxWidth: 760, opacity: 0.92, margin: 0 }}>
           Jack Kingston represented GA-1 for 22 years. Comparing his itemized donors (2004–2012, his last five House
           re-elections) with Jim's this cycle — all in <strong>2026 dollars</strong> — shows a campaign built on the same
-          Savannah donor families: nearly one in eight of Jim's donors gave to his father, and he leans harder on metro-Atlanta.
+          Savannah donor families: nearly one in eight of Jim's donors gave to his father, with some metro-Atlanta money added on top.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginTop: 18 }}>
           <div><div style={{ fontFamily: 'Fraunces, serif', fontSize: 30, fontWeight: 600, color: P.kingstonAccent }}>{L.overlap.n}</div><div style={{ fontSize: 12, opacity: 0.85 }}>of Jim's {jm.donors} donors ({L.overlap.pct}%) also gave to Jack</div></div>
@@ -2952,8 +2952,8 @@ const TabLegacy = () => {
 
       {/* GEOGRAPHY */}
       <Card style={{ padding: 26, marginBottom: 16 }}>
-        <SectionH eyebrow="Where the money comes from" title="Jim leans on Atlanta; Jack reached out-of-state"
-          kicker="The coastal home-base map first, then the full four-way split. Jim draws more than double Jack's share from true metro-Atlanta ZIPs; Jack, a long-serving incumbent, reached further — a quarter of his money from outside Georgia, and more from the rest of the state. Both still anchor most of their giving in the Savannah district."/>
+        <SectionH eyebrow="Where the money comes from" title="Jim's money is homegrown; Jack reached out-of-state"
+          kicker="The coastal home-base map first, then the full four-way split. Both men anchor most of their money in the Savannah district; the differences sit at the edges. Jim has added some metro-Atlanta money on top of the home base, while Jack, a long-serving incumbent, reached further — a quarter of his haul from outside Georgia, and more from the rest of the state."/>
         <LegacyMaps/>
         <div style={{ fontSize: 11.5, color: P.muted, margin: '10px 2px 20px', lineHeight: 1.5 }}>
           Each coastal home-base ZIP is shaded by that candidate's itemized dollars (2026$), normalized to his own peak so
@@ -2963,7 +2963,7 @@ const TabLegacy = () => {
         </div>
         <Bars data={geoData} xKey="cat"/>
         <WhyMatters>
-          A long-serving incumbent, Jack cast the widest net — {jk.geo.outState}% of his money came from outside Georgia (more than double Jim's {jm.geo.outState}%) and another {jk.geo.restGA}% from the rest of the state beyond metro Atlanta — Moultrie, Warner Robins, Valdosta — the reach of a member with statewide standing. Jim, an open-seat challenger, is more homegrown ({jm.geo.inDist}% from the coastal district) but leans on the metro-Atlanta donor class {(jm.geo.metroAtl / jk.geo.metroAtl).toFixed(1)}× as hard as his father did ({jm.geo.metroAtl}% vs {jk.geo.metroAtl}%).
+          A long-serving incumbent, Jack cast the widest net — {jk.geo.outState}% of his money came from outside Georgia (more than double Jim's {jm.geo.outState}%) and another {jk.geo.restGA}% from the rest of the state beyond metro Atlanta — Moultrie, Warner Robins, Valdosta — the reach of a member with statewide standing. Jim, an open-seat challenger, is more homegrown — {jm.geo.inDist}% from the coastal district — and has simply added more metro-Atlanta money than his father did ({jm.geo.metroAtl}% vs {jk.geo.metroAtl}%), though the coast still anchors both.
         </WhyMatters>
       </Card>
 

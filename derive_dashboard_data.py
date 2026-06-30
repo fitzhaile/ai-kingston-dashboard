@@ -569,8 +569,8 @@ if '--check' in sys.argv:
     chk_text('Atlanta moat opponents total', f"{MOAT_OPP:,} total")
     chk_text('Atlanta moat stat value', f"value: '{fmtk(MOAT_K)}'")
 
-    # -- 'outside the coastal home base' dollars = metro Atlanta + rest of Georgia + out-of-state --
-    chk_text('Kingston outside-home-base dollars', f"{fmtk(GEO_D['K'][1] + GEO_D['K'][2] + GEO_D['K'][3])} from outside the coastal home base")
+    # -- Kingston's in-district (coastal home base) share, as stated in the geography narrative --
+    chk_text('Kingston coastal-base share', f"{round(GEO_D['K'][4])}% from the coastal home base")
 
     # -- 31416 head-to-head shares (Kingston's lowest-leading ZIP; Farrell's best) --
     z16 = zsum['K']['31416'] + zsum['M']['31416'] + zsum['F']['31416']
