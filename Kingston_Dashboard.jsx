@@ -3263,7 +3263,7 @@ export default function Dashboard() {
               width: 22, height: 22, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 15, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
             }}>›</span>
           </div>
           <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
@@ -3279,7 +3279,7 @@ export default function Dashboard() {
               width: 22, height: 22, borderRadius: '50%', background: P.paper,
               border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: P.kingston, fontSize: 15, fontWeight: 700, lineHeight: 1,
+              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
             }}>‹</span>
           </div>
         </div>
