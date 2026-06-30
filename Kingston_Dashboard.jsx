@@ -450,13 +450,30 @@ const TabOverview = () => {
     receipts: 2000000, cash: 1500000, donors: 650,
     pacDollars: 200000, inDistPct: 100, selfFundedInverse: 100, // inverse of self-funded % (higher=better)
   };
+  // Each row carries the normalized 0-100 values (for the radar shape) AND the real
+  // underlying values + a formatter (for the hover tooltip), so the tooltip shows the
+  // actual $ / count / % rather than the meaningless normalized number.
+  const pctFmt = (v) => v.toFixed(1) + '%';
+  const numFmt = (v) => v.toLocaleString();
   const radarData = [
-    { metric: 'Total\nReceipts',   Kingston: (FIN.Kingston.receipts/max.receipts)*100,        Montgomery: (FIN.Montgomery.receipts/max.receipts)*100,        Farrell: (FIN.Farrell.receipts/max.receipts)*100 },
-    { metric: 'Cash\non Hand',     Kingston: (FIN.Kingston.cash/max.cash)*100,                Montgomery: (FIN.Montgomery.cash/max.cash)*100,                Farrell: (FIN.Farrell.cash/max.cash)*100 },
-    { metric: 'Donor\nCount',      Kingston: (Q.Kingston.donors/max.donors)*100,              Montgomery: (Q.Montgomery.donors/max.donors)*100,              Farrell: (Q.Farrell.donors/max.donors)*100 },
-    { metric: 'PAC\nSupport',      Kingston: (FIN.Kingston.pac/max.pacDollars)*100,           Montgomery: (FIN.Montgomery.pac/max.pacDollars)*100,           Farrell: (FIN.Farrell.pac/max.pacDollars)*100 },
-    { metric: 'In-District\nShare', Kingston: Q.Kingston.inDistPct, Montgomery: Q.Montgomery.inDistPct, Farrell: Q.Farrell.inDistPct },
-    { metric: 'Grassroots\nIndex',  Kingston: 100 - Q.Kingston.selfPct, Montgomery: 100 - Q.Montgomery.selfPct, Farrell: 100 - Q.Farrell.selfPct },
+    { metric: 'Total\nReceipts', label: 'Total receipts', fmt: fmtK,
+      Kingston: (FIN.Kingston.receipts/max.receipts)*100, Montgomery: (FIN.Montgomery.receipts/max.receipts)*100, Farrell: (FIN.Farrell.receipts/max.receipts)*100,
+      raw: { Kingston: FIN.Kingston.receipts, Montgomery: FIN.Montgomery.receipts, Farrell: FIN.Farrell.receipts } },
+    { metric: 'Cash\non Hand', label: 'Cash on hand', fmt: fmtK,
+      Kingston: (FIN.Kingston.cash/max.cash)*100, Montgomery: (FIN.Montgomery.cash/max.cash)*100, Farrell: (FIN.Farrell.cash/max.cash)*100,
+      raw: { Kingston: FIN.Kingston.cash, Montgomery: FIN.Montgomery.cash, Farrell: FIN.Farrell.cash } },
+    { metric: 'Donor\nCount', label: 'Donor count', fmt: numFmt,
+      Kingston: (Q.Kingston.donors/max.donors)*100, Montgomery: (Q.Montgomery.donors/max.donors)*100, Farrell: (Q.Farrell.donors/max.donors)*100,
+      raw: { Kingston: Q.Kingston.donors, Montgomery: Q.Montgomery.donors, Farrell: Q.Farrell.donors } },
+    { metric: 'PAC\nSupport', label: 'PAC support', fmt: fmtK,
+      Kingston: (FIN.Kingston.pac/max.pacDollars)*100, Montgomery: (FIN.Montgomery.pac/max.pacDollars)*100, Farrell: (FIN.Farrell.pac/max.pacDollars)*100,
+      raw: { Kingston: FIN.Kingston.pac, Montgomery: FIN.Montgomery.pac, Farrell: FIN.Farrell.pac } },
+    { metric: 'In-District\nShare', label: 'In-district share', fmt: pctFmt,
+      Kingston: Q.Kingston.inDistPct, Montgomery: Q.Montgomery.inDistPct, Farrell: Q.Farrell.inDistPct,
+      raw: { Kingston: Q.Kingston.inDistPct, Montgomery: Q.Montgomery.inDistPct, Farrell: Q.Farrell.inDistPct } },
+    { metric: 'Grassroots\nIndex', label: 'Grassroots index (non-self-funded)', fmt: pctFmt,
+      Kingston: 100 - Q.Kingston.selfPct, Montgomery: 100 - Q.Montgomery.selfPct, Farrell: 100 - Q.Farrell.selfPct,
+      raw: { Kingston: 100 - Q.Kingston.selfPct, Montgomery: 100 - Q.Montgomery.selfPct, Farrell: 100 - Q.Farrell.selfPct } },
   ];
   // Custom 2-line radar tick (Recharts ignores the \n). The top label (Total Receipts)
   // renders above its vertex and the bottom one (PAC Support) below it, so neither
@@ -472,6 +489,22 @@ const TabOverview = () => {
       <text x={x} y={y} textAnchor={textAnchor} fontFamily="DM Sans" fontSize={isMobile ? 10 : 12} fontWeight={600} fill={P.ink}>
         {lines.map((l, i) => <tspan key={i} x={x} dy={`${i === 0 ? dy0 : L}em`}>{l}</tspan>)}
       </text>
+    );
+  };
+  // Tooltip for the radar — maps the hovered axis back to each candidate's real value.
+  const RadarTip = ({ active, payload }) => {
+    if (!active || !payload || !payload.length) return null;
+    const row = payload[0].payload;
+    return (
+      <div style={{ background: P.paper, border: `1px solid ${P.kingston}`, borderRadius: 8, padding: '8px 11px', fontFamily: 'DM Sans', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.14)' }}>
+        <div style={{ fontWeight: 700, color: P.kingston, marginBottom: 5 }}>{row.label}</div>
+        {payload.map(p => (
+          <div key={p.name} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginTop: 2 }}>
+            <span style={{ color: p.color, fontWeight: 600 }}>{p.name}</span>
+            <strong style={{ color: P.ink }}>{row.fmt(row.raw[p.name])}</strong>
+          </div>
+        ))}
+      </div>
     );
   };
 
@@ -563,6 +596,7 @@ const TabOverview = () => {
             <PolarGrid stroke={P.line}/>
             <PolarAngleAxis dataKey="metric" tick={radarTick}/>
             <PolarRadiusAxis angle={60} domain={[0, 100]} tick={{ fontFamily: 'DM Sans', fontSize: 10, fill: P.muted }} axisLine={false}/>
+            <Tooltip content={<RadarTip/>} cursor={{ stroke: P.line, strokeWidth: 1 }}/>
             <Radar name="Kingston"   dataKey="Kingston"   stroke={P.kingston}   fill={P.kingston}   fillOpacity={0.35} strokeWidth={2}/>
             <Radar name="Montgomery" dataKey="Montgomery" stroke={P.montgomery} fill={P.montgomery} fillOpacity={0.25} strokeWidth={2}/>
             <Radar name="Farrell"    dataKey="Farrell"    stroke={P.farrell}    fill={P.farrell}    fillOpacity={0.20} strokeWidth={2}/>
@@ -3112,6 +3146,11 @@ export default function Dashboard() {
         .dk-root ul { list-style: disc outside; }
         .dk-root ol { list-style: decimal outside; }
         .dk-root li { margin-bottom: 4px; }
+        /* Nudge the "more tabs" chevron so it's clear the nav strip scrolls sideways */
+        @keyframes dkNavNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+        @media (prefers-reduced-motion: no-preference) {
+          .dk-root .dk-nav-more { animation: dkNavNudge 1.5s ease-in-out infinite; }
+        }
         @media (max-width: 768px) {
           /* Tighten outer container padding */
           .dk-root [style*="padding: 28px 32px"] { padding: 20px 14px !important; }
@@ -3203,7 +3242,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
-          <div ref={navRef} className="dk-nav" style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div ref={navRef} className="dk-nav" style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch' }}>
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 background: 'none', border: 'none',
@@ -3217,25 +3256,37 @@ export default function Dashboard() {
             ))}
           </div>
           <div role="button" aria-label="Scroll tabs right" onClick={() => scrollNav(1)} style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0, width: 44,
+            position: 'absolute', top: 0, right: 0, bottom: 0, width: 58,
             pointerEvents: navOverflow.right ? 'auto' : 'none', cursor: 'pointer',
-            background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 65%)`,
+            background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 52%)`,
             opacity: navOverflow.right ? 1 : 0,
             transition: 'opacity 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-            paddingRight: 10, paddingBottom: 1,
-            color: P.kingston, fontSize: 22, fontWeight: 700, lineHeight: 1,
-          }}>›</div>
+            paddingRight: 7, paddingBottom: 2,
+          }}>
+            <span className="dk-nav-more" style={{
+              width: 27, height: 27, borderRadius: '50%', background: P.paper,
+              border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
+            }}>›</span>
+          </div>
           <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
-            position: 'absolute', top: 0, left: 0, bottom: 0, width: 44,
+            position: 'absolute', top: 0, left: 0, bottom: 0, width: 50,
             pointerEvents: navOverflow.left ? 'auto' : 'none', cursor: 'pointer',
-            background: `linear-gradient(to left, rgba(255,255,255,0), ${P.paper} 65%)`,
+            background: `linear-gradient(to left, rgba(255,255,255,0), ${P.paper} 55%)`,
             opacity: navOverflow.left ? 1 : 0,
             transition: 'opacity 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-            paddingLeft: 10, paddingBottom: 3,
-            color: P.kingston, fontSize: 20, fontWeight: 700, lineHeight: 1,
-          }}>‹</div>
+            paddingLeft: 7, paddingBottom: 2,
+          }}>
+            <span style={{
+              width: 27, height: 27, borderRadius: '50%', background: P.paper,
+              border: `1.5px solid ${P.kingston}`, boxShadow: '0 1px 5px rgba(0,0,0,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: P.kingston, fontSize: 17, fontWeight: 700, lineHeight: 1,
+            }}>‹</span>
+          </div>
         </div>
       </div>
 
