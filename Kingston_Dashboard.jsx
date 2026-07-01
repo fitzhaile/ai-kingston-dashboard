@@ -537,6 +537,187 @@ const StrandChart = ({ data }) => {
   );
 };
 
+// ---- Shared bits for the alternative comparison visualizations (#2–#5) ----
+const VIZ_CANDS = [
+  { key: 'Kingston', color: P.kingston },
+  { key: 'Montgomery', color: P.montgomery },
+  { key: 'Farrell', color: P.farrell },
+];
+const DIM_SHORT = { 'Total receipts': 'Receipts', 'Cash on hand': 'Cash', 'Donor count': 'Donors', 'PAC support': 'PAC', 'In-district share': 'In-district', 'Grassroots index (non-self-funded)': 'Grassroots' };
+const DIM_TINY = { 'Total receipts': 'Rcpts', 'Cash on hand': 'Cash', 'Donor count': 'Dnrs', 'PAC support': 'PAC', 'In-district share': 'In-D', 'Grassroots index (non-self-funded)': 'Grass' };
+const dimLabel = (label, narrow) => (narrow ? DIM_TINY : DIM_SHORT)[label] || label;
+function useVizWidth(ref) {
+  const [w, setW] = useState(820);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const m = () => setW(el.clientWidth || 820);
+    m(); const ro = new ResizeObserver(m); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return w;
+}
+
+// #2 — Connected-dot leaderboards: one 0–100 track per dimension; each candidate a dot,
+// joined by a line so you see the spread and who leads.
+const DotChart = ({ data }) => {
+  const ref = useRef(null); const w = useVizWidth(ref); const [hover, setHover] = useState(null);
+  const narrow = w < 560, W = Math.max(300, w);
+  const labelW = narrow ? 74 : 132, trackR = W - (narrow ? 18 : 34);
+  const rowH = narrow ? 42 : 50, padTop = 12, padBot = 26;
+  const H = padTop + data.length * rowH + padBot;
+  const xVal = (v) => labelW + (v / 100) * (trackR - labelW);
+  return (
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', maxWidth: '100%' }} onMouseLeave={() => setHover(null)}>
+        {[0, 50, 100].map((t) => (
+          <g key={t}>
+            <line x1={xVal(t)} y1={padTop} x2={xVal(t)} y2={H - padBot} stroke={P.line} strokeDasharray="2 5" />
+            <text x={xVal(t)} y={H - padBot + 15} textAnchor="middle" fontFamily="DM Sans" fontSize={9} fill={P.mutedLight}>{t}</text>
+          </g>
+        ))}
+        {data.map((d, i) => {
+          const y = padTop + rowH / 2 + i * rowH, on = hover === i;
+          const rows = VIZ_CANDS.map((c) => ({ ...c, x: xVal(d[c.key]), real: d.fmt(d.raw[c.key]) }));
+          const xs = rows.map((r) => r.x);
+          return (
+            <g key={i} onMouseEnter={() => setHover(i)} onClick={() => setHover(i)} style={{ cursor: 'pointer' }}>
+              <rect x={0} y={y - rowH / 2} width={W} height={rowH} fill={on ? P.bg : 'transparent'} />
+              <text x={labelW - 12} y={y} textAnchor="end" dominantBaseline="middle" fontFamily="DM Sans" fontSize={narrow ? 11 : 12.5} fontWeight={700} fill={P.ink}>{dimLabel(d.label, narrow)}</text>
+              <line x1={Math.min(...xs)} y1={y} x2={Math.max(...xs)} y2={y} stroke={P.line} strokeWidth={3} strokeLinecap="round" />
+              {rows.map((r, ri) => (
+                <g key={r.key}>
+                  <circle cx={r.x} cy={y} r={on ? 6.5 : 5} fill={r.color} stroke="#fff" strokeWidth={1.5} />
+                  {on && <text x={r.x} y={y - 12 - (ri % 2 ? 0 : 0)} textAnchor="middle" fontFamily="DM Sans" fontSize={9.5} fontWeight={700} fill={r.color}>{r.real}</text>}
+                </g>
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+};
+
+// #3 — Gauge matrix: a dial per candidate per dimension; the fuller the ring, the higher.
+const GaugeMatrix = ({ data }) => {
+  const ref = useRef(null); const w = useVizWidth(ref);
+  const narrow = w < 560, W = Math.max(300, w);
+  const labelW = narrow ? 52 : 104, padTop = 34, padBot = 8;
+  const nd = data.length, colW = (W - labelW - 6) / nd;
+  const rowH = narrow ? 66 : 88, R = Math.min(colW, rowH) / 2 - (narrow ? 13 : 17);
+  const H = padTop + VIZ_CANDS.length * rowH + padBot;
+  const gArc = (cx, cy, r, pct) => {
+    const a = Math.min(0.9999, Math.max(0.0001, pct)) * 2 * Math.PI;
+    const ex = cx + r * Math.sin(a), ey = cy - r * Math.cos(a), large = a > Math.PI ? 1 : 0;
+    return `M ${cx} ${(cy - r).toFixed(2)} A ${r} ${r} 0 ${large} 1 ${ex.toFixed(2)} ${ey.toFixed(2)}`;
+  };
+  return (
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', maxWidth: '100%' }}>
+        {data.map((d, i) => (
+          <text key={'h' + i} x={labelW + colW * (i + 0.5)} y={padTop - 15} textAnchor="middle" fontFamily="DM Sans" fontSize={narrow ? 9.5 : 11.5} fontWeight={700} fill={P.ink}>{dimLabel(d.label, narrow)}</text>
+        ))}
+        {VIZ_CANDS.map((c, ci) => {
+          const cyRow = padTop + rowH * ci + rowH / 2;
+          return (
+            <g key={c.key}>
+              <text x={labelW - 8} y={cyRow - 4} textAnchor="end" dominantBaseline="middle" fontFamily="Fraunces, serif" fontSize={narrow ? 11 : 14} fontWeight={600} fill={c.color}>{narrow ? c.key.slice(0, 4) + '.' : c.key}</text>
+              {data.map((d, i) => {
+                const cx = labelW + colW * (i + 0.5), cy = cyRow - 5;
+                return (
+                  <g key={i}>
+                    <circle cx={cx} cy={cy} r={R} fill="none" stroke={P.line} strokeWidth={R * 0.4} />
+                    <path d={gArc(cx, cy, R, d[c.key] / 100)} fill="none" stroke={c.color} strokeWidth={R * 0.4} strokeLinecap="round" />
+                    <text x={cx} y={cy + R + 12} textAnchor="middle" fontFamily="DM Sans" fontSize={narrow ? 8.5 : 10} fontWeight={600} fill={P.muted}>{d.fmt(d.raw[c.key])}</text>
+                  </g>
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+};
+
+// #4 — Candidate blooms: each candidate a six-petal bloom, a petal longer where stronger.
+const BloomChart = ({ data }) => {
+  const ref = useRef(null); const w = useVizWidth(ref); const [hover, setHover] = useState(null);
+  const narrow = w < 560, W = Math.max(300, w);
+  const nc = VIZ_CANDS.length, nd = data.length, cellW = W / nc;
+  const R = Math.min(cellW / 2 - (narrow ? 14 : 24), narrow ? 66 : 104);
+  const cy = (narrow ? 22 : 30) + R, H = cy + R + (narrow ? 46 : 58);
+  const petal = (cx, cyy, ang, len, wd) => {
+    const tx = cx + Math.cos(ang) * len, ty = cyy + Math.sin(ang) * len;
+    const bx = cx + Math.cos(ang) * len * 0.4, by = cyy + Math.sin(ang) * len * 0.4;
+    const px = Math.cos(ang + Math.PI / 2) * wd, py = Math.sin(ang + Math.PI / 2) * wd;
+    return `M ${cx.toFixed(1)} ${cyy.toFixed(1)} Q ${(bx + px).toFixed(1)} ${(by + py).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q ${(bx - px).toFixed(1)} ${(by - py).toFixed(1)} ${cx.toFixed(1)} ${cyy.toFixed(1)} Z`;
+  };
+  return (
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', maxWidth: '100%' }} onMouseLeave={() => setHover(null)}>
+        {VIZ_CANDS.map((c, ci) => {
+          const cx = cellW * (ci + 0.5);
+          return (
+            <g key={c.key}>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke={P.line} strokeDasharray="2 4" />
+              {data.map((d, i) => {
+                const ang = (i / nd) * 2 * Math.PI - Math.PI / 2, len = Math.max(7, (d[c.key] / 100) * R), on = hover === i;
+                return <path key={i} d={petal(cx, cy, ang, len, R * 0.34)} fill={c.color} fillOpacity={on ? 0.95 : 0.68} stroke={c.color} strokeWidth={on ? 1.5 : 0.8} strokeOpacity={0.6} onMouseEnter={() => setHover(i)} onClick={() => setHover(i)} style={{ cursor: 'pointer' }} />;
+              })}
+              <circle cx={cx} cy={cy} r={narrow ? 3 : 4} fill={c.color} />
+              <text x={cx} y={cy + R + (narrow ? 18 : 24)} textAnchor="middle" fontFamily="Fraunces, serif" fontSize={narrow ? 12 : 15} fontWeight={600} fill={c.color}>{c.key}</text>
+              {hover !== null && <text x={cx} y={cy + R + (narrow ? 32 : 40)} textAnchor="middle" fontFamily="DM Sans" fontSize={narrow ? 9.5 : 11} fontWeight={700} fill={c.color}>{data[hover].fmt(data[hover].raw[c.key])}</text>}
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ fontSize: 11, color: P.muted, textAlign: 'center', marginTop: 2, lineHeight: 1.5 }}>
+        Petals clockwise from top: <strong style={{ color: P.ink }}>{DIM_SHORT['Total receipts']} · {DIM_SHORT['Cash on hand']} · {DIM_SHORT['Donor count']} · {DIM_SHORT['PAC support']} · {DIM_SHORT['In-district share']} · {DIM_SHORT['Grassroots index (non-self-funded)']}</strong>. Hover a petal for the figure.
+      </div>
+    </div>
+  );
+};
+
+// #5 — Chernoff faces: each of the six dimensions drives a facial feature. Read character,
+// not numbers — big open faces = broad campaigns, small pinched faces = narrow ones.
+const FacesChart = ({ data }) => {
+  const ref = useRef(null); const w = useVizWidth(ref); const [hover, setHover] = useState(null);
+  const narrow = w < 560, W = Math.max(300, w);
+  const nc = VIZ_CANDS.length, cellW = W / nc;
+  const fs = Math.min(cellW * 0.34, narrow ? 58 : 92);
+  const cy = (narrow ? 16 : 24) + fs * 1.2, H = cy + fs * 1.2 + (narrow ? 30 : 40);
+  const g = (c, i) => data[i][c] / 100;
+  return (
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', maxWidth: '100%' }} onMouseLeave={() => setHover(null)}>
+        {VIZ_CANDS.map((c, ci) => {
+          const X = cellW * (ci + 0.5), col = c.color, on = hover === ci;
+          const rx = fs * (0.6 + 0.42 * g(c.key, 0)), ry = fs * (0.74 + 0.44 * g(c.key, 1));
+          const eyeR = fs * (0.05 + 0.11 * g(c.key, 2)), brow = (0.04 + 0.16 * g(c.key, 3)) * fs;
+          const noseL = fs * (0.1 + 0.2 * g(c.key, 4)), smile = (g(c.key, 5) - 0.45) * fs * 0.55;
+          const eyeY = cy - ry * 0.16, eyeDX = rx * 0.4, mouthY = cy + ry * 0.44, mouthW = rx * 0.52;
+          return (
+            <g key={c.key} onMouseEnter={() => setHover(ci)} onClick={() => setHover(ci)} style={{ cursor: 'pointer' }}>
+              <ellipse cx={X} cy={cy} rx={rx} ry={ry} fill={col} fillOpacity={on ? 0.22 : 0.12} stroke={col} strokeWidth={2.2} />
+              <circle cx={X - eyeDX} cy={eyeY} r={eyeR} fill={col} />
+              <circle cx={X + eyeDX} cy={eyeY} r={eyeR} fill={col} />
+              <line x1={X - eyeDX - eyeR * 1.4} y1={eyeY - eyeR - brow * 0.3} x2={X - eyeDX + eyeR * 1.4} y2={eyeY - eyeR - brow} stroke={col} strokeWidth={2.4} strokeLinecap="round" />
+              <line x1={X + eyeDX - eyeR * 1.4} y1={eyeY - eyeR - brow} x2={X + eyeDX + eyeR * 1.4} y2={eyeY - eyeR - brow * 0.3} stroke={col} strokeWidth={2.4} strokeLinecap="round" />
+              <line x1={X} y1={eyeY + eyeR + 3} x2={X} y2={eyeY + eyeR + 3 + noseL} stroke={col} strokeWidth={2} strokeLinecap="round" />
+              <path d={`M ${(X - mouthW / 2).toFixed(1)} ${mouthY.toFixed(1)} Q ${X} ${(mouthY + smile).toFixed(1)} ${(X + mouthW / 2).toFixed(1)} ${mouthY.toFixed(1)}`} fill="none" stroke={col} strokeWidth={2.6} strokeLinecap="round" />
+              <text x={X} y={cy + ry + (narrow ? 15 : 20)} textAnchor="middle" fontFamily="Fraunces, serif" fontSize={narrow ? 12 : 15} fontWeight={600} fill={col}>{c.key}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ fontSize: 11, color: P.muted, textAlign: 'center', marginTop: 4, lineHeight: 1.5 }}>
+        <strong style={{ color: P.ink }}>Face width</strong> = receipts · <strong style={{ color: P.ink }}>height</strong> = cash · <strong style={{ color: P.ink }}>eyes</strong> = donors · <strong style={{ color: P.ink }}>brows</strong> = PAC · <strong style={{ color: P.ink }}>nose</strong> = in-district · <strong style={{ color: P.ink }}>smile</strong> = grassroots
+      </div>
+    </div>
+  );
+};
+
 const TabOverview = () => {
   const isMobile = useIsMobile();
   const totalField = FIN.Kingston.receipts + FIN.Montgomery.receipts + FIN.Farrell.receipts;
@@ -743,8 +924,8 @@ const TabOverview = () => {
       </Card>
 
       {/* Flowing strands — an unconventional companion to the radar */}
-      <Card style={{ padding: 28 }}>
-        <SectionH eyebrow="The same race, another way" title="Three signatures, six dimensions"
+      <Card style={{ padding: 28, marginBottom: 24 }}>
+        <SectionH eyebrow="#1 · Flowing strands" title="Three signatures, six dimensions"
           kicker="An unconventional companion to the radar above: each candidate is a ribbon flowing through the six dimensions — swelling where they're strong, thinning where they're weak. Kingston's stays broad the whole way; the challengers run thin and bulge only where they compete — Farrell on in-district loyalty, Montgomery on grassroots. Hover or tap any dimension for the real numbers."/>
         <StrandChart data={radarData} />
         <div style={{ display: 'flex', justifyContent: 'center', gap: 22, paddingTop: 14, fontFamily: 'DM Sans', fontSize: 12.5 }}>
@@ -754,6 +935,41 @@ const TabOverview = () => {
             </span>
           ))}
         </div>
+      </Card>
+
+      {/* #2 — connected-dot leaderboards */}
+      <Card style={{ padding: 28, marginBottom: 24 }}>
+        <SectionH eyebrow="#2 · Connected dots" title="Six leaderboards, one race"
+          kicker="One track per dimension, 0 to 100. Each candidate is a dot and the line joins them, so you can read the spread and who leads each measure at a glance. Hover or tap a row for the real figures."/>
+        <DotChart data={radarData} />
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 22, paddingTop: 12, fontFamily: 'DM Sans', fontSize: 12.5 }}>
+          {['Kingston', 'Montgomery', 'Farrell'].map(n => (
+            <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 2, background: C[n].color }}/>{n}
+            </span>
+          ))}
+        </div>
+      </Card>
+
+      {/* #3 — gauge matrix */}
+      <Card style={{ padding: 28, marginBottom: 24 }}>
+        <SectionH eyebrow="#3 · Gauge matrix" title="The scorecard, as dials"
+          kicker="A dial for every candidate on every dimension — the fuller the ring, the higher the value, with the real figure beneath. Read across a row for one candidate's whole profile, or down a column to compare the three."/>
+        <GaugeMatrix data={radarData} />
+      </Card>
+
+      {/* #4 — candidate blooms */}
+      <Card style={{ padding: 28, marginBottom: 24 }}>
+        <SectionH eyebrow="#4 · Candidate blooms" title="Three blooms, six petals"
+          kicker="Each candidate is a six-petal bloom; a petal grows longer the stronger they are on that dimension. Kingston's opens wide and even; the challengers throw one or two long petals and leave the rest short."/>
+        <BloomChart data={radarData} />
+      </Card>
+
+      {/* #5 — Chernoff faces */}
+      <Card style={{ padding: 28 }}>
+        <SectionH eyebrow="#5 · Chernoff faces" title="Three faces, six features"
+          kicker="The classic 1970s trick: each dimension drives a facial feature (mapped below). You don't read exact numbers here — you read character. Kingston's face is big and open; the challengers' come out small and pinched."/>
+        <FacesChart data={radarData} />
       </Card>
     </div>
   );
