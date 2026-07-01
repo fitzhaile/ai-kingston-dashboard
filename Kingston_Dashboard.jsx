@@ -441,6 +441,102 @@ const useIsMobile = () => {
 /* ============================================================
    TAB 1: OVERVIEW
    ============================================================ */
+// Flowing-strands chart — an unconventional companion to the radar. Each candidate is a
+// smooth filled ribbon across the six dimensions, swelling where they're strong and
+// narrowing where they're weak (same normalized 0-100 values as the radar). Hover/tap a
+// dimension for the real underlying figures. Renders at the measured pixel width so text
+// stays crisp at any size.
+const StrandChart = ({ data }) => {
+  const wrapRef = useRef(null);
+  const [w, setW] = useState(820);
+  const [hover, setHover] = useState(null);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => setW(el.clientWidth || 820);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const cands = [
+    { key: 'Kingston', color: P.kingston },
+    { key: 'Montgomery', color: P.montgomery },
+    { key: 'Farrell', color: P.farrell },
+  ];
+  const narrow = w < 560;
+  const SHORT = narrow
+    ? { 'Total receipts': 'Rcpts', 'Cash on hand': 'Cash', 'Donor count': 'Dnrs', 'PAC support': 'PAC', 'In-district share': 'In-D', 'Grassroots index (non-self-funded)': 'Grass' }
+    : { 'Total receipts': 'Receipts', 'Cash on hand': 'Cash', 'Donor count': 'Donors', 'PAC support': 'PAC', 'In-district share': 'In-district', 'Grassroots index (non-self-funded)': 'Grassroots' };
+  const nd = data.length;
+  const W = Math.max(300, w);
+  const padL = narrow ? 62 : 112, padR = narrow ? 30 : 58, padTop = 46, padBot = 16;
+  const laneH = narrow ? 60 : 84, laneGap = 8;
+  const H = padTop + cands.length * laneH + (cands.length - 1) * laneGap + padBot;
+  const innerW = W - padL - padR;
+  const xAt = (i) => padL + innerW * (i / (nd - 1));
+  const colW = innerW / (nd - 1);
+  const maxHalf = laneH / 2 - 6;
+  const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+  const smooth = (pts) => {
+    let s = '';
+    for (let i = 1; i < pts.length; i++) {
+      const p0 = pts[i - 2] || pts[i - 1], p1 = pts[i - 1], p2 = pts[i], p3 = pts[i + 1] || p2;
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      s += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    return s;
+  };
+  const ribbon = (midY, vals) => {
+    const half = vals.map((v) => Math.max(1.6, (v / 100) * maxHalf));
+    const top = data.map((_, i) => [xAt(i), midY - half[i]]);
+    const bot = data.map((_, i) => [xAt(nd - 1 - i), midY + half[nd - 1 - i]]);
+    return `M ${top[0][0].toFixed(1)} ${top[0][1].toFixed(1)}${smooth(top)} L ${bot[0][0].toFixed(1)} ${bot[0][1].toFixed(1)}${smooth(bot)} Z`;
+  };
+  return (
+    <div ref={wrapRef} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', maxWidth: '100%' }} onMouseLeave={() => setHover(null)}>
+        {data.map((d, i) => (
+          <g key={'ax' + i}>
+            <line x1={xAt(i)} y1={padTop - 4} x2={xAt(i)} y2={H - padBot} stroke={hover === i ? P.kingston : P.line}
+              strokeWidth={1} strokeDasharray={hover === i ? undefined : '2 5'} strokeOpacity={hover === i ? 0.4 : 1} />
+            <text x={xAt(i)} y={padTop - 16} textAnchor="middle" fontFamily="DM Sans" fontSize={narrow ? 10 : 12}
+              fontWeight={700} fill={hover === i ? P.kingston : P.ink}>{SHORT[d.label] || d.label}</text>
+          </g>
+        ))}
+        {cands.map((c, ci) => {
+          const midY = padTop + laneH / 2 + ci * (laneH + laneGap);
+          return <path key={c.key} d={ribbon(midY, data.map((d) => d[c.key]))} fill={c.color} fillOpacity={0.88}
+            stroke={c.color} strokeWidth={1.2} strokeOpacity={0.5} />;
+        })}
+        {cands.map((c, ci) => {
+          const midY = padTop + laneH / 2 + ci * (laneH + laneGap);
+          return <text key={'lb' + c.key} x={narrow ? 8 : 14} y={midY} dominantBaseline="middle" fontFamily="Fraunces, serif"
+            fontSize={narrow ? 11 : 15} fontWeight={600} fill={c.color}>{narrow ? c.key.slice(0, 4) + '.' : c.key}</text>;
+        })}
+        {hover !== null && cands.map((c) => {
+          const midY = padTop + laneH / 2 + cands.indexOf(c) * (laneH + laneGap);
+          const d = data[hover], label = d.fmt(d.raw[c.key]);
+          const pw = Math.max(38, label.length * (narrow ? 6.4 : 7.2) + 12);
+          const px = clamp(xAt(hover), padL + pw / 2, W - padR - pw / 2);
+          return (
+            <g key={'pill' + c.key} style={{ pointerEvents: 'none' }}>
+              <rect x={px - pw / 2} y={midY - 10} width={pw} height={20} rx={10} fill={P.paper} stroke={c.color} strokeWidth={1.3} />
+              <text x={px} y={midY + 1} textAnchor="middle" dominantBaseline="middle" fontFamily="DM Sans"
+                fontSize={narrow ? 10 : 11} fontWeight={700} fill={c.color}>{label}</text>
+            </g>
+          );
+        })}
+        {data.map((d, i) => (
+          <rect key={'hz' + i} x={xAt(i) - colW / 2} y={padTop - 4} width={colW} height={H - padTop - padBot + 4}
+            fill="transparent" onMouseEnter={() => setHover(i)} onClick={() => setHover(i)} style={{ cursor: 'pointer' }} />
+        ))}
+      </svg>
+    </div>
+  );
+};
+
 const TabOverview = () => {
   const isMobile = useIsMobile();
   const totalField = FIN.Kingston.receipts + FIN.Montgomery.receipts + FIN.Farrell.receipts;
@@ -615,7 +711,7 @@ const TabOverview = () => {
       </Card>
 
       {/* Timeline */}
-      <Card style={{ padding: 28 }}>
+      <Card style={{ padding: 28, marginBottom: 24 }}>
         <SectionH eyebrow="Campaign chronology" title="How the race took shape" kicker="Ten months of campaign activity, mapped against the primary clock."/>
         <div style={{ position: 'relative', padding: '10px 0 10px 30px', borderLeft: `2px solid ${P.line}` }}>
           {TIMELINE.map((ev, i) => {
@@ -643,6 +739,20 @@ const TabOverview = () => {
               </div>
             );
           })}
+        </div>
+      </Card>
+
+      {/* Flowing strands — an unconventional companion to the radar */}
+      <Card style={{ padding: 28 }}>
+        <SectionH eyebrow="The same race, another way" title="Three signatures, six dimensions"
+          kicker="An unconventional companion to the radar above: each candidate is a ribbon flowing through the six dimensions — swelling where they're strong, thinning where they're weak. Kingston's stays broad the whole way; the challengers run thin and bulge only where they compete — Farrell on in-district loyalty, Montgomery on grassroots. Hover or tap any dimension for the real numbers."/>
+        <StrandChart data={radarData} />
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 22, paddingTop: 14, fontFamily: 'DM Sans', fontSize: 12.5 }}>
+          {['Kingston', 'Montgomery', 'Farrell'].map(n => (
+            <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 2, background: C[n].color }}/>{n}
+            </span>
+          ))}
         </div>
       </Card>
     </div>
