@@ -3482,13 +3482,15 @@ export default function Dashboard() {
           .dk-root [style*="justify-content: space-between"][style*="align-items: center"] {
             flex-wrap: wrap; gap: 10px;
           }
-          /* Mobile masthead: logo + district/date sit together on the top row (date
-             next to the logo); the eyebrow + title wrap to the row below at the 14px
-             edge shared with the nav and content */
-          .dk-root .dk-masthead-inner { flex-wrap: wrap !important; gap: 13px 17px !important; }
-          .dk-root .dk-masthead-text { order: 2; flex-basis: 100%; }
-          .dk-root .dk-masthead-meta { order: 1; margin-left: 0 !important; text-align: left !important; }
-          .dk-root .dk-masthead-title { font-size: 18px !important; line-height: 1.2; }
+          /* Mobile hero: tighten padding to the 14px edge shared with the nav/content,
+             left-align the top bar (don't spread its three items across the row),
+             shrink the logo and top-align it against the wrapped title, and stack the
+             subhead above its source line */
+          .dk-root .dk-hero-inner { padding: 18px 14px 16px !important; }
+          .dk-root .dk-herobar { justify-content: flex-start !important; gap: 6px 14px !important; font-size: 10px !important; margin-bottom: 14px !important; }
+          .dk-root .dk-hero-titlerow { gap: 13px !important; align-items: flex-start !important; }
+          .dk-root .dk-hero-logo { width: 46px !important; height: 46px !important; font-size: 26px !important; border-radius: 12px !important; }
+          .dk-root .dk-hero-sub { flex-direction: column !important; gap: 7px !important; margin-top: 12px !important; }
           .dk-root .dk-nav { padding-left: 14px !important; padding-right: 14px !important; }
           /* Hide the redundant oversized "Apr 29" hero stat on mobile (the date is in
              the masthead); it dominates the small screen and skews the hierarchy */
@@ -3544,42 +3546,69 @@ export default function Dashboard() {
         }
       `}</style>
 
-      {/* Masthead */}
-      <div style={{ background: P.paper, borderBottom: `1px solid ${P.line}`, position: 'sticky', top: 0, zIndex: 10 }}>
-        <div className="dk-masthead-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div className="dk-masthead-logo" style={{
-            width: 38, height: 38, borderRadius: 10,
-            background: `linear-gradient(135deg, ${P.kingston}, ${P.kingstonLight})`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: P.kingstonAccent, fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 600, fontStyle: 'italic',
-          }}>K</div>
-          <div className="dk-masthead-text">
-            <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: P.muted, fontWeight: 700 }}>A Campaign-Finance Analysis</div>
-            <div className="dk-masthead-title" style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: P.kingston }}>Jim Kingston's Fundraising, Examined</div>
+      {/* Hero masthead — editorial "almanac" style (matches the header house style) */}
+      <div style={{ background: P.bg, borderBottom: `3px double ${P.kingston}` }}>
+        <div className="dk-hero-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '26px 32px 20px' }}>
+          {/* Top bar: section label · gold seal · data-through date */}
+          <div className="dk-herobar" style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 11,
+            letterSpacing: '0.14em', textTransform: 'uppercase', color: P.muted, marginBottom: 18,
+          }}>
+            <span>A Campaign-Finance Analysis</span>
+            <span style={{ color: P.kingstonAccent, fontWeight: 700 }}>◆&nbsp;&nbsp;GA-1 Republican Primary&nbsp;&nbsp;◆</span>
+            <span>Data through Apr 29, 2026</span>
           </div>
-          <div className="dk-masthead-meta" style={{ textAlign: 'right', marginLeft: 'auto' }}>
-            <div style={{ fontSize: 10, color: P.muted, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>GA-1 Republican Primary</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: P.kingston }}>Data through Apr 29, 2026</div>
+          {/* Title: logo badge + big serif headline with a gold accent word */}
+          <div className="dk-hero-titlerow" style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div className="dk-hero-logo" style={{
+              width: 58, height: 58, borderRadius: 14, flex: 'none',
+              background: `linear-gradient(135deg, ${P.kingston}, ${P.kingstonLight})`,
+              border: `2px solid ${P.kingstonAccent}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: P.kingstonAccent, fontFamily: 'Fraunces, serif', fontSize: 33, fontWeight: 700, fontStyle: 'italic',
+            }}>K</div>
+            <h1 className="dk-hero-title" style={{
+              margin: 0, fontFamily: 'Fraunces, serif', fontWeight: 600,
+              fontSize: 'clamp(28px, 5.2vw, 52px)', lineHeight: 1.03, letterSpacing: '-0.015em', color: P.kingston,
+            }}>Jim Kingston's Fundraising, <span style={{ fontStyle: 'italic', color: P.kingstonAccent }}>Examined</span></h1>
+          </div>
+          {/* Subhead: italic serif blurb + monospace source line */}
+          <div className="dk-hero-sub" style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 14, flexWrap: 'wrap', marginTop: 16,
+          }}>
+            <span style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 'clamp(15px, 2vw, 20px)', color: P.ink, maxWidth: 760 }}>
+              A close read of the money, the donors, and the legacy network behind the frontrunner.
+            </span>
+            <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 11.5, letterSpacing: '0.09em', textTransform: 'uppercase', color: P.mutedLight, whiteSpace: 'nowrap' }}>
+              Savannah · from FEC filings
+            </span>
           </div>
         </div>
+      </div>
+
+      {/* Sticky nav — numbered tabs, gold underline, frosted-cream bar */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, background: 'rgba(251,248,242,0.82)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderBottom: `1px solid ${P.line}` }}>
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto' }}>
           <div ref={navRef} className="dk-nav" style={{ padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch' }}>
-            {TABS.map(t => (
+            {TABS.map((t, i) => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 background: 'none', border: 'none',
-                borderBottom: tab === t.id ? `3px solid ${P.kingston}` : '3px solid transparent',
-                padding: '12px 16px', fontFamily: 'DM Sans', fontSize: 13,
+                borderBottom: tab === t.id ? `3px solid ${P.kingstonAccent}` : '3px solid transparent',
+                padding: '13px 15px', fontFamily: 'DM Sans', fontSize: 13,
                 fontWeight: tab === t.id ? 700 : 500,
                 color: tab === t.id ? P.kingston : P.muted,
                 cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap',
                 transition: 'color 0.15s',
-              }}>{t.label}</button>
+              }}>
+                <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 10, color: P.kingstonAccent, marginRight: 6, fontWeight: 600 }}>{String(i + 1).padStart(2, '0')}</span>{t.label}
+              </button>
             ))}
           </div>
           <div role="button" aria-label="Scroll tabs right" onClick={() => scrollNav(1)} style={{
             position: 'absolute', top: 0, right: 0, bottom: 0, width: 72,
             pointerEvents: navOverflow.right ? 'auto' : 'none', cursor: 'pointer',
-            background: `linear-gradient(to right, rgba(255,255,255,0), ${P.paper} 52%)`,
+            background: `linear-gradient(to right, rgba(251,248,242,0), ${P.bg} 52%)`,
             opacity: navOverflow.right ? 1 : 0,
             transition: 'opacity 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
@@ -3595,7 +3624,7 @@ export default function Dashboard() {
           <div role="button" aria-label="Scroll tabs left" onClick={() => scrollNav(-1)} style={{
             position: 'absolute', top: 0, left: 0, bottom: 0, width: 50,
             pointerEvents: navOverflow.left ? 'auto' : 'none', cursor: 'pointer',
-            background: `linear-gradient(to left, rgba(255,255,255,0), ${P.paper} 55%)`,
+            background: `linear-gradient(to left, rgba(251,248,242,0), ${P.bg} 55%)`,
             opacity: navOverflow.left ? 1 : 0,
             transition: 'opacity 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
