@@ -21,10 +21,39 @@
     <meta name="twitter:image" content="https://data.fitzhaile.com/d/kingston-fundraising/og-image.png" />
     
     <!-- BEGIN: Google tag (gtag.js) — loads only on the production host
-         (data.fitzhaile.com); dev, previews, and mirrors are excluded so they
-         never pollute analytics -->
+         (data.fitzhaile.com); dev, previews, and mirrors are excluded. Visitors
+         can permanently opt this browser out by visiting once with ?notrack -->
     <script>
       (function () {
+        var GA_ID = 'G-GED32DB63G';
+        var OPTOUT_KEY = 'ga-optout';
+
+        function isOptedOut() {
+          try { return localStorage.getItem(OPTOUT_KEY) === '1'; }
+          catch (e) { return false; }  // storage blocked (private mode) -> not opted out
+        }
+
+        // Per-browser opt-out: visiting .../?notrack (or #notrack) once saves a
+        // flag in this browser's localStorage and never starts GA again — no
+        // installs, nothing to maintain. Share the ?notrack link with anyone who
+        // shouldn't be counted (works on phones too). Undo by clearing site data.
+        if (/[?#&]notrack\b/i.test(location.href)) {
+          try { localStorage.setItem(OPTOUT_KEY, '1'); } catch (e) {}
+          window['ga-disable-' + GA_ID] = true;  // GA's own kill switch, belt-and-suspenders
+          console.info('[analytics] Opt-out saved — Google Analytics is now off for ' +
+                       'this browser and will stay off on future visits. To undo, ' +
+                       "clear this site's browser data.");
+          return;
+        }
+
+        // Honor a prior opt-out on every load, before anything starts.
+        if (isOptedOut()) {
+          window['ga-disable-' + GA_ID] = true;
+          console.info('[analytics] Google Analytics is disabled for this browser ' +
+                       '(opted out earlier via a ?notrack link).');
+          return;
+        }
+
         // Allowlist: run GA4 only on the live production host. Everything else —
         // localhost, LAN IPs, tunnels, preview deploys, mirrors — is excluded by
         // default, so no dev or preview traffic ever lands in analytics.
@@ -33,13 +62,13 @@
         // Load gtag.js dynamically (replaces the <script async src=...> tag)
         var s = document.createElement('script');
         s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-GED32DB63G';
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
         document.head.appendChild(s);
       
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-GED32DB63G', { send_page_view: false });
+        gtag('config', GA_ID, { send_page_view: false });
       
         function tabUrl() {
           var frag = location.hash.replace('#', '');
