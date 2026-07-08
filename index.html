@@ -19,20 +19,55 @@
     <meta name="twitter:title" content="Jim Kingston's Fundraising, Examined" />
     <meta name="twitter:description" content="$1.86M raised — 67% of the field's money — and the legacy donor network behind the GA-1 Republican primary frontrunner." />
     <meta name="twitter:image" content="https://data.fitzhaile.com/d/kingston-fundraising/og-image.png" />
-    <!-- Google Analytics (gtag.js) — only loads on the live site (data.fitzhaile.com),
-         so localhost/dev and any preview host never touch analytics. -->
+    
+    <!-- BEGIN: Google tag (gtag.js) — only on the production host, so Render/Pages
+        deploys and local previews don't pollute analytics -->
     <script>
-      if (location.hostname === 'data.fitzhaile.com') {
+      (function () {
+        var isLocal =
+          location.hostname === 'localhost' ||
+          location.hostname === '127.0.0.1' ||
+          location.hostname === '0.0.0.0' ||
+          location.hostname.endsWith('.local') ||
+          location.hostname.endsWith('.test');
+      
+        if (isLocal) return; // no GA4 script loaded, nothing fires
+      
+        // Load gtag.js dynamically (replaces the <script async src=...> tag)
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-GED32DB63G';
+        document.head.appendChild(s);
+      
         window.dataLayer = window.dataLayer || [];
-        window.gtag = function () { window.dataLayer.push(arguments); };
-        var gaScript = document.createElement('script');
-        gaScript.async = true;
-        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-GED32DB63G';
-        document.head.appendChild(gaScript);
-        window.gtag('js', new Date());
-        window.gtag('config', 'G-GED32DB63G');
-      }
-    </script>
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GED32DB63G', { send_page_view: false });
+      
+        function tabUrl() {
+          var frag = location.hash.replace('#', '');
+          return location.origin + location.pathname + (frag ? frag + '/' : '');
+        }
+      
+        var lastUrl = null;
+        function sendPageView() {
+          var url = tabUrl();
+          if (url === lastUrl) return;
+          lastUrl = url;
+          gtag('event', 'page_view', {
+            page_location: url,
+            page_title: document.title
+          });
+        }
+      
+        sendPageView();
+        window.addEventListener('hashchange', sendPageView);
+      })();
+  </script>
+  <!-- END: Google tag (gtag.js) — only on the production host, so Render/Pages
+       deploys and local previews don't pollute analytics -->
+
+
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231E3A5F%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2246%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2242%22%20font-weight%3D%22700%22%20fill%3D%22%23D4A94A%22%20text-anchor%3D%22middle%22%3EK%3C%2Ftext%3E%3C%2Fsvg%3E" />
   </head>
   <body>
